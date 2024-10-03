@@ -3,7 +3,8 @@
   "profiles": {
     "http": {
       "commandName": "Project",
-      "dotnetRunMessages": true
+      "dotnetRunMessages": true,
+      "workingDirectory": "$(OutDir)"
     }
   }
 }
