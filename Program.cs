@@ -2,28 +2,27 @@ using System.Data;
 using System.Data.SQLite;
 using Dapper;
 using Serilog;
-using Serilog.Events;
 using sproj;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-    .WriteTo.Seq("http://localhost:5341")
+    .MinimumLevel.Verbose()
     .WriteTo.Console()
-    .CreateLogger();
+    .CreateBootstrapLogger();
 
 try {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    // Register services
-    builder.Host.UseSerilog();
-    builder.Services.AddSingleton<IDbConnection>(new SQLiteConnection("Data Source=db.sqlite"));
+    if (builder.Environment.IsDevelopment()) {
+        var connectionString = builder.Configuration.GetConnectionString("SQLite");
+        builder.Services.AddSingleton<IDbConnection>(new SQLiteConnection(connectionString));
+    }
+    
+    builder.Services.AddSerilog(lc => lc.ReadFrom.Configuration(builder.Configuration));
 
     WebApplication app = builder.Build();
 
     InitDb(app.Services.GetRequiredService<IDbConnection>());
 
-    // Middleware
     app.UseSerilogRequestLogging();
 
     app.MapGet("/users",
@@ -44,4 +43,6 @@ void InitDb(IDbConnection connection) {
     var sqlFilePath = "init_db.sql";
     var createTableQuery = File.ReadAllText(sqlFilePath);
     connection.Execute(createTableQuery);
+    
+    Log.Information("Database successfully initialized");
 }
