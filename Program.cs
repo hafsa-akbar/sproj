@@ -17,7 +17,7 @@ try {
 
     // Register services
     builder.Host.UseSerilog();
-    builder.Services.AddSingleton<IDbConnection>(new SQLiteConnection("Data Source=database.db"));
+    builder.Services.AddSingleton<IDbConnection>(new SQLiteConnection("Data Source=db.sqlite"));
 
     WebApplication app = builder.Build();
 

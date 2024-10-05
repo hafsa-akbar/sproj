@@ -11,8 +11,6 @@
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="init_db.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Update="init_db.sql" CopyToPublishDirectory="Always" />
   </ItemGroup>
 </Project>
