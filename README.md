@@ -11,6 +11,6 @@ The platform offers a free service that enhances visibility and employment oppor
 
 ### Tech Stack
 - **Backend**: ASP.NET – for building a scalable and secure backend architecture.
-- **Frontend**: Swevel – for creating a responsive and user-friendly interface.
+- **Frontend**: Svelte – for creating a responsive and user-friendly interface.
 
 

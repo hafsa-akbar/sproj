@@ -12,12 +12,13 @@ Log.Logger = new LoggerConfiguration()
 try {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+    builder.Services.AddSerilog(lc => lc.ReadFrom.Configuration(builder.Configuration));
+    builder.Services.AddProblemDetails();
+    
     if (builder.Environment.IsDevelopment()) {
         var connectionString = builder.Configuration.GetConnectionString("SQLite");
         builder.Services.AddSingleton<IDbConnection>(new SQLiteConnection(connectionString));
     }
-    
-    builder.Services.AddSerilog(lc => lc.ReadFrom.Configuration(builder.Configuration));
 
     WebApplication app = builder.Build();
 
@@ -31,6 +32,7 @@ try {
         await connection.ExecuteAsync("insert into users (username, password) values (@username, @password);", user);
         return Results.Created();
     });
+    app.MapGet("/error", void () => throw new Exception());
 
     app.Run();
 } catch (Exception ex) {
