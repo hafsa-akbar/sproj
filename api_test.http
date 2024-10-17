@@ -1,2 +1,7 @@
 ### GET request to example server
-GET http://localhost:5000/users
+GET http://localhost:5000/error
+Accept: text/html,application/json
+
+
+### GET request to example server
+GET http://localhost:5000/dontexist
