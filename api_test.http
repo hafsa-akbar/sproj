@@ -1,7 +1,21 @@
-### GET request to example server
-GET http://localhost:5000/error
-Accept: text/html,application/json
+###
+POST http://localhost:5000/register
+Content-Type: application/json
 
+{
+  "username": "hadeed",
+  "password": "Password$1"
+}
 
-### GET request to example server
-GET http://localhost:5000/dontexist
+###
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+  "username": "hadeed",
+  "password": "Password$1"
+}
+
+###
+GET http://localhost:5000/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYWRlZWQiLCJqdGkiOiJiNTY3ZWJkMS0zZTAwLTQ2MmItYTQ2Yy02NDZjYjY2ZGRmZjQiLCJleHAiOjE3Mjk1Mzg5ODN9._qrME5jMQybg8vmQJAljn_cCRv--LE0N2pjYNRWDZ3k
