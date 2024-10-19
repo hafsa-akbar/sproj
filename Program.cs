@@ -26,7 +26,8 @@ try {
     builder.Services.AddSwaggerGen();
 
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+            .UseLowerCaseNamingConvention());
     builder.Services.AddScoped<IdentityDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
     builder.Services.AddIdentityCore<IdentityUser>();
@@ -84,13 +85,14 @@ try {
             };
 
             var roles = await userManager.GetRolesAsync(user);
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(roles.Select(role => new Claim("role", role)));
 
             var userClaims = await userManager.GetClaimsAsync(user);
             claims.AddRange(userClaims);
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]));
-            var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(2),
+            var token = new JwtSecurityToken(claims: claims,
+                expires: DateTime.Now.AddSeconds(int.Parse(config["JWT:Duration"])),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
             return TypedResults.Ok(new {

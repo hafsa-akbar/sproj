@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace sproj.Identity;
 
 public class IdentityUser {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
     [MaxLength(128)] public string UserName { get; set; }
@@ -17,6 +19,7 @@ public class IdentityUser {
 }
 
 public class IdentityRole {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [MaxLength(128)] public string Name { get; set; }
@@ -35,6 +38,7 @@ public class IdentityUserRole {
 }
 
 public class IdentityUserClaim {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
     public Guid UserId { get; set; }
