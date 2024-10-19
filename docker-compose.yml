@@ -5,7 +5,7 @@ services:
       - POSTGRES_PASSWORD=password
     ports:
       - "5432:5432"
-    
+  
   seq:
     image: datalust/seq:latest
     container_name: seq-server

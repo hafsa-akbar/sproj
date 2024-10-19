@@ -7,4 +7,6 @@ public class IdentityDbContext : DbContext {
 
     public DbSet<IdentityUser> Users { get; set; }
     public DbSet<IdentityRole> Roles { get; set; }
+    public DbSet<IdentityUserRole> UserRoles { get; set; }
+    public DbSet<IdentityUserClaim> UserClaims { get; set; }
 }

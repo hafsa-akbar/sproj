@@ -38,12 +38,6 @@ try {
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    app.MapGet("/",
-        async Task (UserManager<IdentityUser> userManager) =>
-            await userManager.CreateAsync(new IdentityUser { UserName = "hamza" }));
-
-    app.MapGet("/error", () => { throw new Exception(); });
-
     app.Run();
 } catch (HostAbortedException _) { } catch (Exception ex) {
     Log.Fatal(ex, "Application terminated unexpectedly");
