@@ -44,13 +44,13 @@ namespace sproj.Migrations
                         .HasColumnName("normalizedname");
 
                     b.HasKey("Id")
-                        .HasName("pk_aspnetroles");
+                        .HasName("pk_aspnet_roles");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("aspnet_roles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -76,12 +76,12 @@ namespace sproj.Migrations
                         .HasColumnName("roleid");
 
                     b.HasKey("Id")
-                        .HasName("pk_aspnetroleclaims");
+                        .HasName("pk_aspnet_roleclaims");
 
                     b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_aspnetroleclaims_roleid");
+                        .HasDatabaseName("ix_aspnet_roleclaims_roleid");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("aspnet_roleclaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
@@ -152,7 +152,7 @@ namespace sproj.Migrations
                         .HasColumnName("username");
 
                     b.HasKey("Id")
-                        .HasName("pk_aspnetusers");
+                        .HasName("pk_aspnet_users");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -161,7 +161,7 @@ namespace sproj.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("aspnet_users", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -187,12 +187,12 @@ namespace sproj.Migrations
                         .HasColumnName("userid");
 
                     b.HasKey("Id")
-                        .HasName("pk_aspnetuserclaims");
+                        .HasName("pk_aspnet_userclaims");
 
                     b.HasIndex("UserId")
-                        .HasDatabaseName("ix_aspnetuserclaims_userid");
+                        .HasDatabaseName("ix_aspnet_userclaims_userid");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("aspnet_userclaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -215,12 +215,12 @@ namespace sproj.Migrations
                         .HasColumnName("userid");
 
                     b.HasKey("LoginProvider", "ProviderKey")
-                        .HasName("pk_aspnetuserlogins");
+                        .HasName("pk_aspnet_userlogins");
 
                     b.HasIndex("UserId")
-                        .HasDatabaseName("ix_aspnetuserlogins_userid");
+                        .HasDatabaseName("ix_aspnet_userlogins_userid");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("aspnet_userlogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -234,12 +234,12 @@ namespace sproj.Migrations
                         .HasColumnName("roleid");
 
                     b.HasKey("UserId", "RoleId")
-                        .HasName("pk_aspnetuserroles");
+                        .HasName("pk_aspnet_userroles");
 
                     b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_aspnetuserroles_roleid");
+                        .HasDatabaseName("ix_aspnet_userroles_roleid");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("aspnet_userroles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -261,9 +261,9 @@ namespace sproj.Migrations
                         .HasColumnName("value");
 
                     b.HasKey("UserId", "LoginProvider", "Name")
-                        .HasName("pk_aspnetusertokens");
+                        .HasName("pk_aspnet_usertokens");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("aspnet_usertokens", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -273,7 +273,7 @@ namespace sproj.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_aspnetroleclaims_aspnetroles_roleid");
+                        .HasConstraintName("fk_aspnet_roleclaims_aspnet_roles_roleid");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -283,7 +283,7 @@ namespace sproj.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_aspnetuserclaims_aspnetusers_userid");
+                        .HasConstraintName("fk_aspnet_userclaims_aspnet_users_userid");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -293,7 +293,7 @@ namespace sproj.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_aspnetuserlogins_aspnetusers_userid");
+                        .HasConstraintName("fk_aspnet_userlogins_aspnet_users_userid");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -303,14 +303,14 @@ namespace sproj.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_aspnetuserroles_aspnetroles_roleid");
+                        .HasConstraintName("fk_aspnet_userroles_aspnet_roles_roleid");
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_aspnetuserroles_aspnetusers_userid");
+                        .HasConstraintName("fk_aspnet_userroles_aspnet_users_userid");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -320,7 +320,7 @@ namespace sproj.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_aspnetusertokens_aspnetusers_userid");
+                        .HasConstraintName("fk_aspnet_usertokens_aspnet_users_userid");
                 });
 #pragma warning restore 612, 618
         }

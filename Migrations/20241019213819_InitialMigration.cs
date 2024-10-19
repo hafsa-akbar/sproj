@@ -13,7 +13,7 @@ namespace sproj.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AspNetRoles",
+                name: "aspnet_roles",
                 columns: table => new
                 {
                     id = table.Column<string>(type: "text", nullable: false),
@@ -23,11 +23,11 @@ namespace sproj.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_aspnetroles", x => x.id);
+                    table.PrimaryKey("pk_aspnet_roles", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
+                name: "aspnet_users",
                 columns: table => new
                 {
                     id = table.Column<string>(type: "text", nullable: false),
@@ -48,11 +48,11 @@ namespace sproj.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_aspnetusers", x => x.id);
+                    table.PrimaryKey("pk_aspnet_users", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetRoleClaims",
+                name: "aspnet_roleclaims",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -63,17 +63,17 @@ namespace sproj.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_aspnetroleclaims", x => x.id);
+                    table.PrimaryKey("pk_aspnet_roleclaims", x => x.id);
                     table.ForeignKey(
-                        name: "fk_aspnetroleclaims_aspnetroles_roleid",
+                        name: "fk_aspnet_roleclaims_aspnet_roles_roleid",
                         column: x => x.roleid,
-                        principalTable: "AspNetRoles",
+                        principalTable: "aspnet_roles",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserClaims",
+                name: "aspnet_userclaims",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -84,17 +84,17 @@ namespace sproj.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_aspnetuserclaims", x => x.id);
+                    table.PrimaryKey("pk_aspnet_userclaims", x => x.id);
                     table.ForeignKey(
-                        name: "fk_aspnetuserclaims_aspnetusers_userid",
+                        name: "fk_aspnet_userclaims_aspnet_users_userid",
                         column: x => x.userid,
-                        principalTable: "AspNetUsers",
+                        principalTable: "aspnet_users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserLogins",
+                name: "aspnet_userlogins",
                 columns: table => new
                 {
                     loginprovider = table.Column<string>(type: "text", nullable: false),
@@ -104,17 +104,17 @@ namespace sproj.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_aspnetuserlogins", x => new { x.loginprovider, x.providerkey });
+                    table.PrimaryKey("pk_aspnet_userlogins", x => new { x.loginprovider, x.providerkey });
                     table.ForeignKey(
-                        name: "fk_aspnetuserlogins_aspnetusers_userid",
+                        name: "fk_aspnet_userlogins_aspnet_users_userid",
                         column: x => x.userid,
-                        principalTable: "AspNetUsers",
+                        principalTable: "aspnet_users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserRoles",
+                name: "aspnet_userroles",
                 columns: table => new
                 {
                     userid = table.Column<string>(type: "text", nullable: false),
@@ -122,23 +122,23 @@ namespace sproj.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_aspnetuserroles", x => new { x.userid, x.roleid });
+                    table.PrimaryKey("pk_aspnet_userroles", x => new { x.userid, x.roleid });
                     table.ForeignKey(
-                        name: "fk_aspnetuserroles_aspnetroles_roleid",
+                        name: "fk_aspnet_userroles_aspnet_roles_roleid",
                         column: x => x.roleid,
-                        principalTable: "AspNetRoles",
+                        principalTable: "aspnet_roles",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "fk_aspnetuserroles_aspnetusers_userid",
+                        name: "fk_aspnet_userroles_aspnet_users_userid",
                         column: x => x.userid,
-                        principalTable: "AspNetUsers",
+                        principalTable: "aspnet_users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserTokens",
+                name: "aspnet_usertokens",
                 columns: table => new
                 {
                     userid = table.Column<string>(type: "text", nullable: false),
@@ -148,49 +148,49 @@ namespace sproj.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_aspnetusertokens", x => new { x.userid, x.loginprovider, x.name });
+                    table.PrimaryKey("pk_aspnet_usertokens", x => new { x.userid, x.loginprovider, x.name });
                     table.ForeignKey(
-                        name: "fk_aspnetusertokens_aspnetusers_userid",
+                        name: "fk_aspnet_usertokens_aspnet_users_userid",
                         column: x => x.userid,
-                        principalTable: "AspNetUsers",
+                        principalTable: "aspnet_users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_aspnetroleclaims_roleid",
-                table: "AspNetRoleClaims",
+                name: "ix_aspnet_roleclaims_roleid",
+                table: "aspnet_roleclaims",
                 column: "roleid");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
-                table: "AspNetRoles",
+                table: "aspnet_roles",
                 column: "normalizedname",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_aspnetuserclaims_userid",
-                table: "AspNetUserClaims",
+                name: "ix_aspnet_userclaims_userid",
+                table: "aspnet_userclaims",
                 column: "userid");
 
             migrationBuilder.CreateIndex(
-                name: "ix_aspnetuserlogins_userid",
-                table: "AspNetUserLogins",
+                name: "ix_aspnet_userlogins_userid",
+                table: "aspnet_userlogins",
                 column: "userid");
 
             migrationBuilder.CreateIndex(
-                name: "ix_aspnetuserroles_roleid",
-                table: "AspNetUserRoles",
+                name: "ix_aspnet_userroles_roleid",
+                table: "aspnet_userroles",
                 column: "roleid");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
-                table: "AspNetUsers",
+                table: "aspnet_users",
                 column: "normalizedemail");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
-                table: "AspNetUsers",
+                table: "aspnet_users",
                 column: "normalizedusername",
                 unique: true);
         }
@@ -199,25 +199,25 @@ namespace sproj.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AspNetRoleClaims");
+                name: "aspnet_roleclaims");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserClaims");
+                name: "aspnet_userclaims");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserLogins");
+                name: "aspnet_userlogins");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserRoles");
+                name: "aspnet_userroles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserTokens");
+                name: "aspnet_usertokens");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "aspnet_roles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "aspnet_users");
         }
     }
 }
