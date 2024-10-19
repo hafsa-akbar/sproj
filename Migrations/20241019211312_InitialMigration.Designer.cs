@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using sproj;
+using sproj.Models;
 
 #nullable disable
 
 namespace sproj.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241019200311_InitialMigration")]
+    [Migration("20241019211312_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

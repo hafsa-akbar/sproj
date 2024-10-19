@@ -1,18 +1,18 @@
 ###
-POST http://localhost:5000/register
+POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "hadeedd",
+  "username": "hadeed",
   "password": "Password$1"
 }
 
 ###
-POST http://localhost:5000/login
+POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "hadeedd",
+  "username": "hadeed",
   "password": "Password$1"
 }
 
