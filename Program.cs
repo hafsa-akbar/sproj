@@ -4,10 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using sproj.Identity;
 using sproj.Models;
-using IdentityRole = sproj.Identity.IdentityRole;
-using IdentityUser = sproj.Identity.IdentityUser;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Verbose()
@@ -26,11 +23,8 @@ try {
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
             .UseLowerCaseNamingConvention());
-    builder.Services.AddScoped<IdentityDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
-    builder.Services.AddIdentityCore<IdentityUser>();
-    builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
-    builder.Services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
+    builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
 
     builder.Services.AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options => {

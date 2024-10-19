@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using sproj.Identity;
 
 namespace sproj.Models;
 
-public class AppDbContext : IdentityDbContext {
+public class AppDbContext : IdentityDbContext<IdentityUser> {
     public AppDbContext(DbContextOptions options) : base(options) { }
 }
