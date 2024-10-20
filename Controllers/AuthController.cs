@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 [ApiController]
-[Route("api/auth")]
+[Route("auth")]
 public class AuthController : ControllerBase {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IConfiguration _config;
@@ -55,7 +55,7 @@ public class AuthController : ControllerBase {
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return Ok(new { token = tokenString });
+        return Ok(new { jwt = tokenString });
     }
 
     public record struct RegisterModel(string UserName, string Password);

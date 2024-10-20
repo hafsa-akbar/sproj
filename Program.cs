@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -14,31 +15,7 @@ Log.Logger = new LoggerConfiguration()
 try {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddSerilog(lc => lc.ReadFrom.Configuration(builder.Configuration));
-    builder.Services.AddProblemDetails();
-
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
-
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-            .UseLowerCaseNamingConvention());
-
-    builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
-
-    builder.Services.AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options => {
-            options.TokenValidationParameters = new TokenValidationParameters {
-                ValidateAudience = false,
-                ValidateIssuer = false,
-                IssuerSigningKey =
-                    new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
-            };
-        });
-    builder.Services.AddAuthorization();
-
-    builder.Services.AddControllers();
+    builder.Services.AddServices(builder.Configuration);
 
     WebApplication app = builder.Build();
 
@@ -58,12 +35,70 @@ try {
     app.UseAuthorization();
 
     app.MapControllers();
-    app.MapGet("/", () => "You are logged in!").RequireAuthorization();
+    app.MapGet("/", (ClaimsPrincipal user) => "You are logged in!").RequireAuthorization();
 
     app.Run();
-} catch (Exception ex) {
-    if (ex is not HostAbortedException)
-        Log.Fatal(ex, "Application terminated unexpectedly");
+} catch (HostAbortedException _) { } catch (Exception ex) {
+    Log.Fatal(ex, "Application terminated unexpectedly");
 } finally {
     Log.CloseAndFlush();
+}
+
+public static class ServiceCollectionExtensions {
+    private static IConfiguration _config;
+
+    public static void AddServices(this IServiceCollection services, IConfiguration config) {
+        _config = config;
+
+        services
+            .AddSerilog()
+            .AddSwagger()
+            .AddProblemDetails()
+            .AddControllers();
+
+        services
+            .AddDataServices()
+            .AddAuthServices();
+    }
+
+    private static IServiceCollection AddSerilog(this IServiceCollection services) {
+        services.AddSerilog(logging => logging.ReadFrom.Configuration(_config));
+        return services;
+    }
+
+    private static IServiceCollection AddSwagger(this IServiceCollection services) {
+        services.AddEndpointsApiExplorer()
+            .AddSwaggerGen();
+        return services;
+    }
+
+    private static IServiceCollection AddDataServices(this IServiceCollection services) {
+        var connectionString = _config.GetConnectionString("DefaultConnection");
+
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(connectionString)
+                .UseLowerCaseNamingConvention());
+
+        services.AddIdentityCore<IdentityUser>()
+            .AddEntityFrameworkStores<AppDbContext>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAuthServices(this IServiceCollection services) {
+        var jwtKey = _config["JWT:Key"];
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                };
+                options.MapInboundClaims = false;
+            });
+
+        services.AddAuthorization();
+        return services;
+    }
 }
