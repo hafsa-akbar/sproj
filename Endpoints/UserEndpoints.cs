@@ -27,7 +27,7 @@ public static class UserEndpoints {
     }
 
     public static async Task<IResult> LoginEndpoint(LoginDTO input, UserManager<IdentityUser> userManager,
-        IConfiguration config) {
+        JWTOptions jwtOptions) {
         IdentityUser? user = await userManager.FindByNameAsync(input.UserName);
         if (user == null) return Results.Unauthorized();
 
@@ -39,26 +39,20 @@ public static class UserEndpoints {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var userRoles = await userManager.GetRolesAsync(user);
-        claims.AddRange(userRoles.Select(role => new Claim("role", role)));
-
         var userClaims = await userManager.GetClaimsAsync(user);
         claims.AddRange(userClaims);
 
-        var jwtKey = config["JWT:Key"] ?? "00000000000000000000000000000000";
-        var tokenDuration = int.Parse(config["JWT:Duration"] ?? "900");
-
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.Now.AddSeconds(tokenDuration),
-            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-                SecurityAlgorithms.HmacSha256)
+            expires: DateTime.Now.AddSeconds(jwtOptions.Duration),
+            signingCredentials: new SigningCredentials(jwtOptions.SecurityKey, SecurityAlgorithms.HmacSha256)
         );
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return Results.Ok(new
-            { token = tokenString, expires_in = tokenDuration, token_type = JwtBearerDefaults.AuthenticationScheme });
+        return Results.Ok(new {
+            token = tokenString, expires_in = jwtOptions.Duration, token_type = JwtBearerDefaults.AuthenticationScheme
+        });
     }
 
     public record struct RegisterDTO(string UserName, string Password);
