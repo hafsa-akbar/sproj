@@ -46,13 +46,10 @@ public static class StartupExtensions {
         }
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        builder.Services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<AppDbContext>();
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(connectionString).UseLowerCaseNamingConvention());
+        builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
+        builder.Services.AddScoped<PasswordHasher<User>>();
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
-        builder.Services.AddAuthorization();
-
         builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
             .Configure<JwtOptions>((jwtBearerOptions, jwtOptions) => {
                 jwtBearerOptions.MapInboundClaims = false;
@@ -62,6 +59,7 @@ public static class StartupExtensions {
                     ValidateIssuer = false
                 };
             });
+        builder.Services.AddAuthorization();
 
         builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)
             .Validate(o => o.Key != null, "Missing JWT Key").ValidateOnStart();

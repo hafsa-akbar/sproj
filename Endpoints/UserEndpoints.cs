@@ -2,7 +2,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using sproj.Models;
 
 namespace sproj.Endpoints;
 
@@ -14,32 +16,36 @@ public static class UserEndpoints {
         group.MapPost("/login", LoginEndpoint);
     }
 
+    // TODO: Add validation
     public static async Task<IResult> RegisterEndpoint(RegisterRequest input,
-        UserManager<IdentityUser> userManager) {
-        var user = new IdentityUser { UserName = input.UserName };
-        IdentityResult result = await userManager.CreateAsync(user, input.Password);
+        AppDbContext dbContext,
+        PasswordHasher<User> passwordHasher
+    ) {
+        if (await dbContext.Users.AnyAsync(u => u.Username == input.UserName))
+            return Results.BadRequest("Username is already taken");
 
-        if (result.Succeeded)
-            return Results.Ok();
+        var user = new User { Username = input.UserName, Password = string.Empty };
+        user.Password = passwordHasher.HashPassword(user, input.Password);
 
-        return Results.BadRequest(result.Errors);
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+
+        return Results.Ok();
     }
 
-    public static async Task<IResult> LoginEndpoint(LoginRequest input, UserManager<IdentityUser> userManager,
-        JwtOptions jwtOptions) {
-        var user = await userManager.FindByNameAsync(input.UserName);
+    // TODO: Timing attack vulnerability
+    public static IResult LoginEndpoint(LoginRequest input, AppDbContext dbContext,
+        PasswordHasher<User> passwordHasher, JwtOptions jwtOptions) {
+        var user = dbContext.Users.SingleOrDefault(u => u.Username == input.UserName);
         if (user == null) return Results.Unauthorized();
 
-        var passwordCheck = await userManager.CheckPasswordAsync(user, input.Password);
-        if (!passwordCheck) return Results.Unauthorized();
+        var passwordCheck = passwordHasher.VerifyHashedPassword(user, user.Password, input.Password);
+        if (passwordCheck == PasswordVerificationResult.Failed) return Results.Unauthorized();
 
         var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.Sub, user.UserName!),
+            new(JwtRegisteredClaimNames.Sub, user.Username),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-
-        var userClaims = await userManager.GetClaimsAsync(user);
-        claims.AddRange(userClaims);
 
         var token = new JwtSecurityToken(
             claims: claims,

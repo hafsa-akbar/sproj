@@ -3,8 +3,8 @@ POST http://localhost:5000/api/user/register
 Content-Type: application/json
 
 {
-  "username": "hadeed",
-  "password": "Password$1"
+  "username": "hadeeda",
+  "password": "Password"
 }
 
 ###
@@ -12,10 +12,10 @@ POST http://localhost:5000/api/user/login
 Content-Type: application/json
 
 {
-  "username": "hadeed",
-  "password": "Password$1"
+  "username": "hadeeda",
+  "password": "Password"
 }
 
 ###
 GET http://localhost:5000/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYWRlZWQiLCJqdGkiOiJiOTVkMzMxNC1hZDkyLTRiYWItODAxOC0wODY1ODZjOWE5MDkiLCJleHAiOjE3Mjk4NTA5NDR9.kUqwgGpEaQei0kK9DktCnLsFf1EyUT-6COQZm5GJpP8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYWRlZWRhIiwianRpIjoiNjVhOGYwMDEtYmYyZi00MmI0LTgwZWYtNGQyMzdjYzUyMDk4IiwiZXhwIjoxNzMwMDA5MDkzfQ.j-WJKMi7j3DXlmgLBQA3RTeAccghV_c9eA1SAQM-Tbo
