@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace sproj;
 
-public class JWTOptions {
+public class JwtOptions {
     public const string SectionName = "JWT";
 
     // ReSharper disable once UnusedAutoPropertyAccessor.Global

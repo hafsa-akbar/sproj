@@ -1,6 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +14,7 @@ public static class UserEndpoints {
         group.MapPost("/login", LoginEndpoint);
     }
 
-    public static async Task<IResult> RegisterEndpoint(RegisterDTO input,
+    public static async Task<IResult> RegisterEndpoint(RegisterRequest input,
         UserManager<IdentityUser> userManager) {
         var user = new IdentityUser { UserName = input.UserName };
         IdentityResult result = await userManager.CreateAsync(user, input.Password);
@@ -26,8 +25,8 @@ public static class UserEndpoints {
         return Results.BadRequest(result.Errors);
     }
 
-    public static async Task<IResult> LoginEndpoint(LoginDTO input, UserManager<IdentityUser> userManager,
-        JWTOptions jwtOptions) {
+    public static async Task<IResult> LoginEndpoint(LoginRequest input, UserManager<IdentityUser> userManager,
+        JwtOptions jwtOptions) {
         IdentityUser? user = await userManager.FindByNameAsync(input.UserName);
         if (user == null) return Results.Unauthorized();
 
@@ -55,7 +54,7 @@ public static class UserEndpoints {
         });
     }
 
-    public record struct RegisterDTO(string UserName, string Password);
+    public record struct RegisterRequest(string UserName, string Password);
 
-    public record struct LoginDTO(string UserName, string Password);
+    public record struct LoginRequest(string UserName, string Password);
 }

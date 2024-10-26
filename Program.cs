@@ -54,7 +54,7 @@ public static class StartupExtensions {
         builder.Services.AddAuthorization();
 
         builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-            .Configure<JWTOptions>((jwtBearerOptions, jwtOptions) => {
+            .Configure<JwtOptions>((jwtBearerOptions, jwtOptions) => {
                 jwtBearerOptions.MapInboundClaims = false;
                 jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters {
                     IssuerSigningKey = jwtOptions.SecurityKey,
@@ -63,9 +63,9 @@ public static class StartupExtensions {
                 };
             });
 
-        builder.Services.AddOptions<JWTOptions>().BindConfiguration(JWTOptions.SectionName)
+        builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)
             .Validate(o => o.Key != null, "Missing JWT Key").ValidateOnStart();
-        builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JWTOptions>>().Value);
+        builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JwtOptions>>().Value);
     }
 
     public static void RegisterMiddleware(this WebApplication app) {
