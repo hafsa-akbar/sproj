@@ -9,7 +9,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser> {
 
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
-        
+
         builder.Entity<IdentityUser>().ToTable("aspnet_users");
         builder.Entity<IdentityRole>().ToTable("aspnet_roles");
         builder.Entity<IdentityUserRole<string>>().ToTable("aspnet_userroles");

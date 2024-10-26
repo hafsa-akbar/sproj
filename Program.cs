@@ -14,15 +14,15 @@ Log.Logger = new LoggerConfiguration()
     .CreateBootstrapLogger();
 
 try {
-    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+    var builder = WebApplication.CreateBuilder(args);
 
     builder.RegisterServices();
 
-    WebApplication app = builder.Build();
-    
-    using (IServiceScope scope = app.Services.CreateScope()) {
+    var app = builder.Build();
+
+    using (var scope = app.Services.CreateScope()) {
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        
+
         dbContext.Database.Migrate();
     }
 
@@ -82,7 +82,7 @@ public static class StartupExtensions {
         app.UseAuthentication();
         app.UseAuthorization();
 
-        RouteGroupBuilder api = app.MapGroup("api");
+        var api = app.MapGroup("api");
         api.RegisterUserEndpoints();
 
         app.MapGet("/", () => "You're authorized").RequireAuthorization();

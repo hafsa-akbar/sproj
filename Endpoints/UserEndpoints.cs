@@ -8,7 +8,7 @@ namespace sproj.Endpoints;
 
 public static class UserEndpoints {
     public static void RegisterUserEndpoints(this IEndpointRouteBuilder app) {
-        RouteGroupBuilder group = app.MapGroup("user");
+        var group = app.MapGroup("user");
 
         group.MapPost("/register", RegisterEndpoint);
         group.MapPost("/login", LoginEndpoint);
@@ -27,7 +27,7 @@ public static class UserEndpoints {
 
     public static async Task<IResult> LoginEndpoint(LoginRequest input, UserManager<IdentityUser> userManager,
         JwtOptions jwtOptions) {
-        IdentityUser? user = await userManager.FindByNameAsync(input.UserName);
+        var user = await userManager.FindByNameAsync(input.UserName);
         if (user == null) return Results.Unauthorized();
 
         var passwordCheck = await userManager.CheckPasswordAsync(user, input.Password);
