@@ -7,6 +7,7 @@ using Serilog;
 using sproj;
 using sproj.Endpoints;
 using sproj.Models;
+using sproj.Services;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Verbose()
@@ -64,6 +65,9 @@ public static class StartupExtensions {
         builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)
             .Validate(o => o.Key != null, "Missing JWT Key").ValidateOnStart();
         builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JwtOptions>>().Value);
+
+        if (!builder.Environment.IsDevelopment()) builder.Services.AddScoped<IPhoneService, DummyPhoneService>();
+        else builder.Services.AddScoped<IPhoneService, PhoneService>();
     }
 
     public static void RegisterMiddleware(this WebApplication app) {
@@ -80,7 +84,7 @@ public static class StartupExtensions {
         app.UseAuthentication();
         app.UseAuthorization();
 
-        var api = app.MapGroup("api");
+        var api = app.MapGroup("/api");
         api.RegisterUserEndpoints();
 
         app.MapGet("/", () => "You're authorized").RequireAuthorization();

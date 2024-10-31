@@ -8,23 +8,26 @@ using sproj.Models;
 
 namespace sproj.Endpoints;
 
+// TODO: Add validation
 public static class UserEndpoints {
     public static void RegisterUserEndpoints(this IEndpointRouteBuilder app) {
-        var group = app.MapGroup("user");
+        var group = app.MapGroup("/user");
 
         group.MapPost("/register", RegisterEndpoint);
         group.MapPost("/login", LoginEndpoint);
+
+        group.MapPost("/send-verification-sms", VerifyPhoneEndpoint).RequireAuthorization(policy =>
+            policy.RequireAssertion(ctx => ctx.User.HasClaim(c => c.Type == "isPhoneVerified" && c.Value == "false")));
+        // group.MapPost("/verify-phone", LoginEndpoint);
     }
 
-    // TODO: Add validation
     public static async Task<IResult> RegisterEndpoint(RegisterRequest input,
         AppDbContext dbContext,
-        PasswordHasher<User> passwordHasher
-    ) {
+        PasswordHasher<User> passwordHasher) {
         if (await dbContext.Users.AnyAsync(u => u.Username == input.UserName))
             return Results.BadRequest("Username is already taken");
 
-        var user = new User { Username = input.UserName, Password = string.Empty };
+        var user = new User { Username = input.UserName, Password = string.Empty, PhoneNumber = input.PhoneNumber };
         user.Password = passwordHasher.HashPassword(user, input.Password);
 
         dbContext.Users.Add(user);
@@ -44,7 +47,8 @@ public static class UserEndpoints {
 
         var claims = new List<Claim> {
             new(JwtRegisteredClaimNames.Sub, user.Username),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("isPhoneVerified", user.isPhoneVerified.ToString())
         };
 
         var token = new JwtSecurityToken(
@@ -60,7 +64,11 @@ public static class UserEndpoints {
         });
     }
 
-    public record struct RegisterRequest(string UserName, string Password);
+    public static IResult VerifyPhoneEndpoint() {
+        return Results.Ok();
+    }
+
+    public record struct RegisterRequest(string UserName, string Password, string PhoneNumber);
 
     public record struct LoginRequest(string UserName, string Password);
 }
