@@ -1,10 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.JsonWebTokens;
 using sproj.Models;
+using sproj.Services;
 
 namespace sproj.Endpoints;
 
@@ -16,14 +15,12 @@ public static class UserEndpoints {
         group.MapPost("/register", RegisterEndpoint);
         group.MapPost("/login", LoginEndpoint);
 
-        group.MapPost("/send-verification-sms", VerifyPhoneEndpoint).RequireAuthorization(policy =>
-            policy.RequireAssertion(ctx => ctx.User.HasClaim(c => c.Type == "isPhoneVerified" && c.Value == "false")));
-        // group.MapPost("/verify-phone", LoginEndpoint);
+        group.MapPost("/send-verification-sms", SendVerificationSMSEndpoint).RequireAuthorization("PhoneNotVerified");
+        group.MapPost("/verify-sms", VerifySMSEndpoint).RequireAuthorization("PhoneNotVerified");
     }
 
-    public static async Task<IResult> RegisterEndpoint(RegisterRequest input,
-        AppDbContext dbContext,
-        PasswordHasher<User> passwordHasher) {
+    public static async Task<IResult> RegisterEndpoint(RegisterRequest input, AppDbContext dbContext,
+        PasswordHasher<User> passwordHasher, JwtCreatorService jwtCreator) {
         if (await dbContext.Users.AnyAsync(u => u.Username == input.UserName))
             return Results.BadRequest("Username is already taken");
 
@@ -33,42 +30,56 @@ public static class UserEndpoints {
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        return Results.Ok();
+        return Results.Ok(jwtCreator.CreateJwt(user));
     }
 
-    // TODO: Timing attack vulnerability
-    public static IResult LoginEndpoint(LoginRequest input, AppDbContext dbContext,
-        PasswordHasher<User> passwordHasher, JwtOptions jwtOptions) {
-        var user = dbContext.Users.SingleOrDefault(u => u.Username == input.UserName);
-        if (user == null) return Results.Unauthorized();
+    public static IResult LoginEndpoint(LoginRequest input, AppDbContext dbContext, PasswordHasher<User> passwordHasher,
+        JwtCreatorService jwtCreator) {
+        var dummyUser = new User {
+            Password = "",
+            Username = null!,
+            PhoneNumber = null!
+        };
+
+        var user = dbContext.Users.SingleOrDefault(u => u.Username == input.UserName) ?? dummyUser;
 
         var passwordCheck = passwordHasher.VerifyHashedPassword(user, user.Password, input.Password);
         if (passwordCheck == PasswordVerificationResult.Failed) return Results.Unauthorized();
 
-        var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.Sub, user.Username),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new("isPhoneVerified", user.isPhoneVerified.ToString())
-        };
+        return Results.Ok(jwtCreator.CreateJwt(user));
+    }
 
-        var token = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.Now.AddSeconds(jwtOptions.Duration),
-            signingCredentials: new SigningCredentials(jwtOptions.SecurityKey, SecurityAlgorithms.HmacSha256)
-        );
+    // TODO: Add rate limit
+    public static IResult SendVerificationSMSEndpoint(ClaimsPrincipal claimsPrincipal, AppDbContext dbContext,
+        CodeVerificationService codeVerificationService, ISMSService smsService) {
+        var username = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value;
 
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+        var user = dbContext.Users.First(u => u.Username == username);
+        var code = codeVerificationService.CreateCode(username);
+        smsService.SendCode(user.PhoneNumber, code);
 
         return Results.Ok(new {
-            token = tokenString, expires_in = jwtOptions.Duration, token_type = JwtBearerDefaults.AuthenticationScheme
+            message = "Verification code sent!"
         });
     }
 
-    public static IResult VerifyPhoneEndpoint() {
-        return Results.Ok();
+    public static async Task<IResult> VerifySMSEndpoint(int code, AppDbContext dbContext, ClaimsPrincipal claimsPrincipal, CodeVerificationService codeVerificationService) {
+        var username = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value;
+
+        var result = codeVerificationService.VerifyCode(username, code);
+
+        if (result) {
+            var user = dbContext.Users.First(u => u.Username == username);
+            user.isPhoneVerified = true;
+            await dbContext.SaveChangesAsync();
+            return Results.Ok(new {
+                message = "Verification successful!"
+            });
+        }
+
+        return Results.Unauthorized();
     }
 
     public record struct RegisterRequest(string UserName, string Password, string PhoneNumber);
-
     public record struct LoginRequest(string UserName, string Password);
 }

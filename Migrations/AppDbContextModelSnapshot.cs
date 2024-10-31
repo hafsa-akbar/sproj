@@ -36,11 +36,21 @@ namespace sproj.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("password");
 
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("phonenumber");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
                         .HasColumnName("username");
+
+                    b.Property<bool>("isPhoneVerified")
+                        .HasColumnType("boolean")
+                        .HasColumnName("isphoneverified");
 
                     b.HasKey("Id")
                         .HasName("pk_users");

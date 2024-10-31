@@ -18,7 +18,9 @@ namespace sproj.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     username = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    password = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
+                    password = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    phonenumber = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
+                    isphoneverified = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {

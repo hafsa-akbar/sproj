@@ -11,7 +11,7 @@ using sproj.Models;
 namespace sproj.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241026055105_InitialMigration")]
+    [Migration("20241031094841_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -39,11 +39,21 @@ namespace sproj.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("password");
 
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("phonenumber");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
                         .HasColumnName("username");
+
+                    b.Property<bool>("isPhoneVerified")
+                        .HasColumnType("boolean")
+                        .HasColumnName("isphoneverified");
 
                     b.HasKey("Id")
                         .HasName("pk_users");

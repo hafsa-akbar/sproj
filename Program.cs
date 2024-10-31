@@ -60,14 +60,25 @@ public static class StartupExtensions {
                     ValidateIssuer = false
                 };
             });
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorization(o => {
+            o.AddPolicy("PhoneNotVerified",
+                p => p.RequireAssertion(
+                    ctx => ctx.User.HasClaim(c => c.Type == "isPhoneVerified" && c.Value == "False")));
+
+            o.AddPolicy("PhoneVerified",
+                p => p.RequireAssertion(
+                    ctx => ctx.User.HasClaim(c => c.Type == "isPhoneVerified" && c.Value == "True")));
+        });
 
         builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)
             .Validate(o => o.Key != null, "Missing JWT Key").ValidateOnStart();
         builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JwtOptions>>().Value);
 
-        if (!builder.Environment.IsDevelopment()) builder.Services.AddScoped<IPhoneService, DummyPhoneService>();
-        else builder.Services.AddScoped<IPhoneService, PhoneService>();
+        if (builder.Environment.IsDevelopment()) builder.Services.AddScoped<ISMSService, DummySMSService>();
+        else builder.Services.AddScoped<ISMSService, SMSService>();
+
+        builder.Services.AddScoped<JwtCreatorService>();
+        builder.Services.AddSingleton<CodeVerificationService>();
     }
 
     public static void RegisterMiddleware(this WebApplication app) {
@@ -87,6 +98,6 @@ public static class StartupExtensions {
         var api = app.MapGroup("/api");
         api.RegisterUserEndpoints();
 
-        app.MapGet("/", () => "You're authorized").RequireAuthorization();
+        app.MapGet("/", () => "You're authorized").RequireAuthorization("PhoneVerified");
     }
 }
