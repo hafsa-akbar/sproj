@@ -8,5 +8,5 @@ public class User {
     [MaxLength(256)] public required string Password { get; set; }
 
     [MaxLength(15)] public required string PhoneNumber { get; set; }
-    public bool isPhoneVerified { get; set; } = false;
+    public bool IsPhoneVerified { get; set; }
 }

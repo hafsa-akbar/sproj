@@ -78,8 +78,8 @@ public static class StartupExtensions {
             .Validate(o => o.Key != null, "Missing JWT Key").ValidateOnStart();
         builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JwtOptions>>().Value);
 
-        if (builder.Environment.IsDevelopment()) builder.Services.AddScoped<ISMSService, DummySMSService>();
-        else builder.Services.AddScoped<ISMSService, SMSService>();
+        if (builder.Environment.IsDevelopment()) builder.Services.AddScoped<ISmsService, DummySmsService>();
+        else builder.Services.AddScoped<ISmsService, SmsService>();
 
         builder.Services.AddScoped<JwtCreatorService>();
         builder.Services.AddSingleton<CodeVerificationService>();

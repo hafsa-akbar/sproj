@@ -15,8 +15,8 @@ public static class UserEndpoints {
         group.MapPost("/register", RegisterEndpoint);
         group.MapPost("/login", LoginEndpoint);
 
-        group.MapPost("/send-verification-sms", SendVerificationSMSEndpoint).RequireAuthorization("PhoneNotVerified");
-        group.MapPost("/verify-sms", VerifySMSEndpoint).RequireAuthorization("PhoneNotVerified");
+        group.MapPost("/send-verification-sms", SendVerificationSmsEndpoint).RequireAuthorization("PhoneNotVerified");
+        group.MapPost("/verify-sms", VerifySmsEndpoint).RequireAuthorization("PhoneNotVerified");
     }
 
     public record struct RegisterRequest(string UserName, string Password, string PhoneNumber);
@@ -54,8 +54,8 @@ public static class UserEndpoints {
     }
 
     // TODO: Add rate limit
-    public static IResult SendVerificationSMSEndpoint(ClaimsPrincipal claimsPrincipal, AppDbContext dbContext,
-        CodeVerificationService codeVerificationService, ISMSService smsService) {
+    public static IResult SendVerificationSmsEndpoint(ClaimsPrincipal claimsPrincipal, AppDbContext dbContext,
+        CodeVerificationService codeVerificationService, ISmsService smsService) {
         var username = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value;
 
         var user = dbContext.Users.First(u => u.Username == username);
@@ -67,7 +67,7 @@ public static class UserEndpoints {
         });
     }
 
-    public static async Task<IResult> VerifySMSEndpoint(int code, AppDbContext dbContext,
+    public static async Task<IResult> VerifySmsEndpoint(int code, AppDbContext dbContext,
         ClaimsPrincipal claimsPrincipal, CodeVerificationService codeVerificationService) {
         var username = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value;
 
@@ -75,7 +75,7 @@ public static class UserEndpoints {
 
         if (result) {
             var user = dbContext.Users.First(u => u.Username == username);
-            user.isPhoneVerified = true;
+            user.IsPhoneVerified = true;
             await dbContext.SaveChangesAsync();
             return Results.Ok(new {
                 message = "Verification successful!"

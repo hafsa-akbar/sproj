@@ -1,23 +1,23 @@
 namespace sproj.Services;
 
-public interface ISMSService {
+public interface ISmsService {
     public void SendCode(string to, int code);
 }
 
-public class SMSService : ISMSService {
+public class SmsService : ISmsService {
     public void SendCode(string to, int code) {
         throw new NotImplementedException();
     }
 }
 
-public class DummySMSService : ISMSService {
-    private readonly ILogger<DummySMSService> logger;
+public class DummySmsService : ISmsService {
+    private readonly ILogger<DummySmsService> _logger;
 
-    public DummySMSService(ILogger<DummySMSService> logger) {
-        this.logger = logger;
+    public DummySmsService(ILogger<DummySmsService> logger) {
+        _logger = logger;
     }
 
     public void SendCode(string to, int code) {
-        logger.LogInformation("Sending code {code} to {to}", code, to);
+        _logger.LogInformation("Sending code {code} to {to}", code, to);
     }
 }
