@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using sproj.Models;
+
 // ReSharper disable NotAccessedPositionalProperty.Global
 
 namespace sproj.Services;

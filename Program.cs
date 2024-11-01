@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,9 @@ public static class StartupExtensions {
                     ctx => ctx.User.HasClaim(c => c.Type == "isPhoneVerified" && c.Value == "True")));
         });
 
+        builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+        builder.AddFluentValidationEndpointFilter();
+
         builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)
             .Validate(o => o.Key != null, "Missing JWT Key").ValidateOnStart();
         builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JwtOptions>>().Value);
@@ -95,7 +99,7 @@ public static class StartupExtensions {
         app.UseAuthentication();
         app.UseAuthorization();
 
-        var api = app.MapGroup("/api");
+        var api = app.MapGroup("/api").AddFluentValidationFilter();
         api.RegisterUserEndpoints();
 
         app.MapGet("/", () => "You're authorized").RequireAuthorization("PhoneVerified");

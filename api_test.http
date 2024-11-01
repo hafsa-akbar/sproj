@@ -4,8 +4,7 @@ Content-Type: application/json
 
 {
   "username": "hadeed",
-  "password": "password",
-  "phoneNumber": "03356423333"
+  "password": "password"
 }
 
 ###

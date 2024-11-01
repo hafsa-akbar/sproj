@@ -19,6 +19,8 @@ public static class UserEndpoints {
         group.MapPost("/verify-sms", VerifySMSEndpoint).RequireAuthorization("PhoneNotVerified");
     }
 
+    public record struct RegisterRequest(string UserName, string Password, string PhoneNumber);
+
     public static async Task<IResult> RegisterEndpoint(RegisterRequest input, AppDbContext dbContext,
         PasswordHasher<User> passwordHasher, JwtCreatorService jwtCreator) {
         if (await dbContext.Users.AnyAsync(u => u.Username == input.UserName))
@@ -32,6 +34,8 @@ public static class UserEndpoints {
 
         return Results.Ok(jwtCreator.CreateJwt(user));
     }
+
+    public record struct LoginRequest(string UserName, string Password);
 
     public static IResult LoginEndpoint(LoginRequest input, AppDbContext dbContext, PasswordHasher<User> passwordHasher,
         JwtCreatorService jwtCreator) {
@@ -63,7 +67,8 @@ public static class UserEndpoints {
         });
     }
 
-    public static async Task<IResult> VerifySMSEndpoint(int code, AppDbContext dbContext, ClaimsPrincipal claimsPrincipal, CodeVerificationService codeVerificationService) {
+    public static async Task<IResult> VerifySMSEndpoint(int code, AppDbContext dbContext,
+        ClaimsPrincipal claimsPrincipal, CodeVerificationService codeVerificationService) {
         var username = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value;
 
         var result = codeVerificationService.VerifyCode(username, code);
@@ -79,7 +84,4 @@ public static class UserEndpoints {
 
         return Results.Unauthorized();
     }
-
-    public record struct RegisterRequest(string UserName, string Password, string PhoneNumber);
-    public record struct LoginRequest(string UserName, string Password);
 }
