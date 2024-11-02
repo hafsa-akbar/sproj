@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace sproj.Models;
+namespace sproj.Data.Entities;
 
 public class User {
     public int Id { get; set; }

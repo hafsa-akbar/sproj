@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using sproj.Data.Entities;
 
-namespace sproj.Models;
+namespace sproj.Data;
 
 public class AppDbContext : DbContext {
     public AppDbContext(DbContextOptions options) : base(options) { }

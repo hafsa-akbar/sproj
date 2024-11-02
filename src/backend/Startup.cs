@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
+using sproj.Data;
+using sproj.Data.Entities;
 using sproj.Endpoints;
-using sproj.Models;
 using sproj.Services;
 
 namespace sproj;

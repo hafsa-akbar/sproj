@@ -2,7 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
-using sproj.Models;
+using sproj.Data;
+using sproj.Data.Entities;
 using sproj.Services;
 
 namespace sproj.Endpoints;
