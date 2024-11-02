@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -20,6 +21,11 @@ namespace sproj.Data.Migrations
                     username = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     password = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     phonenumber = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
+                    address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    birthdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    cnic = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
+                    driverlicense = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    role = table.Column<int>(type: "integer", nullable: false),
                     isphoneverified = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
