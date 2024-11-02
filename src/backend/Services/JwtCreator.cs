@@ -3,14 +3,12 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using sproj.Models;
 
-// ReSharper disable NotAccessedPositionalProperty.Global
-
 namespace sproj.Services;
 
-public class JwtCreatorService {
+public class JwtCreator {
     private readonly JwtOptions _jwtOptions;
 
-    public JwtCreatorService(JwtOptions jwtOptions) {
+    public JwtCreator(JwtOptions jwtOptions) {
         _jwtOptions = jwtOptions;
     }
 
@@ -23,12 +21,13 @@ public class JwtCreatorService {
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.Now.AddSeconds(_jwtOptions.Duration),
-            signingCredentials: new SigningCredentials(_jwtOptions.SecurityKey, SecurityAlgorithms.HmacSha256)
+            signingCredentials: new(_jwtOptions.SecurityKey, SecurityAlgorithms.HmacSha256),
+            expires: DateTime.Now.AddSeconds(_jwtOptions.Duration)
         );
 
         return new JwtResponse(new JwtSecurityTokenHandler().WriteToken(token), _jwtOptions.Duration);
     }
 }
 
+// ReSharper disable NotAccessedPositionalProperty.Global
 public record JwtResponse(string Token, int ExpiresIn);

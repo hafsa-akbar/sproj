@@ -7,7 +7,6 @@ using sproj.Services;
 
 namespace sproj.Endpoints;
 
-// TODO: Add validation
 public static class UserEndpoints {
     public static void RegisterUserEndpoints(this IEndpointRouteBuilder app) {
         var group = app.MapGroup("/user");
@@ -22,7 +21,7 @@ public static class UserEndpoints {
     public record struct RegisterRequest(string UserName, string Password, string PhoneNumber);
 
     public static async Task<IResult> RegisterEndpoint(RegisterRequest input, AppDbContext dbContext,
-        PasswordHasher<User> passwordHasher, JwtCreatorService jwtCreator) {
+        PasswordHasher<User> passwordHasher, JwtCreator jwtCreator) {
         if (await dbContext.Users.AnyAsync(u => u.Username == input.UserName))
             return Results.BadRequest("Username is already taken");
 
@@ -38,7 +37,7 @@ public static class UserEndpoints {
     public record struct LoginRequest(string UserName, string Password);
 
     public static IResult LoginEndpoint(LoginRequest input, AppDbContext dbContext, PasswordHasher<User> passwordHasher,
-        JwtCreatorService jwtCreator) {
+        JwtCreator jwtCreator) {
         var dummyUser = new User {
             Password = "",
             Username = null!,
@@ -55,12 +54,12 @@ public static class UserEndpoints {
 
     // TODO: Add rate limit
     public static IResult SendVerificationSmsEndpoint(ClaimsPrincipal claimsPrincipal, AppDbContext dbContext,
-        CodeVerificationService codeVerificationService, ISmsService smsService) {
+        CodeVerifier codeVerifier, ISmsSender smsSender) {
         var username = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value;
 
         var user = dbContext.Users.First(u => u.Username == username);
-        var code = codeVerificationService.CreateCode(username);
-        smsService.SendCode(user.PhoneNumber, code);
+        var code = codeVerifier.CreateCode(username);
+        smsSender.SendCode(user.PhoneNumber, code);
 
         return Results.Ok(new {
             message = "Verification code sent!"
@@ -68,10 +67,10 @@ public static class UserEndpoints {
     }
 
     public static async Task<IResult> VerifySmsEndpoint(int code, AppDbContext dbContext,
-        ClaimsPrincipal claimsPrincipal, CodeVerificationService codeVerificationService) {
+        ClaimsPrincipal claimsPrincipal, CodeVerifier codeVerifier) {
         var username = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value;
 
-        var result = codeVerificationService.VerifyCode(username, code);
+        var result = codeVerifier.VerifyCode(username, code);
 
         if (result) {
             var user = dbContext.Users.First(u => u.Username == username);

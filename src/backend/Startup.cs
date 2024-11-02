@@ -3,64 +3,38 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using sproj;
 using sproj.Endpoints;
 using sproj.Models;
 using sproj.Services;
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Verbose()
-    .WriteTo.Console()
-    .CreateBootstrapLogger();
+namespace sproj;
 
-try {
-    var builder = WebApplication.CreateBuilder(args);
-
-    builder.RegisterServices();
-
-    var app = builder.Build();
-
-    using (var scope = app.Services.CreateScope()) {
-        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        dbContext.Database.Migrate();
-    }
-
-    app.RegisterMiddleware();
-
-    app.Run();
-} catch (HostAbortedException) { } catch (Exception ex) {
-    Log.Fatal(ex, "Application terminated unexpectedly");
-} finally {
-    Log.CloseAndFlush();
-}
-
-public static class StartupExtensions {
+public static class Startup {
     public static void RegisterServices(this WebApplicationBuilder builder) {
         builder.Services.AddSerilog(logging => logging.ReadFrom.Configuration(builder.Configuration));
-        builder.Services.AddProblemDetails();
 
         if (builder.Environment.IsDevelopment()) {
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
         }
 
+        builder.Services.AddProblemDetails();
+
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
-        builder.Services.AddScoped<PasswordHasher<User>>();
 
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
         builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
             .Configure<JwtOptions>((jwtBearerOptions, jwtOptions) => {
                 jwtBearerOptions.MapInboundClaims = false;
-                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters {
+                jwtBearerOptions.TokenValidationParameters = new() {
                     IssuerSigningKey = jwtOptions.SecurityKey,
                     ValidateAudience = false,
                     ValidateIssuer = false
                 };
             });
+
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
         builder.Services.AddAuthorization(o => {
             o.AddPolicy("PhoneNotVerified",
                 p => p.RequireAssertion(
@@ -71,18 +45,27 @@ public static class StartupExtensions {
                     ctx => ctx.User.HasClaim(c => c.Type == "isPhoneVerified" && c.Value == "True")));
         });
 
-        builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-        builder.AddFluentValidationEndpointFilter();
-
         builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)
             .Validate(o => o.Key != null, "Missing JWT Key").ValidateOnStart();
         builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JwtOptions>>().Value);
 
-        if (builder.Environment.IsDevelopment()) builder.Services.AddScoped<ISmsService, DummySmsService>();
-        else builder.Services.AddScoped<ISmsService, SmsService>();
+        builder.Services.AddScoped<PasswordHasher<User>>();
 
-        builder.Services.AddScoped<JwtCreatorService>();
-        builder.Services.AddSingleton<CodeVerificationService>();
+        builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+        builder.AddFluentValidationEndpointFilter();
+
+        builder.AddCustomServices();
+    }
+
+    private static void AddCustomServices(this WebApplicationBuilder builder) {
+        builder.Services.AddSingleton<CodeVerifier>();
+        builder.Services.AddScoped<JwtCreator>();
+
+        if (builder.Environment.IsDevelopment()) {
+            builder.Services.AddScoped<ISmsSender, DummySmsSender>();
+        } else {
+            builder.Services.AddScoped<ISmsSender, SmsSender>();
+        }
     }
 
     public static void RegisterMiddleware(this WebApplication app) {
@@ -103,5 +86,13 @@ public static class StartupExtensions {
         api.RegisterUserEndpoints();
 
         app.MapGet("/", () => "You're authorized").RequireAuthorization("PhoneVerified");
+    }
+
+    public static void ApplyMigrations(this WebApplication webApplication) {
+        using (var scope = webApplication.Services.CreateScope()) {
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            dbContext.Database.Migrate();
+        }
     }
 }

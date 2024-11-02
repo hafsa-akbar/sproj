@@ -2,11 +2,11 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace sproj.Services;
 
-public class CodeVerificationService {
+public class CodeVerifier {
     private readonly MemoryCache _cache;
     private readonly Random _random;
 
-    public CodeVerificationService() {
+    public CodeVerifier() {
         _cache = new MemoryCache(new MemoryCacheOptions());
         _random = new Random();
     }
