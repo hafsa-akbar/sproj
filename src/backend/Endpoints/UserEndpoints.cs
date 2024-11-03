@@ -72,16 +72,14 @@ public static class UserEndpoints {
         var username = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value;
 
         var result = codeVerifier.VerifyCode(username, code);
+        if (!result) return Results.Unauthorized();
 
-        if (result) {
-            var user = dbContext.Users.First(u => u.Username == username);
-            user.IsPhoneVerified = true;
-            await dbContext.SaveChangesAsync();
-            return Results.Ok(new {
-                message = "Verification successful!"
-            });
-        }
+        var user = dbContext.Users.First(u => u.Username == username);
+        user.IsPhoneVerified = true;
+        await dbContext.SaveChangesAsync();
 
-        return Results.Unauthorized();
+        return Results.Ok(new {
+            message = "Verification successful!"
+        });
     }
 }

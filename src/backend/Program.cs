@@ -19,7 +19,7 @@ try {
 
     app.Run();
 } catch (HostAbortedException) { } catch (Exception ex) {
-    Log.Fatal(ex, "Application terminated unexpectedly");
+    Log.Fatal(ex, "application crashed");
 } finally {
     Log.CloseAndFlush();
 }

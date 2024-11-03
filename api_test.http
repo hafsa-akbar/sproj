@@ -1,5 +1,5 @@
 ###
-POST http://localhost:5000/api/user/register
+POST http://localhost:5000/users/register
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:5000/api/user/login
+POST http://localhost:5000/users/login
 Content-Type: application/json
 
 {
@@ -19,13 +19,7 @@ Content-Type: application/json
 
 ###
 POST http://localhost:5000/api/user/send-verification-sms
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYWRlZWQiLCJqdGkiOiI1NzgxOThjNC1mMjBhLTQ1MjctYTQ2NC1hMjM4MjljODczZTciLCJpc1Bob25lVmVyaWZpZWQiOiJGYWxzZSIsImV4cCI6MTczMDQ1NDU4NX0.zllZ7rEeovzts2wkNw5WMgOYoUFsWVC5oQsqNDle9gw
 
 ###
 POST http://localhost:5000/api/user/verify-sms?code=988455
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYWRlZWQiLCJqdGkiOiI1NzgxOThjNC1mMjBhLTQ1MjctYTQ2NC1hMjM4MjljODczZTciLCJpc1Bob25lVmVyaWZpZWQiOiJGYWxzZSIsImV4cCI6MTczMDQ1NDU4NX0.zllZ7rEeovzts2wkNw5WMgOYoUFsWVC5oQsqNDle9gw
-
-###
-GET http://localhost:5000/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYWRlZWQiLCJqdGkiOiI1NzgxOThjNC1mMjBhLTQ1MjctYTQ2NC1hMjM4MjljODczZTciLCJpc1Bob25lVmVyaWZpZWQiOiJGYWxzZSIsImV4cCI6MTczMDQ1NDU4NX0.zllZ7rEeovzts2wkNw5WMgOYoUFsWVC5oQsqNDle9gw

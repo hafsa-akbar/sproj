@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using FastEndpoints.Security;
 using Microsoft.IdentityModel.Tokens;
 using sproj.Data.Entities;
 
@@ -12,22 +13,14 @@ public class JwtCreator {
         _jwtOptions = jwtOptions;
     }
 
-    public JwtResponse CreateJwt(User user) {
-        var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.Sub, user.Username),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new("isPhoneVerified", user.IsPhoneVerified.ToString())
-        };
+    public string CreateJwt(User user) {
+        var jwtToken = JwtBearer.CreateToken(o => {
+            o.SigningKey = _jwtOptions.Key!;
+            o.ExpireAt = DateTime.Now.AddSeconds(_jwtOptions.Duration);
 
-        var token = new JwtSecurityToken(
-            claims: claims,
-            signingCredentials: new(_jwtOptions.SecurityKey, SecurityAlgorithms.HmacSha256),
-            expires: DateTime.Now.AddSeconds(_jwtOptions.Duration)
-        );
+            o.User["username"] = user.Username;
+        });
 
-        return new JwtResponse(new JwtSecurityTokenHandler().WriteToken(token), _jwtOptions.Duration);
+        return jwtToken;
     }
 }
-
-// ReSharper disable NotAccessedPositionalProperty.Global
-public record JwtResponse(string Token, int ExpiresIn);

@@ -1,5 +1,6 @@
 from google.cloud import documentai_v1 as documentai
 
+
 # run ❯ export GOOGLE_APPLICATION_CREDENTIALS="/Users/hafsaakbar/Desktop/sproj/ocr/documentAI_SA.json" on terminal before running code
 # u can also look into setting up default creds here: https://cloud.google.com/docs/authentication/provide-credentials-adc#local-dev
 # i need to figure out how to extract key-val pairs using the form parser api
@@ -8,11 +9,13 @@ from google.cloud import documentai_v1 as documentai
 def initialize_document_ai_client():
     return documentai.DocumentProcessorServiceClient()
 
+
 def layout_to_text(layout, text):
     return "".join(
-        text[int(segment.start_index) : int(segment.end_index)]
+        text[int(segment.start_index): int(segment.end_index)]
         for segment in layout.text_anchor.text_segments
     )
+
 
 def get_key_value_pairs(result):
     text = result.document.text
@@ -22,13 +25,14 @@ def get_key_value_pairs(result):
             value = layout_to_text(field.field_value, text)
             print(f"    * {repr(name.strip())}: {repr(value.strip())}")
 
+
 def process_document(client, project_id, location, processor_id, image_path, key_value_pairs=False):
     name = client.processor_path(project_id, location, processor_id)
 
     with open(image_path, "rb") as image_file:
         document_content = image_file.read()
 
-    document = {"content": document_content, "mime_type": "image/png"} 
+    document = {"content": document_content, "mime_type": "image/png"}
     request = {"name": name, "raw_document": document}
 
     result = client.process_document(request=request)
@@ -37,11 +41,12 @@ def process_document(client, project_id, location, processor_id, image_path, key
 
     return result.document
 
-project_id = "590344950484"         
-location = "us"            
-form_parser = "3255425ad2e217bc"     
+
+project_id = "590344950484"
+location = "us"
+form_parser = "3255425ad2e217bc"
 id_proofing_processor_id = "ecb806491cb77272"
-image_path = 'license.png'            
+image_path = 'license.png'
 
 client = initialize_document_ai_client()
 print("Extracting Fields...")
