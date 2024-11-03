@@ -3,9 +3,9 @@ POST http://localhost:5000/users/register
 Content-Type: application/json
 
 {
-  "username": "hadeed",
+  "username": "hadeedahasdf",
   "password": "password",
-  "phonenumber": "+92 3356423333"
+  "phonenumber": "03356423333"
 }
 
 ###

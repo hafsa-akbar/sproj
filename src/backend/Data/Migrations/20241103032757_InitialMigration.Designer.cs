@@ -11,7 +11,7 @@ using sproj.Data;
 namespace sproj.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241103020840_InitialMigration")]
+    [Migration("20241103032757_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

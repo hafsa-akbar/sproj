@@ -1,4 +1,5 @@
 using FastEndpoints;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 using sproj.Data.Entities;
@@ -17,24 +18,34 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
 
     public required AppDbContext DbContext { get; set; }
     public required PasswordHasher PasswordHasher { get; set; }
+    public required PhoneNumberUtil PhoneNumberUtil { get; set; }
 
-    public record Request(string Username, string Password, string PhoneNumber);
+    public record struct Request(string PhoneNumber, string Password);
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
-        if (await DbContext.Users.AnyAsync(u => u.Username == req.Username))
-            AddError(r => r.Username, "this username is already in use");
+        var normalizedPhoneNumber = PhoneNumberUtil.NormalizePhoneNumber(req.PhoneNumber);
+
+        if (await DbContext.Users.AnyAsync(u => u.PhoneNumber == normalizedPhoneNumber))
+            AddError(r => r.PhoneNumber, "phone number is already in use");
 
         ThrowIfAnyErrors();
 
         var newUser = new User {
-            Username = req.Username,
-            PhoneNumber = req.PhoneNumber,
-            Password = PasswordHasher.HashPassword(req.Password)
+            PhoneNumber = PhoneNumberUtil.NormalizePhoneNumber(req.PhoneNumber),
+            Password = PasswordHasher.HashPassword(req.Password),
         };
 
         DbContext.Users.Add(newUser);
         await DbContext.SaveChangesAsync();
 
         await SendOkAsync();
+    }
+
+    public class RequestValidator : Validator<Request> {
+        public RequestValidator(PhoneNumberUtil phoneNumberUtil) {
+            RuleFor(x => x.PhoneNumber).NotEmpty().Must(phoneNumberUtil.ValidatePhoneNumber)
+                .WithMessage("phone number is invalid");
+            RuleFor(x => x.Password).NotEmpty().MinimumLength(8);
+        }
     }
 }

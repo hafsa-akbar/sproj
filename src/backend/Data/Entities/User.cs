@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace sproj.Data.Entities;
 
 public enum UserState {
@@ -13,7 +11,6 @@ public enum UserState {
 public class User {
     public int Id { get; init; }
 
-    public required string Username { get; set; }
     public required string PhoneNumber { get; set; }
     public required string Password { get; set; }
 
