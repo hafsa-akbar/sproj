@@ -11,16 +11,15 @@ using sproj.Services;
 namespace sproj.Features.Registration;
 
 public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse> {
+    public required AppDbContext DbContext { get; set; }
+    public required JwtCreator JwtCreator { get; set; }
+    public required PasswordHasher PasswordHasher { get; set; }
+    public required PhoneNumberUtil PhoneNumberUtil { get; set; }
+
     public override void Configure() {
         Post("/users/register");
         AllowAnonymous();
     }
-
-    public required AppDbContext DbContext { get; set; }
-    public required PasswordHasher PasswordHasher { get; set; }
-    public required PhoneNumberUtil PhoneNumberUtil { get; set; }
-
-    public record struct Request(string PhoneNumber, string Password);
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var normalizedPhoneNumber = PhoneNumberUtil.NormalizePhoneNumber(req.PhoneNumber);
@@ -30,16 +29,23 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
 
         ThrowIfAnyErrors();
 
-        var newUser = new User {
+        var user = new User {
             PhoneNumber = PhoneNumberUtil.NormalizePhoneNumber(req.PhoneNumber),
-            Password = PasswordHasher.HashPassword(req.Password),
+            Password = PasswordHasher.HashPassword(req.Password)
         };
 
-        DbContext.Users.Add(newUser);
+        DbContext.Users.Add(user);
         await DbContext.SaveChangesAsync();
 
-        await SendOkAsync();
+        await SendResultAsync(Results.Ok(new {
+            Status = "success",
+            Data = new {
+                Token = JwtCreator.CreateJwt(user)
+            }
+        }));
     }
+
+    public record struct Request(string PhoneNumber, string Password);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator(PhoneNumberUtil phoneNumberUtil) {

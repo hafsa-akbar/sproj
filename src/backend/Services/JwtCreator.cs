@@ -14,6 +14,9 @@ public class JwtCreator {
         var jwtToken = JwtBearer.CreateToken(o => {
             o.SigningKey = _jwtOptions.Key!;
             o.ExpireAt = DateTime.Now.AddSeconds(_jwtOptions.Duration);
+
+            o.User["phoneNumber"] = user.PhoneNumber;
+            o.User["isPhoneVerified"] = user.IsPhoneVerified.ToString().ToLower();
         });
 
         return jwtToken;

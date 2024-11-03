@@ -3,9 +3,8 @@ POST http://localhost:5000/users/register
 Content-Type: application/json
 
 {
-  "username": "hadeedahasdf",
-  "password": "password",
-  "phonenumber": "03356423333"
+  "phonenumber": "03356423333",
+  "password": "password"
 }
 
 ###
@@ -13,13 +12,17 @@ POST http://localhost:5000/users/login
 Content-Type: application/json
 
 {
-  "username": "hadeed",
+  "phonenumber": "03356423333",
   "password": "password"
 }
 
 ###
-POST http://localhost:5000/api/user/send-verification-sms
+POST http://localhost:5000/users/send-sms-code
+Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZU51bWJlciI6Iis5MjMzNTY0MjMzMzMiLCJpc1Bob25lVmVyaWZpZWQiOiJ0cnVlIiwiZXhwIjoxNzMwNzIzMzYxLCJpYXQiOjE3MzA2MzY5NjEsIm5iZiI6MTczMDYzNjk2MX0.j1UJ-0VQ6My4ywIoCc5gqGO8fIpaMpSBrsJ-pTtgR-w
 
 ###
-POST http://localhost:5000/api/user/verify-sms?code=988455
+POST http://localhost:5000/users/verify-sms-code
+Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZU51bWJlciI6Iis5MjMzNTY0MjMzMzMiLCJpc1Bob25lVmVyaWZpZWQiOiJmYWxzZSIsImV4cCI6MTczMDcyMzAwOCwiaWF0IjoxNzMwNjM2NjA4LCJuYmYiOjE3MzA2MzY2MDh9.kNmiHAGVswXzEBo9QL5v9QMh5xZWkEI1-miJpep6gFo
 Content-Type: application/json
+
+{"code": "473486"}

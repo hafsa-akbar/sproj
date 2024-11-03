@@ -48,11 +48,6 @@ namespace sproj.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("state");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("username");
-
                     b.HasKey("Id")
                         .HasName("pk_users");
 

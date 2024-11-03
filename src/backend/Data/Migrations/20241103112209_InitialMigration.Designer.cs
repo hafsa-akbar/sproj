@@ -11,7 +11,7 @@ using sproj.Data;
 namespace sproj.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241103032757_InitialMigration")]
+    [Migration("20241103112209_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -50,11 +50,6 @@ namespace sproj.Data.Migrations
                     b.Property<int>("State")
                         .HasColumnType("integer")
                         .HasColumnName("state");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("username");
 
                     b.HasKey("Id")
                         .HasName("pk_users");

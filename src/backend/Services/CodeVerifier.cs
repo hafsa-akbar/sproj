@@ -2,6 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace sproj.Services;
 
+// TODO: Use out of process database
 public class CodeVerifier {
     private readonly MemoryCache _cache;
     private readonly Random _random;
@@ -11,31 +12,31 @@ public class CodeVerifier {
         _random = new Random();
     }
 
-    public int CreateCode(string username) {
+    public string CreateCode(string phoneNumber) {
         var code = GenerateRandomCode();
 
-        _cache.Set(CacheKey(username), code, new MemoryCacheEntryOptions {
+        _cache.Set(CacheKey(phoneNumber), code, new MemoryCacheEntryOptions {
             AbsoluteExpirationRelativeToNow = new TimeSpan(0, 15, 0)
         });
 
         return code;
     }
 
-    public bool VerifyCode(string username, int code) {
-        if (_cache.TryGetValue<int>(CacheKey(username), out var storedCode))
+    public bool VerifyCode(string phoneNumber, string code) {
+        if (_cache.TryGetValue<string>(CacheKey(phoneNumber), out var storedCode))
             return code == storedCode;
 
         return false;
     }
 
-    private int GenerateRandomCode(int length = 6) {
+    private string GenerateRandomCode(int length = 6) {
         var code = new char[length];
         for (var i = 0; i < length; i++) code[i] = (char)('0' + _random.Next(0, 10));
 
-        return int.Parse(code);
+        return new string(code);
     }
 
-    private string CacheKey(string username) {
-        return $"SMSCode_{username}";
+    private string CacheKey(string phoneNumber) {
+        return $"SMSCode_{phoneNumber}";
     }
 }

@@ -12,8 +12,8 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="EFCore.NamingConventions" Version="8.0.3"/>
-        <PackageReference Include="FastEndpoints" Version="5.30.0"/>
-        <PackageReference Include="FastEndpoints.Security" Version="5.30.0"/>
+        <PackageReference Include="FastEndpoints" Version="5.31.0"/>
+        <PackageReference Include="FastEndpoints.Security" Version="5.31.0"/>
         <PackageReference Include="libphonenumber-csharp" Version="8.13.48"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10"/>
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.3"/>
