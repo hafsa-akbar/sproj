@@ -1,7 +1,6 @@
 using FastEndpoints;
 using FluentValidation;
 using sproj.Data;
-using sproj.Data.Entities;
 using sproj.Services;
 
 // ReSharper disable NotAccessedPositionalProperty.Global
@@ -25,7 +24,11 @@ public class LoginEndpoint : Endpoint<LoginEndpoint.Request, EmptyRequest> {
 
         var dummyUser = new User {
             Password = string.Empty,
-            PhoneNumber = normalizedPhoneNumber
+            PhoneNumber = normalizedPhoneNumber,
+            RoleId = 0,
+            FullName = null!,
+            Address = null!,
+            Birthdate = default
         };
 
         var user = DbContext.Users.SingleOrDefault(u => u.PhoneNumber == normalizedPhoneNumber) ?? dummyUser;

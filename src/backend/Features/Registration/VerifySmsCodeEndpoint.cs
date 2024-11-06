@@ -22,7 +22,7 @@ public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, Emp
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var phoneNumber = User.FindFirst("phoneNumber")!.Value;
 
-        var result = CodeVerifier.VerifyCode(phoneNumber, req.Code);
+        var result = await CodeVerifier.VerifyCode(phoneNumber, req.Code);
         if (!result) {
             // TODO: inconsistent with problem details
             var error = new ErrorResponse([new ValidationFailure("code", "provided code is invalid")], 401);
@@ -31,7 +31,7 @@ public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, Emp
         }
 
         var user = DbContext.Users.First(u => u.PhoneNumber == phoneNumber);
-        user.IsPhoneVerified = true;
+        user.RoleId = Data.Roles.Employer;
         await DbContext.SaveChangesAsync();
 
         await SendResultAsync(Results.Ok(new {

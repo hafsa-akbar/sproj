@@ -1,5 +1,5 @@
 using FastEndpoints.Security;
-using sproj.Data.Entities;
+using sproj.Data;
 
 namespace sproj.Services;
 
@@ -16,7 +16,7 @@ public class JwtCreator {
             o.ExpireAt = DateTime.Now.AddSeconds(_jwtOptions.Duration);
 
             o.User["phoneNumber"] = user.PhoneNumber;
-            o.User["isPhoneVerified"] = user.IsPhoneVerified.ToString().ToLower();
+            o.User["role"] = user.RoleId.ToString();
         });
 
         return jwtToken;

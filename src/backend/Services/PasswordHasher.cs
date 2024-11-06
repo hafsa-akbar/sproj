@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using sproj.Data.Entities;
+using sproj.Data;
 
 namespace sproj.Services;
 

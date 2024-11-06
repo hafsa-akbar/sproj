@@ -14,14 +14,14 @@ public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
 
     public override void Configure() {
         Post("/users/send-sms-code");
-        Policy(p => p.RequireClaim("isPhoneVerified", "false"));
+        Policy(p => p.RequireClaim("role", Data.Roles.Unregistered.ToString()));
     }
 
     // TODO: Add rate limiting
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {
         var phoneNumber = User.FindFirst("phoneNumber")!.Value;
 
-        var code = CodeVerifier.CreateCode(phoneNumber);
+        var code = await CodeVerifier.CreateCode(phoneNumber);
         SmsSender.SendCode(phoneNumber, code);
 
         await SendResultAsync(Results.Ok(new {

@@ -26,7 +26,7 @@ public static class Startup {
     }
 
     private static void AddCustomServices(this WebApplicationBuilder builder) {
-        builder.Services.AddSingleton<CodeVerifier>();
+        builder.Services.AddScoped<CodeVerifier>();
         builder.Services.AddSingleton<JwtCreator>();
         builder.Services.AddSingleton<PhoneNumberUtil>();
         builder.Services.AddSingleton<PasswordHasher>();

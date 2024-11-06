@@ -2,7 +2,6 @@ using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
-using sproj.Data.Entities;
 using sproj.Services;
 
 // ReSharper disable NotAccessedPositionalProperty.Global
@@ -31,7 +30,11 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
 
         var user = new User {
             PhoneNumber = PhoneNumberUtil.NormalizePhoneNumber(req.PhoneNumber),
-            Password = PasswordHasher.HashPassword(req.Password)
+            Password = PasswordHasher.HashPassword(req.Password),
+            RoleId = 0,
+            FullName = null!,
+            Address = null!,
+            Birthdate = default
         };
 
         DbContext.Users.Add(user);
