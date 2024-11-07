@@ -4,7 +4,10 @@ Content-Type: application/json
 
 {
   "phonenumber": "03356423333",
-  "password": "password"
+  "password": "password",
+  "fullname": "Hadeed Ahmad",
+  "address": "147",
+  "birthdate": "2002-03-08"
 }
 
 ###
@@ -26,3 +29,16 @@ Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW
 Content-Type: application/json
 
 {"code": "473486"}
+
+###
+POST http://localhost:5000/jobs
+Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInBob25lX251bWJlciI6Iis5MjMzNTY0MjMzMzMiLCJyb2xlIjoiMyIsImV4cCI6MTczMTAyODk1NCwiaWF0IjoxNzMwOTQyNTU0LCJuYmYiOjE3MzA5NDI1NTR9.JwjIsHWzB88lek3-AhVgcQVsgI6kqsEHjKIXU3GXCjc
+Content-Type: application/json
+
+{
+  "wageRate": 30,
+  "jobCategory": 1,
+  "jobType": 2,
+  "jobExperience": 2,
+  "locale": 1
+}

@@ -4,7 +4,6 @@ using FluentValidation.Results;
 using sproj.Data;
 using sproj.Services;
 
-// ReSharper disable NotAccessedPositionalProperty.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace sproj.Features.Registration;
@@ -16,11 +15,11 @@ public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, Emp
 
     public override void Configure() {
         Post("/users/verify-sms-code");
-        Policy(p => p.RequireClaim("isPhoneVerified", "false"));
+        Policy(p => p.RequireClaim("role", ((int)Data.Roles.Unregistered).ToString()));
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
-        var phoneNumber = User.FindFirst("phoneNumber")!.Value;
+        var phoneNumber = User.FindFirst("phone_number")!.Value;
 
         var result = await CodeVerifier.VerifyCode(phoneNumber, req.Code);
         if (!result) {

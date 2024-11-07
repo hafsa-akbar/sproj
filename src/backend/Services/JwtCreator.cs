@@ -15,8 +15,9 @@ public class JwtCreator {
             o.SigningKey = _jwtOptions.Key!;
             o.ExpireAt = DateTime.Now.AddSeconds(_jwtOptions.Duration);
 
-            o.User["phoneNumber"] = user.PhoneNumber;
-            o.User["role"] = user.RoleId.ToString();
+            o.User["user_id"] = user.UserId.ToString();
+            o.User["phone_number"] = user.PhoneNumber;
+            o.User["role"] = ((int)user.RoleId).ToString();
         });
 
         return jwtToken;

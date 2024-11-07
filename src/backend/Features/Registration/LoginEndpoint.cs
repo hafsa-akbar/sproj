@@ -3,7 +3,6 @@ using FluentValidation;
 using sproj.Data;
 using sproj.Services;
 
-// ReSharper disable NotAccessedPositionalProperty.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace sproj.Features.Registration;
@@ -25,7 +24,7 @@ public class LoginEndpoint : Endpoint<LoginEndpoint.Request, EmptyRequest> {
         var dummyUser = new User {
             Password = string.Empty,
             PhoneNumber = normalizedPhoneNumber,
-            RoleId = 0,
+            RoleId = Data.Roles.Unregistered,
             FullName = null!,
             Address = null!,
             Birthdate = default

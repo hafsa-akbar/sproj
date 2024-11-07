@@ -3,7 +3,6 @@ using sproj.Data;
 
 namespace sproj.Services;
 
-// TODO: Use out of process database
 public class CodeVerifier {
     private readonly AppDbContext _appDbContext;
     private readonly Random _random;
@@ -35,11 +34,8 @@ public class CodeVerifier {
             .Include(u => u.SmsVerifications)
             .FirstOrDefaultAsync();
 
-        if (user?.SmsVerifications == null) {
-            return false;
-        }
+        if (user?.SmsVerifications == null) return false;
 
-        // Check if the code matches and is not expired
         return user.SmsVerifications.VerificationCode == code &&
                user.SmsVerifications.ExpiresAt > DateTime.Now;
     }

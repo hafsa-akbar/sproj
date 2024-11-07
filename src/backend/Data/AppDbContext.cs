@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using sproj.Services;
 
 // ReSharper disable CollectionNeverUpdated.Global
 
@@ -16,48 +17,50 @@ public class AppDbContext : DbContext {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        // TODO: Use generic function to clean this
         modelBuilder.Entity<Locale>(entity => {
             entity.HasData(
-                new Locale { LocaleId = Locales.Lahore, LocaleName = "lahore" },
-                new Locale { LocaleId = Locales.Islamabad, LocaleName = "islamabad" }
+                Utils.GetEnumNames<Locales>().Select(e => new Locale {
+                    // TODO: Use strong types
+                    LocaleId = e.Item1,
+                    LocaleName = e.Item2
+                })
             );
         });
 
         modelBuilder.Entity<JobCategory>(entity => {
             entity.HasData(
-                new JobCategory { JobCategoryId = JobCategories.Cooking, JobCategoryDescription = "cooking" },
-                new JobCategory { JobCategoryId = JobCategories.Cleaning, JobCategoryDescription = "cleaning" },
-                new JobCategory { JobCategoryId = JobCategories.Driving, JobCategoryDescription = "driving" },
-                new JobCategory { JobCategoryId = JobCategories.Laundry, JobCategoryDescription = "laundry" },
-                new JobCategory { JobCategoryId = JobCategories.Gardening, JobCategoryDescription = "gardening" },
-                new JobCategory { JobCategoryId = JobCategories.Babysitting, JobCategoryDescription = "babysitting" },
-                new JobCategory { JobCategoryId = JobCategories.PetCare, JobCategoryDescription = "pet_care" },
-                new JobCategory
-                    { JobCategoryId = JobCategories.SecurityGuard, JobCategoryDescription = "securit_guard" }
+                Utils.GetEnumNames<JobCategories>().Select(e => new JobCategory {
+                    JobCategoryId = e.Item1,
+                    JobCategoryDescription = e.Item2
+                })
             );
         });
 
         modelBuilder.Entity<JobType>(entity => {
             entity.HasData(
-                new JobType { JobTypeId = JobTypes.OneShot, JobTypeDescription = "one_shot" },
-                new JobType { JobTypeId = JobTypes.PermanentHire, JobTypeDescription = "permanent_hire" }
+                Utils.GetEnumNames<JobTypes>().Select(e => new JobType {
+                    JobTypeId = e.Item1,
+                    JobTypeDescription = e.Item2
+                })
             );
         });
 
         modelBuilder.Entity<JobExperience>(entity => {
             entity.HasData(
-                new JobExperience { JobExperienceId = JobExperiences.Beginner, JobExperienceDescription = "beginner" },
-                new JobExperience
-                    { JobExperienceId = JobExperiences.Intermediate, JobExperienceDescription = "intermediate" },
-                new JobExperience { JobExperienceId = JobExperiences.Expert, JobExperienceDescription = "expert" }
+                Utils.GetEnumNames<JobExperiences>().Select(e => new JobExperience {
+                    JobExperienceId = e.Item1,
+                    JobExperienceDescription = e.Item2
+                })
             );
         });
 
         modelBuilder.Entity<Role>(entity => {
             entity.HasData(
-                new Role { RoleId = Roles.Unregistered, RoleDescription = "unregistered" },
-                new Role { RoleId = Roles.Employer, RoleDescription = "employer" },
-                new Role { RoleId = Roles.Worker, RoleDescription = "worker" }
+                Utils.GetEnumNames<Roles>().Select(e => new Role {
+                    RoleId = e.Item1,
+                    RoleDescription = e.Item2
+                })
             );
         });
 
