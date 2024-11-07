@@ -31,6 +31,9 @@ public static class Startup {
         builder.Services.AddSingleton<PhoneNumberUtil>();
         builder.Services.AddSingleton<PasswordHasher>();
 
+        if (!builder.Environment.IsDevelopment()) builder.Services.AddScoped<ICnicVerificationService, CnicVerificationService>();
+        else builder.Services.AddSingleton<ICnicVerificationService, DummyCnicVerificationService>();
+
         if (!builder.Environment.IsDevelopment()) builder.Services.AddScoped<ISmsSender, SmsSender>();
         else builder.Services.AddSingleton<ISmsSender, DummySmsSender>();
 

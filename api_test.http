@@ -1,3 +1,13 @@
+POST http://localhost:5000/users/cnic-upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="cnic"; filename="README.md"
+
+< ./README.md
+--WebAppBoundary--
+
+###
 ###
 POST http://localhost:5000/users/register
 Content-Type: application/json
