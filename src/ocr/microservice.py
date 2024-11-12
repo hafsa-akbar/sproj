@@ -1,3 +1,7 @@
+import base64
+import hashlib
+import json
+
 from dateutil import parser
 from flask import Flask, request, jsonify
 from google.cloud import documentai_v1 as documentai
@@ -6,6 +10,20 @@ import re
 
 app = Flask(__name__)
 
+CACHE_FILE = "cache.json"
+
+def load_cache():
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, "r") as file:
+            return json.load(file)
+    return {}
+
+def save_cache(cache):
+    with open(CACHE_FILE, "w") as file:
+        json.dump(cache, file)
+
+def get_cache_key(image_data):
+    return hashlib.sha256(image_data).hexdigest()
 
 def initialize_document_ai_client():
     return documentai.DocumentProcessorServiceClient()
@@ -62,36 +80,47 @@ def process_document(client, project_id, location, ids, image):
         request = {"name": name, "raw_document": document}
         return client.process_document(request=request)
 
-    try:
-        fp_result = ocr(fp)
-        fields = get_key_value_pairs(fp_result)
-        id_details = extract_identity_details(fields)
+    fp_result = ocr(fp)
+    fields = get_key_value_pairs(fp_result)
+    id_details = extract_identity_details(fields)
 
-        id_proof_result = ocr(proofing)
-        id_details['id_proofing'] = all(
-            entity.mention_text == 'PASS' for entity in id_proof_result.document.entities
-        )
-        return id_details
+    id_proof_result = ocr(proofing)
+    id_details['id_proofing'] = all(
+        entity.mention_text == 'PASS' for entity in id_proof_result.document.entities
+    )
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return id_details
 
 
 @app.route('/check_identity', methods=['POST'])
-def check_identity(image):
+def check_identity():
     image = request.files['image']
     if not image:
         return jsonify({"error": "No image provided"}), 400
 
-    client = initialize_document_ai_client()
-    project_id = "713882766306"
-    location = "us"
-    fp = "c92b67b5117b5320"
-    id_proof = "c2cca91b6637391a"
+    image_data = image.read()
+    cache_key = get_cache_key(image_data)
 
-    id_details = process_document(client, project_id, location, (fp, id_proof), image)
-    return jsonify(id_details), 200
+    cache = load_cache()
+    if cache_key in cache:
+        return jsonify(cache[cache_key]), 200
 
+    image_base64 = base64.b64encode(image_data).decode("utf-8")
+
+    try:
+        client = initialize_document_ai_client()
+        project_id = "713882766306"
+        location = "us"
+        fp = "c92b67b5117b5320"
+        id_proof = "c2cca91b6637391a"
+
+        id_details = process_document(client, project_id, location, (fp, id_proof), image_base64)
+        cache[cache_key] = id_details
+        save_cache(cache)
+
+        return jsonify(id_details), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     script_directory = os.path.dirname(os.path.abspath(__file__))

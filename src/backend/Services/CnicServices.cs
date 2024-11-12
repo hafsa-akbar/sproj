@@ -5,7 +5,7 @@ using sproj.Data;
 namespace sproj.Services;
 
 public interface ICnicVerificationService {
-    Task<bool> VerifyCnicAsync(User user, Stream cnicImage);
+    Task<string?> VerifyCnicAsync(User user, Stream cnicImage);
 }
 
 public class CnicVerificationService : ICnicVerificationService {
@@ -18,7 +18,7 @@ public class CnicVerificationService : ICnicVerificationService {
         _logger = logger;
     }
 
-    public async Task<bool> VerifyCnicAsync(User user, Stream cnicImage) {
+    public async Task<string?> VerifyCnicAsync(User user, Stream cnicImage) {
         var httpClient = _httpClientFactory.CreateClient();
 
         try {
@@ -34,22 +34,27 @@ public class CnicVerificationService : ICnicVerificationService {
 
             if (!response.IsSuccessStatusCode) {
                 _logger.LogWarning("Request to microservice failed: {body}", jsonResponse);
-                return false;
+                return null;
             }
 
-            var cnic = responseData["cnic"]!.ToString();
-            var idProofing = bool.Parse(responseData["id_proofing"]!.ToString());
+            if (bool.Parse(responseData["id_proofing"]!.ToString())) return null;
 
-            return cnic == user.CnicNumber && idProofing;
+            var birthdate = DateOnly.Parse(responseData["birthdate"]!.ToString());
+            if (user.Birthdate != birthdate) return null;
+
+            var expiry = DateOnly.Parse(responseData["expirydate"]!.ToString());
+            if (expiry < DateOnly.FromDateTime(DateTime.Today)) return null;
+
+            return responseData["cnic"]!.ToString();
         } catch (Exception exception){
             _logger.LogError("Exception while verifying cnic: {exception}", exception);
-            return false;
+            return null;
         }
     }
 }
 
 public class DummyCnicVerificationService : ICnicVerificationService {
-    public Task<bool> VerifyCnicAsync(User user, Stream cnicImage) {
-        return Task.FromResult(true);
+    public Task<string?> VerifyCnicAsync(User user, Stream cnicImage) {
+        return Task.FromResult("15609-0979259-9");
     }
 }

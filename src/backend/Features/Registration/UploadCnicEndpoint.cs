@@ -17,25 +17,28 @@ public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyRequ
     {
         Post("/users/cnic-upload");
         AllowAnonymous();
-        // Policy(p => p.RequireClaim("role", ((int)Data.Roles.Employer).ToString()));
+        Policy(p => p.RequireClaim("role", ((int)Data.Roles.Employer).ToString()));
 
         AllowFileUploads();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        // var userId = int.Parse(User.FindFirst("user_id")!.Value);
-        // var user = await DbContext.Users.FirstAsync(u => u.UserId == userId, ct);
-        User user = null!;
+        var userId = int.Parse(User.FindFirst("user_id")!.Value);
+        var user = await DbContext.Users.FirstAsync(u => u.UserId == userId);
 
         using var fileStream = req.Cnic.OpenReadStream();
-        var isVerified = await CnicVerificationService.VerifyCnicAsync(user, fileStream);
+        var cnic = await CnicVerificationService.VerifyCnicAsync(user, fileStream);
 
-        if (!isVerified) {
+        if (cnic is null) {
             await SendResultAsync(Results.BadRequest("CNIC verification failed"));
             return;
         }
 
+        user.CnicNumber = cnic;
+        user.RoleId = Data.Roles.Worker;
+
+        await DbContext.SaveChangesAsync();
         await SendResultAsync(Results.Ok("CNIC verified successfully"));
     }
 
