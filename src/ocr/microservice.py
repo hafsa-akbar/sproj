@@ -1,6 +1,7 @@
-from google.cloud import documentai_v1 as documentai
-from flask import Flask, request, jsonify
 from dateutil import parser
+from flask import Flask, request, jsonify
+from google.cloud import documentai_v1 as documentai
+import os
 import re
 
 app = Flask(__name__)
@@ -31,7 +32,7 @@ def get_key_value_pairs(result):
 def reformat_date(date_str):
     try:
         parsed_date = parser.parse(date_str, dayfirst=True)
-        return parsed_date.strftime("%Y-%m-%d") 
+        return parsed_date.strftime("%Y-%m-%d")
     except Exception as e:
         return None
 
@@ -48,9 +49,9 @@ def extract_identity_details(fields):
             details["cnic"] = value
         elif re.search(r"\blicense\b", key, re.IGNORECASE):
             details["licenseNumber"] = value
-    
+
     return details
-    
+
 
 def process_document(client, project_id, location, ids, image):
     fp, proofing = ids
@@ -60,18 +61,18 @@ def process_document(client, project_id, location, ids, image):
         document = {"content": image, "mime_type": "image/png"}
         request = {"name": name, "raw_document": document}
         return client.process_document(request=request)
-    
+
     try:
         fp_result = ocr(fp)
         fields = get_key_value_pairs(fp_result)
         id_details = extract_identity_details(fields)
-        
+
         id_proof_result = ocr(proofing)
         id_details['id_proofing'] = all(
             entity.mention_text == 'PASS' for entity in id_proof_result.document.entities
         )
         return id_details
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -81,16 +82,19 @@ def check_identity(image):
     image = request.files['image']
     if not image:
         return jsonify({"error": "No image provided"}), 400
-    
+
     client = initialize_document_ai_client()
     project_id = "713882766306"
     location = "us"
     fp = "c92b67b5117b5320"
     id_proof = "c2cca91b6637391a"
-    
+
     id_details = process_document(client, project_id, location, (fp, id_proof), image)
     return jsonify(id_details), 200
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(script_directory, "documentAI_SA.json")
+
+    app.run(host='127.0.0.1', port=1811)

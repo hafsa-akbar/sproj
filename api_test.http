@@ -1,10 +1,10 @@
-POST http://localhost:5000/users/cnic-upload
+POST http://localhost:1811/check_identity
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
-Content-Disposition: form-data; name="cnic"; filename="README.md"
+Content-Disposition: form-data; name="image"; filename="nadra.png"
 
-< ./README.md
+< src/ocr/nadra.png
 --WebAppBoundary--
 
 ###
