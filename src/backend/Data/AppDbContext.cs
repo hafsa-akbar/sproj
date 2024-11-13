@@ -14,6 +14,7 @@ public class AppDbContext : DbContext {
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         modelBuilder.Entity<Job>().HasOne(j => j.WorkerDetails).WithOne().HasForeignKey<Job>(j => j.UserId);
+        modelBuilder.Entity<PastJob>().HasOne(j => j.WorkerDetails).WithOne().HasForeignKey<PastJob>(j => j.UserId);
     }
 }
 
@@ -56,15 +57,15 @@ public class SmsVerification {
 
 public class CnicVerification {
     [Key] public int UserId { get; set; }
-    public required byte[] CnicImage { get; set; }
+    public required byte[] IdImage { get; set; }
+    public required IdType IdType { get; set; }
 
     public User? User { get; set; }
 }
 
 public class UserPreferences {
     [Key] public int UserId { get; set; }
-
-    public Locale? JobLocale { get; set; }
+    [MaxLength(64)] public string? JobLocale { get; set; }
     public required List<JobCategory> JobCategories { get; set; }
     public required List<JobType> JobTypes { get; set; }
     public required List<JobExperience> JobExperiences { get; set; }
@@ -73,7 +74,6 @@ public class UserPreferences {
 public class Job {
     public int JobId { get; set; }
 
-    public required bool IsCoupleJob { get; set; }
     public required int WageRate { get; set; }
 
     public required int UserId { get; set; }
@@ -83,13 +83,32 @@ public class Job {
     public required JobCategory JobCategory { get; set; }
     public required JobExperience JobExperience { get; set; }
     public required JobType JobType { get; set; }
-    public required Locale Locale { get; set; }
+    [MaxLength(64)] public required string Locale { get; set; }
 
     public PermanentJob? PermanentJobDetails { get; set; }
+}
+
+public class PastJob {
+    public required int PastJobId { get; set; }
+
+    public required int UserId { get; set; }
+    public WorkerDetails? WorkerDetails { get; set; }
+
+    [MaxLength(15)] public required string EmployerPhoneNumber { get; set; }
+    public required JobGender JobGender { get; set; }
+    public required JobCategory JobCategory { get; set; }
+    public required JobType JobType { get; set; }
+    [MaxLength(64)] public required string Locale { get; set; }
+
+    public required bool IsVerified { get; set; }
+
+    public int? Rating { get; set; }
+    [MaxLength(256)] public string? Comments { get; set; }
 }
 
 public class PermanentJob {
     [Key] public int JobId { get; set; }
 
     public int TrialPeriod { get; set; }
+    
 }

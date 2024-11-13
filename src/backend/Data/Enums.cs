@@ -43,3 +43,8 @@ public enum JobGender {
     Female = 2,
     Couple = 3
 }
+
+public enum IdType {
+    DrivingLicense = 1,
+    CNIC = 2
+}
