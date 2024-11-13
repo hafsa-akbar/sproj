@@ -12,7 +12,7 @@ public class UpdateUserPreferencesEndpoint : Endpoint<UpdateUserPreferencesEndpo
 
     public override void Configure() {
         Put("/user/preferences");
-        Policy(p => p.RequireClaim("role", ((int)Data.Roles.Employer).ToString()));
+        Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
@@ -25,20 +25,9 @@ public class UpdateUserPreferencesEndpoint : Endpoint<UpdateUserPreferencesEndpo
         user.UserPreferences = new UserPreferences { UserId = userId };
 
         user.UserPreferences.JobLocale = req.Locale;
-        user.UserPreferences.JobCategories =
-            req.JobCategories.Select(jc => new JobCategory {
-                JobCategoryId = jc,
-                JobCategoryDescription = null!
-            }).ToList();
-        user.UserPreferences.JobTypes = req.JobTypes.Select(jt => new JobType {
-            JobTypeId = jt,
-            JobTypeDescription = null!
-        }).ToList();
-        user.UserPreferences.JobExperiences =
-            req.JobExperiences.Select(je => new JobExperience {
-                JobExperienceId = je,
-                JobExperienceDescription = null!
-            }).ToList();
+        user.UserPreferences.JobCategories = req.JobCategories;
+        user.UserPreferences.JobTypes = req.JobTypes;
+        user.UserPreferences.JobExperiences = req.JobExperiences;
 
         await DbContext.SaveChangesAsync(ct);
 
@@ -46,10 +35,10 @@ public class UpdateUserPreferencesEndpoint : Endpoint<UpdateUserPreferencesEndpo
     }
 
     public record struct Request(
-        Locales Locale,
-        List<JobCategories> JobCategories,
-        List<JobTypes> JobTypes,
-        List<JobExperiences> JobExperiences);
+        Locale Locale,
+        List<JobCategory> JobCategories,
+        List<JobType> JobTypes,
+        List<JobExperience> JobExperiences);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {

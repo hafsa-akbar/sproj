@@ -15,7 +15,7 @@ public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, Emp
 
     public override void Configure() {
         Post("/users/verify-sms-code");
-        Policy(p => p.RequireClaim("role", ((int)Data.Roles.Unregistered).ToString()));
+        Policy(p => p.RequireClaim("role", Role.Unregistered.ToString()));
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
@@ -23,14 +23,13 @@ public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, Emp
 
         var result = await CodeVerifier.VerifyCode(phoneNumber, req.Code);
         if (!result) {
-            // TODO: inconsistent with problem details
             var error = new ErrorResponse([new ValidationFailure("code", "provided code is invalid")], 401);
             await error.ExecuteAsync(HttpContext);
             return;
         }
 
         var user = DbContext.Users.First(u => u.PhoneNumber == phoneNumber);
-        user.RoleId = Data.Roles.Employer;
+        user.Role= Role.Employer;
         await DbContext.SaveChangesAsync();
 
         await SendResultAsync(Results.Ok(new {

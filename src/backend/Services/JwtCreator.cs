@@ -17,7 +17,7 @@ public class JwtCreator {
 
             o.User["user_id"] = user.UserId.ToString();
             o.User["phone_number"] = user.PhoneNumber;
-            o.User["role"] = ((int)user.RoleId).ToString();
+            o.User["role"] = user.Role.ToString();
         });
 
         return jwtToken;

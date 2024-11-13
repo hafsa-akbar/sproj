@@ -13,7 +13,7 @@ public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
 
     public override void Configure() {
         Post("/users/send-sms-code");
-        Policy(p => p.RequireClaim("role", ((int)Data.Roles.Unregistered).ToString()));
+        Policy(p => p.RequireClaim("role", Role.Unregistered.ToString()));
     }
 
     // TODO: Add rate limiting

@@ -17,7 +17,8 @@ Content-Type: application/json
   "password": "password",
   "fullname": "Hadeed Ahmad",
   "address": "147",
-  "birthdate": "2002-03-08"
+  "birthdate": "2002-03-08",
+  "gender": 1
 }
 
 ###

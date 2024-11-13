@@ -20,7 +20,15 @@ public static class Startup {
         builder.Services.AddAuthorization();
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
+        builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString, optionsBuilder => {
+            optionsBuilder.MapEnum<Locale>("locale");
+            optionsBuilder.MapEnum<JobCategory>("job_category");
+            optionsBuilder.MapEnum<JobType>("job_type");
+            optionsBuilder.MapEnum<JobExperience>("job_experience");
+            optionsBuilder.MapEnum<Role>("role");
+            optionsBuilder.MapEnum<UserGender>("user_gender");
+            optionsBuilder.MapEnum<JobGender>("job_gender");
+        }));
 
         builder.AddCustomServices();
     }

@@ -15,7 +15,7 @@ public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyResp
     public override void Configure() {
         Post("/users/cnic-upload");
         AllowAnonymous();
-        Policy(p => p.RequireClaim("role", ((int)Data.Roles.Employer).ToString()));
+        Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
 
         AllowFileUploads();
     }
@@ -33,7 +33,7 @@ public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyResp
         }
 
         user.CnicNumber = cnic;
-        user.RoleId = Data.Roles.Worker;
+        user.Role= Role.Worker;
 
         await DbContext.SaveChangesAsync();
         await SendResultAsync(Results.Ok("CNIC verified successfully"));

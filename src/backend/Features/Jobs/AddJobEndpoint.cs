@@ -11,7 +11,7 @@ public class AddJobEndpoint : Endpoint<AddJobEndpoint.Request, EmptyRequest> {
 
     public override void Configure() {
         Post("/jobs");
-        Policy(p => p.RequireClaim("role", ((int)Data.Roles.Worker).ToString()));
+        Policy(p => p.RequireClaim("role", Role.Worker.ToString()));
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
@@ -19,10 +19,10 @@ public class AddJobEndpoint : Endpoint<AddJobEndpoint.Request, EmptyRequest> {
         var job = new Job {
             WageRate = req.WageRate,
             UserId = int.Parse(User.FindFirst("user_id")!.Value),
-            JobCategoryId = req.JobCategory,
-            JobTypeId = req.JobType,
-            JobExperienceId = req.JobExperience,
-            LocaleId = req.Locale
+            JobCategory= req.JobCategory,
+            JobType= req.JobType,
+            JobExperience= req.JobExperience,
+            Locale= req.Locale
         };
 
         DbContext.Jobs.Add(job);
@@ -34,10 +34,10 @@ public class AddJobEndpoint : Endpoint<AddJobEndpoint.Request, EmptyRequest> {
     // TODO: Deserialize as strings
     public record struct Request(
         int WageRate,
-        JobCategories JobCategory,
-        JobTypes JobType,
-        JobExperiences JobExperience,
-        Locales Locale);
+        JobCategory JobCategory,
+        JobType JobType,
+        JobExperience JobExperience,
+        Locale Locale);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {

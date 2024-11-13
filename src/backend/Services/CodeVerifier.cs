@@ -46,8 +46,4 @@ public class CodeVerifier {
 
         return new string(code);
     }
-
-    private string CacheKey(string phoneNumber) {
-        return $"SMSCode_{phoneNumber}";
-    }
 }

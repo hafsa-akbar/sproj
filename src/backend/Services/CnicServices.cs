@@ -55,6 +55,6 @@ public class CnicVerificationService : ICnicVerificationService {
 
 public class DummyCnicVerificationService : ICnicVerificationService {
     public Task<string?> VerifyCnicAsync(User user, Stream cnicImage) {
-        return Task.FromResult("15609-0979259-9");
+        return Task.FromResult((string?) "15609-0979259-9");
     }
 }

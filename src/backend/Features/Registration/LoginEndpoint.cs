@@ -24,11 +24,11 @@ public class LoginEndpoint : Endpoint<LoginEndpoint.Request, EmptyResponse> {
         var dummyUser = new User {
             Password = string.Empty,
             PhoneNumber = normalizedPhoneNumber,
-            RoleId = Data.Roles.Unregistered,
             FullName = null!,
             Address = null!,
             Birthdate = default,
-            Gender = UserGenders.Male
+            Gender = UserGender.Male,
+            Role = Role.Unregistered
         };
 
         var user = DbContext.Users.SingleOrDefault(u => u.PhoneNumber == normalizedPhoneNumber) ?? dummyUser;

@@ -30,7 +30,7 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
         var user = new User {
             PhoneNumber = PhoneNumberUtil.NormalizePhoneNumber(req.PhoneNumber),
             Password = PasswordHasher.HashPassword(req.Password),
-            RoleId = Data.Roles.Unregistered,
+            Role = Role.Unregistered,
             FullName = req.FullName,
             Address = req.Address,
             Birthdate = req.Birthdate,
@@ -54,7 +54,7 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
         string FullName,
         string Address,
         DateOnly Birthdate,
-        UserGenders Gender);
+        UserGender Gender);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator(PhoneNumberUtil phoneNumberUtil) {

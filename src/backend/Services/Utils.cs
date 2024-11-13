@@ -1,6 +1,6 @@
 namespace sproj.Services;
 
-public class Utils {
+public static class Utils {
     public static List<(TEnum, string)> GetEnumNames<TEnum>() where TEnum : Enum {
         var enumNames = new List<(TEnum, string)>();
 

@@ -13,7 +13,7 @@ try {
 
     var app = builder.Build();
 
-    app.ApplyMigrations();
+    // app.ApplyMigrations();
 
     app.RegisterMiddleware();
 

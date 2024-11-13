@@ -22,10 +22,10 @@ public class GetJobsEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
                 j.JobId,
                 j.WageRate,
                 j.UserId,
-                JobCategory = j.JobCategory!.JobCategoryDescription,
-                JobType = j.JobType!.JobTypeDescription,
-                JobExperience = j.JobExperience!.JobExperienceDescription,
-                Locale = j.Locale!.LocaleName,
+                j.JobCategory,
+                j.JobType,
+                j.JobExperience,
+                j.Locale,
                 IsPermanent = j.PermanentJobDetails != null
             })
             .ToListAsync(ct);
