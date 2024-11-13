@@ -3,6 +3,8 @@ using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace sproj.Features.Registration;
 
 public class AddCoupleEndpoint : Endpoint<AddCoupleEndpoint.Request, EmptyResponse> {

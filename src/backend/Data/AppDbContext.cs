@@ -79,6 +79,7 @@ public class Job {
     public required int UserId { get; set; }
     public WorkerDetails? WorkerDetails { get; set; }
 
+    public required JobGender JobGender { get; set; }
     public required JobCategory JobCategory { get; set; }
     public required JobExperience JobExperience { get; set; }
     public required JobType JobType { get; set; }
