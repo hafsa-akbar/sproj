@@ -32,6 +32,8 @@ public class User {
     [MaxLength(32)] public string? CnicNumber { get; set; }
     [MaxLength(32)] public string? DrivingLicense { get; set; }
 
+    public User? Couple { get; set; }
+
     public SmsVerification? SmsVerifications { get; set; }
     public CnicVerification? CnicVerifications { get; set; }
     public UserPreferences? UserPreferences { get; set; }
@@ -63,15 +65,15 @@ public class UserPreferences {
     [Key] public int UserId { get; set; }
 
     public Locale? JobLocale { get; set; }
-    public ICollection<JobCategory>? JobCategories { get; set; }
-    public ICollection<JobType>? JobTypes { get; set; }
-    public ICollection<JobExperience>? JobExperiences { get; set; }
+    public required List<JobCategory> JobCategories { get; set; }
+    public required List<JobType> JobTypes { get; set; }
+    public required List<JobExperience> JobExperiences { get; set; }
 }
 
 public class Job {
     public int JobId { get; set; }
 
-    // public required bool IsCoupleJob { get; set; }
+    public required bool IsCoupleJob { get; set; }
     public required int WageRate { get; set; }
 
     public required int UserId { get; set; }

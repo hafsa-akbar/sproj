@@ -19,10 +19,11 @@ public class AddJobEndpoint : Endpoint<AddJobEndpoint.Request, EmptyRequest> {
         var job = new Job {
             WageRate = req.WageRate,
             UserId = int.Parse(User.FindFirst("user_id")!.Value),
-            JobCategory= req.JobCategory,
-            JobType= req.JobType,
-            JobExperience= req.JobExperience,
-            Locale= req.Locale
+            JobCategory = req.JobCategory,
+            JobType = req.JobType,
+            JobExperience = req.JobExperience,
+            Locale = req.Locale,
+            IsCoupleJob = false
         };
 
         DbContext.Jobs.Add(job);
