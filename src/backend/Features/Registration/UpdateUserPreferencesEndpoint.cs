@@ -7,7 +7,7 @@ using sproj.Data;
 
 namespace sproj.Features.Registration;
 
-public class UpdateUserPreferencesEndpoint : Endpoint<UpdateUserPreferencesEndpoint.Request, EmptyRequest> {
+public class UpdateUserPreferencesEndpoint : Endpoint<UpdateUserPreferencesEndpoint.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {

@@ -8,13 +8,11 @@ using sproj.Services;
 
 namespace sproj.Features.Registration;
 
-public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyRequest>
-{
+public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
     public required ICnicVerificationService CnicVerificationService { get; set; }
 
-    public override void Configure()
-    {
+    public override void Configure() {
         Post("/users/cnic-upload");
         AllowAnonymous();
         Policy(p => p.RequireClaim("role", ((int)Data.Roles.Employer).ToString()));
@@ -22,8 +20,7 @@ public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyRequ
         AllowFileUploads();
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
-    {
+    public override async Task HandleAsync(Request req, CancellationToken ct) {
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
         var user = await DbContext.Users.FirstAsync(u => u.UserId == userId);
 

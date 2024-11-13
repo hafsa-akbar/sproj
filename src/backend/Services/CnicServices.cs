@@ -46,7 +46,7 @@ public class CnicVerificationService : ICnicVerificationService {
             if (expiry < DateOnly.FromDateTime(DateTime.Today)) return null;
 
             return responseData["cnic"]!.ToString();
-        } catch (Exception exception){
+        } catch (Exception exception) {
             _logger.LogError("Exception while verifying cnic: {exception}", exception);
             return null;
         }

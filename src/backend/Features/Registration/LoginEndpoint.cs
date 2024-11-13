@@ -7,7 +7,7 @@ using sproj.Services;
 
 namespace sproj.Features.Registration;
 
-public class LoginEndpoint : Endpoint<LoginEndpoint.Request, EmptyRequest> {
+public class LoginEndpoint : Endpoint<LoginEndpoint.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
     public required JwtCreator JwtCreator { get; set; }
     public required PasswordHasher PasswordHasher { get; set; }
