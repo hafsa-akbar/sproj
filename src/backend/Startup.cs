@@ -43,7 +43,7 @@ public static class Startup {
             builder.Services.AddScoped<ICnicVerificationService, CnicVerificationService>();
         else builder.Services.AddSingleton<ICnicVerificationService, DummyCnicVerificationService>();
 
-        if (!builder.Environment.IsDevelopment()) builder.Services.AddScoped<ISmsSender, SmsSender>();
+        if (!builder.Environment.IsDevelopment()) builder.Services.AddScoped<ISmsSender, SmsSender>(); // Not configured
         else builder.Services.AddSingleton<ISmsSender, DummySmsSender>();
 
         builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)

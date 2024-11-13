@@ -29,7 +29,7 @@ public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, Emp
         }
 
         var user = DbContext.Users.First(u => u.PhoneNumber == phoneNumber);
-        user.Role= Role.Employer;
+        user.Role = Role.Employer;
         await DbContext.SaveChangesAsync();
 
         await SendResultAsync(Results.Ok(new {

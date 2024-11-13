@@ -1,3 +1,7 @@
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
+
 namespace sproj.Services;
 
 public interface ISmsSender {
@@ -5,8 +9,26 @@ public interface ISmsSender {
 }
 
 public class SmsSender : ISmsSender {
+    private readonly string _twilioPhoneNumber;
+
+    public SmsSender(string accountSid, string authToken, string twilioPhoneNumber) {
+        TwilioClient.Init(accountSid, authToken);
+        _twilioPhoneNumber = twilioPhoneNumber;
+    }
+
     public void SendCode(string to, string code) {
-        throw new NotImplementedException();
+        try {
+            var message = MessageResource.Create(
+                from: new PhoneNumber(_twilioPhoneNumber),
+                to: new PhoneNumber(to),
+                body: $"Your verification code is: {code}"
+            );
+
+            Console.WriteLine($"Message sent to {to}: Status {message.Status}");
+        } catch (Exception ex) {
+            Console.WriteLine($"Error sending SMS to {to}: {ex.Message}");
+            throw;
+        }
     }
 }
 

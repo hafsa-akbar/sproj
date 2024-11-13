@@ -33,7 +33,7 @@ public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyResp
         }
 
         user.CnicNumber = cnic;
-        user.Role= Role.Worker;
+        user.Role = Role.Worker;
 
         await DbContext.SaveChangesAsync();
         await SendResultAsync(Results.Ok("CNIC verified successfully"));

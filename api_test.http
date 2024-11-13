@@ -13,7 +13,7 @@ POST http://localhost:5000/users/register
 Content-Type: application/json
 
 {
-  "phonenumber": "03356423333",
+  "phonenumber": "03099411411",
   "password": "password",
   "fullname": "Hadeed Ahmad",
   "address": "147",
@@ -32,7 +32,7 @@ Content-Type: application/json
 
 ###
 POST http://localhost:5000/users/send-sms-code
-Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZU51bWJlciI6Iis5MjMzNTY0MjMzMzMiLCJpc1Bob25lVmVyaWZpZWQiOiJ0cnVlIiwiZXhwIjoxNzMwNzIzMzYxLCJpYXQiOjE3MzA2MzY5NjEsIm5iZiI6MTczMDYzNjk2MX0.j1UJ-0VQ6My4ywIoCc5gqGO8fIpaMpSBrsJ-pTtgR-w
+Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzE1NTgwNjYsImlhdCI6MTczMTQ3MTY2NiwidXNlcl9pZCI6IjEiLCJwaG9uZV9udW1iZXIiOiIrOTIzMDk5NDExNDExIiwicm9sZSI6IlVucmVnaXN0ZXJlZCIsIm5iZiI6MTczMTQ3MTY2Nn0.nG8bQfYrPX09ggzLhnhmiOeWzMHUzrKUJ0Tu9DqWtzs
 
 ###
 POST http://localhost:5000/users/verify-sms-code

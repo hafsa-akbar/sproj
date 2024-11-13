@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using sproj.Data;
@@ -27,11 +28,17 @@ namespace sproj.Data.Migrations
                     Birthdate = table.Column<DateOnly>(type: "date", nullable: false),
                     Gender = table.Column<UserGender>(type: "user_gender", nullable: false),
                     CnicNumber = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
-                    DrivingLicense = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true)
+                    DrivingLicense = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    CoupleUserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_Users_Users_CoupleUserId",
+                        column: x => x.CoupleUserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -77,9 +84,9 @@ namespace sproj.Data.Migrations
                 {
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     JobLocale = table.Column<Locale>(type: "locale", nullable: true),
-                    JobCategories = table.Column<JobCategory[]>(type: "job_category[]", nullable: true),
-                    JobTypes = table.Column<JobType[]>(type: "job_type[]", nullable: true),
-                    JobExperiences = table.Column<JobExperience[]>(type: "job_experience[]", nullable: true)
+                    JobCategories = table.Column<List<JobCategory>>(type: "job_category[]", nullable: false),
+                    JobTypes = table.Column<List<JobType>>(type: "job_type[]", nullable: false),
+                    JobExperiences = table.Column<List<JobExperience>>(type: "job_experience[]", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -115,8 +122,10 @@ namespace sproj.Data.Migrations
                 {
                     JobId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IsCoupleJob = table.Column<bool>(type: "boolean", nullable: false),
                     WageRate = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
+                    JobGender = table.Column<JobGender>(type: "job_gender", nullable: false),
                     JobCategory = table.Column<JobCategory>(type: "job_category", nullable: false),
                     JobExperience = table.Column<JobExperience>(type: "job_experience", nullable: false),
                     JobType = table.Column<JobType>(type: "job_type", nullable: false),
@@ -156,6 +165,11 @@ namespace sproj.Data.Migrations
                 table: "Jobs",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_CoupleUserId",
+                table: "Users",
+                column: "CoupleUserId");
         }
 
         /// <inheritdoc />

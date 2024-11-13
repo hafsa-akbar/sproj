@@ -15,13 +15,15 @@ public class CodeVerifier {
     public async Task<string> CreateCode(string phoneNumber) {
         var smsVerification = new SmsVerification {
             VerificationCode = GenerateRandomCode(),
-            ExpiresAt = DateTime.Now.AddMinutes(5)
+            ExpiresAt = DateTime.Now.AddMinutes(5).ToUniversalTime()
         };
 
-        _appDbContext.Users
+        var user = await _appDbContext.Users
             .Where(u => u.PhoneNumber == phoneNumber)
             .Include(u => u.SmsVerifications)
-            .ExecuteUpdate(b => b.SetProperty(u => u.SmsVerifications, smsVerification));
+            .FirstAsync();
+
+        user.SmsVerifications = smsVerification;
 
         await _appDbContext.SaveChangesAsync();
 

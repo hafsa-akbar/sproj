@@ -36,7 +36,7 @@ public class AddCoupleEndpoint : Endpoint<AddCoupleEndpoint.Request, EmptyRespon
         couple.Couple = user;
         await DbContext.SaveChangesAsync();
 
-        await SendResultAsync(Results.Ok( new {
+        await SendResultAsync(Results.Ok(new {
             Status = "success"
         }));
     }
