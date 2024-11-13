@@ -27,14 +27,12 @@ public class Role {
     [MaxLength(32)] public required string RoleDescription { get; set; }
 }
 
-public enum Locales
-{
+public enum Locales {
     Lahore = 1,
     Islamabad = 2
 }
 
-public enum JobCategories
-{
+public enum JobCategories {
     Cooking = 1,
     Cleaning = 2,
     Driving = 3,
@@ -45,22 +43,30 @@ public enum JobCategories
     SecurityGuard = 8
 }
 
-public enum JobTypes
-{
+public enum JobTypes {
     OneShot = 1,
     PermanentHire = 2
 }
 
-public enum JobExperiences
-{
+public enum JobExperiences {
     Beginner = 1,
     Intermediate = 2,
     Expert = 3
 }
 
-public enum Roles
-{
+public enum Roles {
     Unregistered = 1,
     Employer = 2,
     Worker = 3
+}
+
+public enum UserGenders {
+    Male = 1,
+    Female = 2
+}
+
+public enum JobGenders {
+    Male = 1,
+    Female = 2,
+    Couple = 3
 }

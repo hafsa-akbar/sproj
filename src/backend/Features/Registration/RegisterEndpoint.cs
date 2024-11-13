@@ -33,7 +33,8 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
             RoleId = Data.Roles.Unregistered,
             FullName = req.FullName,
             Address = req.Address,
-            Birthdate = req.Birthdate
+            Birthdate = req.Birthdate,
+            Gender = req.Gender
         };
 
         DbContext.Users.Add(user);
@@ -52,7 +53,8 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
         string Password,
         string FullName,
         string Address,
-        DateOnly Birthdate);
+        DateOnly Birthdate,
+        UserGenders Gender);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator(PhoneNumberUtil phoneNumberUtil) {
@@ -61,6 +63,7 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
             RuleFor(x => x.Password).NotEmpty().MinimumLength(6);
             RuleFor(x => x.FullName).NotEmpty().MaximumLength(128);
             RuleFor(x => x.Address).NotEmpty().MaximumLength(512);
+            RuleFor(x => x.Gender).NotEmpty().IsInEnum();
         }
     }
 }

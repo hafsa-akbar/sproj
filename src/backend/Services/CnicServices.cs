@@ -9,8 +9,8 @@ public interface ICnicVerificationService {
 }
 
 public class CnicVerificationService : ICnicVerificationService {
-    private IHttpClientFactory _httpClientFactory;
-    private ILogger<DummyCnicVerificationService> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<DummyCnicVerificationService> _logger;
 
 
     public CnicVerificationService(IHttpClientFactory httpClientFactory, ILogger<DummyCnicVerificationService> logger) {

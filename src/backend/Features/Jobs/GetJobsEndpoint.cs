@@ -1,6 +1,6 @@
 using FastEndpoints;
-using sproj.Data;
 using Microsoft.EntityFrameworkCore;
+using sproj.Data;
 
 namespace sproj.Features.Jobs;
 

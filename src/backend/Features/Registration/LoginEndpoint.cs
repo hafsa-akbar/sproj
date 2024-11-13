@@ -27,7 +27,8 @@ public class LoginEndpoint : Endpoint<LoginEndpoint.Request, EmptyResponse> {
             RoleId = Data.Roles.Unregistered,
             FullName = null!,
             Address = null!,
-            Birthdate = default
+            Birthdate = default,
+            Gender = UserGenders.Male
         };
 
         var user = DbContext.Users.SingleOrDefault(u => u.PhoneNumber == normalizedPhoneNumber) ?? dummyUser;

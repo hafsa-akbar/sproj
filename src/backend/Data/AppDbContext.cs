@@ -107,6 +107,7 @@ public class User {
     [MaxLength(128)] public required string FullName { get; set; }
     [MaxLength(512)] public required string Address { get; set; }
     public required DateOnly Birthdate { get; set; }
+    public required UserGenders Gender { get; set; }
     [MaxLength(32)] public string? CnicNumber { get; set; }
     [MaxLength(32)] public string? DrivingLicense { get; set; }
 
