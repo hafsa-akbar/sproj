@@ -25,7 +25,6 @@ namespace sproj.Data.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "job_experience", new[] { "beginner", "expert", "intermediate" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "job_gender", new[] { "couple", "female", "male" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "job_type", new[] { "one_shot", "permanent_hire" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "locale", new[] { "islamabad", "lahore" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "role", new[] { "employer", "unregistered", "worker" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_gender", new[] { "female", "male" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -35,9 +34,12 @@ namespace sproj.Data.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<byte[]>("CnicImage")
+                    b.Property<byte[]>("IdImage")
                         .IsRequired()
                         .HasColumnType("bytea");
+
+                    b.Property<int>("IdType")
+                        .HasColumnType("integer");
 
                     b.HasKey("UserId");
 
@@ -52,9 +54,6 @@ namespace sproj.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("JobId"));
 
-                    b.Property<bool>("IsCoupleJob")
-                        .HasColumnType("boolean");
-
                     b.Property<JobCategory>("JobCategory")
                         .HasColumnType("job_category");
 
@@ -67,8 +66,10 @@ namespace sproj.Data.Migrations
                     b.Property<JobType>("JobType")
                         .HasColumnType("job_type");
 
-                    b.Property<Locale>("Locale")
-                        .HasColumnType("locale");
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -82,6 +83,54 @@ namespace sproj.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Jobs");
+                });
+
+            modelBuilder.Entity("sproj.Data.PastJob", b =>
+                {
+                    b.Property<int>("PastJobId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PastJobId"));
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("EmployerPhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<JobCategory>("JobCategory")
+                        .HasColumnType("job_category");
+
+                    b.Property<JobGender>("JobGender")
+                        .HasColumnType("job_gender");
+
+                    b.Property<JobType>("JobType")
+                        .HasColumnType("job_type");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int?>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PastJobId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("PastJob");
                 });
 
             modelBuilder.Entity("sproj.Data.PermanentJob", b =>
@@ -183,8 +232,9 @@ namespace sproj.Data.Migrations
                         .IsRequired()
                         .HasColumnType("job_experience[]");
 
-                    b.Property<Locale?>("JobLocale")
-                        .HasColumnType("locale");
+                    b.Property<string>("JobLocale")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.PrimitiveCollection<List<JobType>>("JobTypes")
                         .IsRequired()
@@ -221,6 +271,17 @@ namespace sproj.Data.Migrations
                     b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
                         .WithOne()
                         .HasForeignKey("sproj.Data.Job", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkerDetails");
+                });
+
+            modelBuilder.Entity("sproj.Data.PastJob", b =>
+                {
+                    b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
+                        .WithOne()
+                        .HasForeignKey("sproj.Data.PastJob", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

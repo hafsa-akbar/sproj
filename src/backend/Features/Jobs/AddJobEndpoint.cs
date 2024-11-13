@@ -33,7 +33,6 @@ public class AddJobEndpoint : Endpoint<AddJobEndpoint.Request, EmptyRequest> {
             JobType = req.JobType,
             JobExperience = req.JobExperience,
             Locale = req.Locale,
-            IsCoupleJob = false,
             JobGender = req.JobGender
         };
 
@@ -50,7 +49,7 @@ public class AddJobEndpoint : Endpoint<AddJobEndpoint.Request, EmptyRequest> {
         JobCategory JobCategory,
         JobType JobType,
         JobExperience JobExperience,
-        Locale Locale);
+        string Locale);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
@@ -69,8 +68,7 @@ public class AddJobEndpoint : Endpoint<AddJobEndpoint.Request, EmptyRequest> {
             RuleFor(r => r.JobExperience).NotNull()
                 .IsInEnum().WithMessage("Job experience must be a valid value.");
 
-            RuleFor(r => r.Locale).NotNull()
-                .IsInEnum().WithMessage("Locale must be a valid value.");
+            RuleFor(r => r.Locale).NotNull();
         }
     }
 }

@@ -40,14 +40,13 @@ public class UpdateUserPreferencesEndpoint : Endpoint<UpdateUserPreferencesEndpo
     }
 
     public record struct Request(
-        Locale? Locale,
+        string? Locale,
         List<JobCategory>? JobCategories,
         List<JobType>? JobTypes,
         List<JobExperience>? JobExperiences);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
-            RuleFor(r => r.Locale).IsInEnum().WithMessage("Locale must be a valid value.");
             RuleForEach(r => r.JobCategories).IsInEnum().WithMessage("Job category ID must be a valid number.");
             RuleForEach(r => r.JobTypes).IsInEnum().WithMessage("Job type ID must be a valid number.");
             RuleForEach(r => r.JobExperiences).IsInEnum().WithMessage("Job experience ID must be a valid number.");

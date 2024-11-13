@@ -14,15 +14,6 @@ namespace sproj.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:job_category", "babysitting,cleaning,cooking,driving,gardening,laundry,pet_care,security_guard")
-                .Annotation("Npgsql:Enum:job_experience", "beginner,expert,intermediate")
-                .Annotation("Npgsql:Enum:job_gender", "couple,female,male")
-                .Annotation("Npgsql:Enum:job_type", "one_shot,permanent_hire")
-                .Annotation("Npgsql:Enum:locale", "islamabad,lahore")
-                .Annotation("Npgsql:Enum:role", "employer,unregistered,worker")
-                .Annotation("Npgsql:Enum:user_gender", "female,male");
-
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -55,7 +46,8 @@ namespace sproj.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    CnicImage = table.Column<byte[]>(type: "bytea", nullable: false)
+                    IdImage = table.Column<byte[]>(type: "bytea", nullable: false),
+                    IdType = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,7 +84,7 @@ namespace sproj.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    JobLocale = table.Column<Locale>(type: "locale", nullable: true),
+                    JobLocale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     JobCategories = table.Column<List<JobCategory>>(type: "job_category[]", nullable: false),
                     JobTypes = table.Column<List<JobType>>(type: "job_type[]", nullable: false),
                     JobExperiences = table.Column<List<JobExperience>>(type: "job_experience[]", nullable: false)
@@ -131,20 +123,46 @@ namespace sproj.Data.Migrations
                 {
                     JobId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IsCoupleJob = table.Column<bool>(type: "boolean", nullable: false),
                     WageRate = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     JobGender = table.Column<JobGender>(type: "job_gender", nullable: false),
                     JobCategory = table.Column<JobCategory>(type: "job_category", nullable: false),
                     JobExperience = table.Column<JobExperience>(type: "job_experience", nullable: false),
                     JobType = table.Column<JobType>(type: "job_type", nullable: false),
-                    Locale = table.Column<Locale>(type: "locale", nullable: false)
+                    Locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Jobs", x => x.JobId);
                     table.ForeignKey(
                         name: "FK_Jobs_WorkerDetails_UserId",
+                        column: x => x.UserId,
+                        principalTable: "WorkerDetails",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PastJob",
+                columns: table => new
+                {
+                    PastJobId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    EmployerPhoneNumber = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
+                    JobGender = table.Column<JobGender>(type: "job_gender", nullable: false),
+                    JobCategory = table.Column<JobCategory>(type: "job_category", nullable: false),
+                    JobType = table.Column<JobType>(type: "job_type", nullable: false),
+                    Locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    IsVerified = table.Column<bool>(type: "boolean", nullable: false),
+                    Rating = table.Column<int>(type: "integer", nullable: true),
+                    Comments = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PastJob", x => x.PastJobId);
+                    table.ForeignKey(
+                        name: "FK_PastJob_WorkerDetails_UserId",
                         column: x => x.UserId,
                         principalTable: "WorkerDetails",
                         principalColumn: "UserId",
@@ -176,6 +194,12 @@ namespace sproj.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_PastJob_UserId",
+                table: "PastJob",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_CoupleUserId",
                 table: "Users",
                 column: "CoupleUserId");
@@ -186,6 +210,9 @@ namespace sproj.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CnicVerification");
+
+            migrationBuilder.DropTable(
+                name: "PastJob");
 
             migrationBuilder.DropTable(
                 name: "PermanentJob");

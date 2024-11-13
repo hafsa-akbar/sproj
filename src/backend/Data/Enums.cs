@@ -1,9 +1,5 @@
 namespace sproj.Data;
 
-public enum Locale {
-    Lahore = 1,
-    Islamabad = 2
-}
 
 public enum JobCategory {
     Cooking = 1,
