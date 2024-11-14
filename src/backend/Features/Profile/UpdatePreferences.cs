@@ -12,7 +12,7 @@ public class UpdatePreferences : Endpoint<UpdatePreferences.Request, EmptyRespon
 
     public override void Configure() {
         Patch("/preferences");
-        Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
+        Policy(p => p.RequireClaim("role", Role.Employer.ToString(), Role.Worker.ToString()));
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {

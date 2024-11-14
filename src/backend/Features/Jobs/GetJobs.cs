@@ -4,7 +4,7 @@ using sproj.Data;
 
 namespace sproj.Features.Jobs;
 
-public class GetJobsEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
+public class GetJobs : Endpoint<EmptyRequest, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {

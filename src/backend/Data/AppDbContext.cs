@@ -89,18 +89,18 @@ public class Job {
 }
 
 public class PastJob {
-    public required int PastJobId { get; set; }
+    public int PastJobId { get; set; }
 
-    public required int UserId { get; set; }
+    public int UserId { get; set; }
     public WorkerDetails? WorkerDetails { get; set; }
 
     public required JobCategory JobCategory { get; set; }
     public required JobGender JobGender { get; set; }
     public required JobType JobType { get; set; }
-
-    [MaxLength(15)] public required string EmployerPhoneNumber { get; set; }
     [MaxLength(64)] public required string Locale { get; set; }
 
+
+    [MaxLength(15)] public required string EmployerPhoneNumber { get; set; }
     public required bool IsVerified { get; set; }
     public int? Rating { get; set; }
     [MaxLength(256)] public string? Comments { get; set; }

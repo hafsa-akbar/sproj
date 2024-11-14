@@ -11,7 +11,7 @@ public class GetPreferences : Endpoint<EmptyRequest, EmptyResponse> {
 
     public override void Configure() {
         Get("/preferences");
-        Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
+        Policy(p => p.RequireClaim("role", Role.Employer.ToString(), Role.Worker.ToString()));
     }
 
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {

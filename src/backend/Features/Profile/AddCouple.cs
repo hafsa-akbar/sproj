@@ -6,7 +6,7 @@ using sproj.Data;
 
 namespace sproj.Features.Profile;
 
-public class AddCoupleEndpoint : Endpoint<AddCoupleEndpoint.Request, EmptyResponse> {
+public class AddCouple : Endpoint<AddCouple.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {

@@ -8,7 +8,7 @@ using sproj.Services;
 
 namespace sproj.Features.Registration;
 
-public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse> {
+public class Register : Endpoint<Register.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
     public required JwtCreator JwtCreator { get; set; }
     public required PasswordHasher PasswordHasher { get; set; }
