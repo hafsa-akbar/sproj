@@ -5,29 +5,31 @@ using Twilio.Types;
 namespace sproj.Services;
 
 public interface ISmsSender {
-    public void SendCode(string to, string code);
+    public void SendMessage(string to, string text);
 }
 
 public class SmsSender : ISmsSender {
     private readonly TwilioOptions _twilioOptions;
+    private readonly ILogger<SmsSender> _logger;
 
-    public SmsSender(TwilioOptions twilioOptions) {
+    public SmsSender(TwilioOptions twilioOptions, ILogger<SmsSender> logger) {
+        TwilioClient.Init(twilioOptions.AccountSid, twilioOptions.AuthToken);
         _twilioOptions = twilioOptions;
-        TwilioClient.Init(_twilioOptions.AccountSid, _twilioOptions.AuthToken);
+        _logger = logger;
     }
 
-    public void SendCode(string to, string code) {
+    public void SendMessage(string to, string text) {
         try {
-            var message = MessageResource.Create(
+            var messageResource = MessageResource.Create(
                 from: new PhoneNumber(_twilioOptions.PhoneNumber),
                 to: new PhoneNumber(to),
-                body: $"Your verification code is: {code}"
+                body: $"{text}"
             );
 
-            Console.WriteLine($"Message sent to {to}: Status {message.Status}");
-        } catch (Exception ex) {
-            Console.WriteLine($"Error sending SMS to {to}: {ex.Message}");
-            throw;
+            _logger.LogInformation("SMS sent to {recipient}. Status: {status}", to, messageResource.Status);
+        }
+        catch (Exception ex) {
+            _logger.LogError("Error sending sms to {recipient}: {exception}", to, ex.Message);
         }
     }
 }
@@ -39,7 +41,7 @@ public class DummySmsSender : ISmsSender {
         _logger = logger;
     }
 
-    public void SendCode(string to, string code) {
-        _logger.LogInformation("Sending code {code} to {to}", code, to);
+    public void SendMessage(string to, string text) {
+        _logger.LogInformation("Sending a dummy text to {recipient}. Contents: {text}", to, text);
     }
 }

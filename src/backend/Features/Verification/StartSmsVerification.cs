@@ -20,7 +20,7 @@ public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
         var phoneNumber = User.FindFirst("phone_number")!.Value;
 
         var code = await CodeVerifier.CreateCode(phoneNumber);
-        SmsSender.SendCode(phoneNumber, code);
+        SmsSender.SendMessage(phoneNumber, $"Your verification code is {code}");
 
         await SendOkAsync();
     }
