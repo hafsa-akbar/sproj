@@ -6,8 +6,8 @@ namespace sproj.Services;
 public class PasswordHasher {
     private readonly IPasswordHasher<User> _passwordHasher;
 
-    public PasswordHasher(IPasswordHasher<User> passwordHasher) {
-        _passwordHasher = passwordHasher;
+    public PasswordHasher() {
+        _passwordHasher = new PasswordHasher<User>();
     }
 
     public string HashPassword(string password) {

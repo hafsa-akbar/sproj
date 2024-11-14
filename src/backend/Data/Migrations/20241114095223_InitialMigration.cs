@@ -14,14 +14,6 @@ namespace sproj.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:job_category", "babysitting,cleaning,cooking,driving,gardening,laundry,pet_care,security_guard")
-                .Annotation("Npgsql:Enum:job_experience", "beginner,expert,intermediate")
-                .Annotation("Npgsql:Enum:job_gender", "couple,female,male")
-                .Annotation("Npgsql:Enum:job_type", "one_shot,permanent_hire")
-                .Annotation("Npgsql:Enum:role", "employer,unregistered,worker")
-                .Annotation("Npgsql:Enum:user_gender", "female,male");
-
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -163,11 +155,11 @@ namespace sproj.Data.Migrations
                     PastJobId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    EmployerPhoneNumber = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
-                    JobGender = table.Column<JobGender>(type: "job_gender", nullable: false),
                     JobCategory = table.Column<JobCategory>(type: "job_category", nullable: false),
+                    JobGender = table.Column<JobGender>(type: "job_gender", nullable: false),
                     JobType = table.Column<JobType>(type: "job_type", nullable: false),
                     Locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    EmployerPhoneNumber = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
                     IsVerified = table.Column<bool>(type: "boolean", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: true),
                     Comments = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),

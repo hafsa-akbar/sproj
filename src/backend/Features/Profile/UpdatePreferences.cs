@@ -23,16 +23,16 @@ public class UpdatePreferences : Endpoint<UpdatePreferences.Request, EmptyRespon
             .FirstAsync(u => u.UserId == userId);
 
         if (req.Locale is not null)
-            user.UserPreferences.JobLocale = req.Locale;
+            user.UserPreferences!.JobLocale = req.Locale;
 
         if (req.JobCategories is not null)
-            user.UserPreferences.JobCategories = req.JobCategories.Distinct().ToList();
+            user.UserPreferences!.JobCategories = req.JobCategories.Distinct().ToList();
 
         if (req.JobExperiences is not null)
-            user.UserPreferences.JobExperiences = req.JobExperiences.Distinct().ToList();
+            user.UserPreferences!.JobExperiences = req.JobExperiences.Distinct().ToList();
 
         if (req.JobTypes is not null)
-            user.UserPreferences.JobTypes = req.JobTypes.Distinct().ToList();
+            user.UserPreferences!.JobTypes = req.JobTypes.Distinct().ToList();
 
         await DbContext.SaveChangesAsync();
         await SendResultAsync(Results.Ok(user.UserPreferences));

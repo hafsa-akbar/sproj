@@ -13,7 +13,7 @@ using sproj.Data;
 namespace sproj.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241114033737_InitialMigration")]
+    [Migration("20241114095223_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -345,11 +345,13 @@ namespace sproj.Data.Migrations
 
             modelBuilder.Entity("sproj.Data.WorkerDetails", b =>
                 {
-                    b.HasOne("sproj.Data.User", null)
+                    b.HasOne("sproj.Data.User", "User")
                         .WithOne("WorkerDetails")
                         .HasForeignKey("sproj.Data.WorkerDetails", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("sproj.Data.Job", b =>
