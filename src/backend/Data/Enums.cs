@@ -1,6 +1,5 @@
 namespace sproj.Data;
 
-
 public enum JobCategory {
     Cooking = 1,
     Cleaning = 2,

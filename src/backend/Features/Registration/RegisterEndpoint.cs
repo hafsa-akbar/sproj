@@ -11,8 +11,6 @@ namespace sproj.Features.Registration;
 public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
     public required JwtCreator JwtCreator { get; set; }
-    public required PasswordHasher PasswordHasher { get; set; }
-    public required PhoneNumberUtil PhoneNumberUtil { get; set; }
 
     public override void Configure() {
         Post("/users/register");
@@ -20,7 +18,7 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
-        var normalizedPhoneNumber = PhoneNumberUtil.NormalizePhoneNumber(req.PhoneNumber);
+        var normalizedPhoneNumber = Utils.NormalizePhoneNumber(req.PhoneNumber);
 
         if (await DbContext.Users.AnyAsync(u => u.PhoneNumber == normalizedPhoneNumber))
             AddError(r => r.PhoneNumber, "phone number is already in use");
@@ -28,8 +26,8 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
         ThrowIfAnyErrors();
 
         var user = new User {
-            PhoneNumber = PhoneNumberUtil.NormalizePhoneNumber(req.PhoneNumber),
-            Password = PasswordHasher.HashPassword(req.Password),
+            PhoneNumber = Utils.NormalizePhoneNumber(req.PhoneNumber),
+            Password = Utils.HashPassword(req.Password),
             Role = Role.Unregistered,
             FullName = req.FullName,
             Address = req.Address,
@@ -57,8 +55,8 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
         UserGender Gender);
 
     public class RequestValidator : Validator<Request> {
-        public RequestValidator(PhoneNumberUtil phoneNumberUtil) {
-            RuleFor(x => x.PhoneNumber).NotEmpty().Must(phoneNumberUtil.ValidatePhoneNumber)
+        public RequestValidator() {
+            RuleFor(x => x.PhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber)
                 .WithMessage("phone number is invalid");
             RuleFor(x => x.Password).NotEmpty().MinimumLength(6);
             RuleFor(x => x.FullName).NotEmpty().MaximumLength(128);

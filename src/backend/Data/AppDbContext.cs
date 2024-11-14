@@ -110,5 +110,4 @@ public class PermanentJob {
     [Key] public int JobId { get; set; }
 
     public int TrialPeriod { get; set; }
-    
 }

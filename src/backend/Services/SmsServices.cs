@@ -9,17 +9,17 @@ public interface ISmsSender {
 }
 
 public class SmsSender : ISmsSender {
-    private readonly string _twilioPhoneNumber;
+    private readonly TwilioOptions _twilioOptions;
 
-    public SmsSender(string accountSid, string authToken, string twilioPhoneNumber) {
-        TwilioClient.Init(accountSid, authToken);
-        _twilioPhoneNumber = twilioPhoneNumber;
+    public SmsSender(TwilioOptions twilioOptions) {
+        _twilioOptions = twilioOptions;
+        TwilioClient.Init(_twilioOptions.AccountSid, _twilioOptions.AuthToken);
     }
 
     public void SendCode(string to, string code) {
         try {
             var message = MessageResource.Create(
-                from: new PhoneNumber(_twilioPhoneNumber),
+                from: new PhoneNumber(_twilioOptions.PhoneNumber),
                 to: new PhoneNumber(to),
                 body: $"Your verification code is: {code}"
             );

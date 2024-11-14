@@ -12,7 +12,7 @@ public class JwtCreator {
 
     public string CreateJwt(User user) {
         var jwtToken = JwtBearer.CreateToken(o => {
-            o.SigningKey = _jwtOptions.Key!;
+            o.SigningKey = _jwtOptions.Key;
             o.ExpireAt = DateTime.Now.AddSeconds(_jwtOptions.Duration);
 
             o.User["user_id"] = user.UserId.ToString();

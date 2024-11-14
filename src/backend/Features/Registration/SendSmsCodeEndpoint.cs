@@ -16,7 +16,6 @@ public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
         Policy(p => p.RequireClaim("role", Role.Unregistered.ToString()));
     }
 
-    // TODO: Add rate limiting
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {
         var phoneNumber = User.FindFirst("phone_number")!.Value;
 
