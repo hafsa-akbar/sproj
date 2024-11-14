@@ -6,15 +6,15 @@ using sproj.Services;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace sproj.Features.Registration;
+namespace sproj.Features.Verification;
 
-public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyResponse> {
+public class StartCnicVerification : Endpoint<StartCnicVerification.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
+    public required JwtCreator JwtCreator { get; set; }
     public required ICnicVerificationService CnicVerificationService { get; set; }
 
     public override void Configure() {
-        Post("/users/cnic-upload");
-        AllowAnonymous();
+        Post("/verify/cnic");
         Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
 
         AllowFileUploads();
@@ -27,16 +27,16 @@ public class UploadCnicEndpoint : Endpoint<UploadCnicEndpoint.Request, EmptyResp
         using var fileStream = req.Cnic.OpenReadStream();
         var cnic = await CnicVerificationService.VerifyCnicAsync(user, fileStream);
 
-        if (cnic is null) {
-            await SendResultAsync(Results.BadRequest("CNIC verification failed"));
-            return;
-        }
+        if (cnic is null) ThrowError("cnic verification failed");
 
         user.CnicNumber = cnic;
         user.Role = Role.Worker;
-
+        user.WorkerDetails = new WorkerDetails();
         await DbContext.SaveChangesAsync();
-        await SendResultAsync(Results.Ok("CNIC verified successfully"));
+
+        await SendResultAsync(Results.Ok(new {
+            Token = JwtCreator.CreateJwt(user)
+        }));
     }
 
     public record Request(IFormFile Cnic);

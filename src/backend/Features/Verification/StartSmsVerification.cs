@@ -4,7 +4,7 @@ using sproj.Services;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace sproj.Features.Registration;
+namespace sproj.Features.Verification;
 
 public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
@@ -12,7 +12,7 @@ public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
     public required ISmsSender SmsSender { get; set; }
 
     public override void Configure() {
-        Post("/users/send-sms-code");
+        Post("/verify/start-sms");
         Policy(p => p.RequireClaim("role", Role.Unregistered.ToString()));
     }
 
@@ -22,8 +22,6 @@ public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
         var code = await CodeVerifier.CreateCode(phoneNumber);
         SmsSender.SendCode(phoneNumber, code);
 
-        await SendResultAsync(Results.Ok(new {
-            Status = "success"
-        }));
+        await SendOkAsync();
     }
 }

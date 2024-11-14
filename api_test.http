@@ -13,7 +13,7 @@ POST http://localhost:5000/users/register
 Content-Type: application/json
 
 {
-  "phonenumber": "03099411411",
+  "phonenumber": "03355423333",
   "password": "password",
   "fullname": "Hadeed Ahmad",
   "address": "147",

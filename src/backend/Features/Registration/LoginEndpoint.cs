@@ -10,6 +10,7 @@ namespace sproj.Features.Registration;
 public class LoginEndpoint : Endpoint<LoginEndpoint.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
     public required JwtCreator JwtCreator { get; set; }
+    public required PasswordHasher PasswordHasher { get; set; }
 
     public override void Configure() {
         Post("/users/login");
@@ -19,27 +20,19 @@ public class LoginEndpoint : Endpoint<LoginEndpoint.Request, EmptyResponse> {
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var normalizedPhoneNumber = Utils.NormalizePhoneNumber(req.PhoneNumber);
 
-        var dummyUser = new User {
-            Password = string.Empty,
-            PhoneNumber = normalizedPhoneNumber,
-            FullName = null!,
-            Address = null!,
-            Birthdate = default,
-            Gender = UserGender.Male,
-            Role = Role.Unregistered
-        };
+        var user = DbContext.Users.SingleOrDefault(u => u.PhoneNumber == normalizedPhoneNumber);
+        if (user is null) {
+            await SendUnauthorizedAsync();
+            return;
+        }
 
-        var user = DbContext.Users.SingleOrDefault(u => u.PhoneNumber == normalizedPhoneNumber) ?? dummyUser;
-        if (!Utils.VerifyHashedPassword(user.Password, req.Password)) {
-            await SendResultAsync(TypedResults.Unauthorized());
+        if (!PasswordHasher.VerifyHashedPassword(user.Password, req.Password)) {
+            await SendUnauthorizedAsync();
             return;
         }
 
         await SendResultAsync(Results.Ok(new {
-            Status = "success",
-            Data = new {
-                Token = JwtCreator.CreateJwt(user)
-            }
+            Token = JwtCreator.CreateJwt(user)
         }));
     }
 

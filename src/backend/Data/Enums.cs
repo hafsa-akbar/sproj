@@ -41,5 +41,5 @@ public enum JobGender {
 
 public enum IdType {
     DrivingLicense = 1,
-    CNIC = 2
+    Cnic = 2
 }

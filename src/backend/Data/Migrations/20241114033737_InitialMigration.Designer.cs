@@ -13,7 +13,7 @@ using sproj.Data;
 namespace sproj.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241113134028_InitialMigration")]
+    [Migration("20241114033737_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -80,10 +80,15 @@ namespace sproj.Data.Migrations
                     b.Property<int>("WageRate")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("WorkerDetailsUserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("JobId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
+
+                    b.HasIndex("WorkerDetailsUserId");
 
                     b.ToTable("Jobs");
                 });
@@ -128,10 +133,15 @@ namespace sproj.Data.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("WorkerDetailsUserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("PastJobId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
+
+                    b.HasIndex("WorkerDetailsUserId");
 
                     b.ToTable("PastJob");
                 });
@@ -260,13 +270,11 @@ namespace sproj.Data.Migrations
 
             modelBuilder.Entity("sproj.Data.CnicVerification", b =>
                 {
-                    b.HasOne("sproj.Data.User", "User")
+                    b.HasOne("sproj.Data.User", null)
                         .WithOne("CnicVerifications")
                         .HasForeignKey("sproj.Data.CnicVerification", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("sproj.Data.Job", b =>
@@ -276,6 +284,10 @@ namespace sproj.Data.Migrations
                         .HasForeignKey("sproj.Data.Job", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("sproj.Data.WorkerDetails", null)
+                        .WithMany("Jobs")
+                        .HasForeignKey("WorkerDetailsUserId");
 
                     b.Navigation("WorkerDetails");
                 });
@@ -287,6 +299,10 @@ namespace sproj.Data.Migrations
                         .HasForeignKey("sproj.Data.PastJob", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("sproj.Data.WorkerDetails", null)
+                        .WithMany("PastJobs")
+                        .HasForeignKey("WorkerDetailsUserId");
 
                     b.Navigation("WorkerDetails");
                 });
@@ -302,13 +318,11 @@ namespace sproj.Data.Migrations
 
             modelBuilder.Entity("sproj.Data.SmsVerification", b =>
                 {
-                    b.HasOne("sproj.Data.User", "User")
+                    b.HasOne("sproj.Data.User", null)
                         .WithOne("SmsVerifications")
                         .HasForeignKey("sproj.Data.SmsVerification", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("sproj.Data.User", b =>
@@ -331,13 +345,11 @@ namespace sproj.Data.Migrations
 
             modelBuilder.Entity("sproj.Data.WorkerDetails", b =>
                 {
-                    b.HasOne("sproj.Data.User", "User")
+                    b.HasOne("sproj.Data.User", null)
                         .WithOne("WorkerDetails")
                         .HasForeignKey("sproj.Data.WorkerDetails", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("sproj.Data.Job", b =>
@@ -354,6 +366,13 @@ namespace sproj.Data.Migrations
                     b.Navigation("UserPreferences");
 
                     b.Navigation("WorkerDetails");
+                });
+
+            modelBuilder.Entity("sproj.Data.WorkerDetails", b =>
+                {
+                    b.Navigation("Jobs");
+
+                    b.Navigation("PastJobs");
                 });
 #pragma warning restore 612, 618
         }

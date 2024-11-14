@@ -1,13 +1,9 @@
-using Microsoft.AspNetCore.Identity;
 using PhoneNumbers;
-using sproj.Data;
 
 namespace sproj.Services;
 
 public static class Utils {
     private static readonly PhoneNumberUtil PhoneNumberUtil = PhoneNumberUtil.GetInstance();
-
-    private static readonly PasswordHasher<User> PasswordHasher = new();
 
     public static List<(TEnum, string)> GetEnumNames<TEnum>() where TEnum : Enum {
         var enumNames = new List<(TEnum, string)>();
@@ -36,14 +32,5 @@ public static class Utils {
 
     public static string NormalizePhoneNumber(string phoneNumber) {
         return PhoneNumberUtil.Format(PhoneNumberUtil.Parse(phoneNumber, "PK"), PhoneNumberFormat.E164);
-    }
-
-    public static string HashPassword(string password) {
-        return PasswordHasher.HashPassword(null!, password);
-    }
-
-    public static bool VerifyHashedPassword(string hashedPassword, string providedPassword) {
-        return PasswordHasher.VerifyHashedPassword(null!, hashedPassword, providedPassword) ==
-               PasswordVerificationResult.Success;
     }
 }

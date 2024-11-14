@@ -1,6 +1,5 @@
 using FastEndpoints;
 using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 
@@ -18,37 +17,33 @@ public class AddJobEndpoint : Endpoint<AddJobEndpoint.Request, EmptyRequest> {
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
-        var user = await DbContext.Users.Include(u => u.Couple).FirstAsync(u => u.UserId == userId);
+        var user = await DbContext.Users.Include(u => u.Couple).Include(u => u.WorkerDetails)
+            .FirstAsync(u => u.UserId == userId);
 
-        if (req.JobGender == JobGender.Couple && user.Couple == null) {
-            var error = new ErrorResponse([new ValidationFailure("jobGender", "you must be a couple")]);
-            await error.ExecuteAsync(HttpContext);
-            return;
-        }
+        if (req.JobGender == JobGender.Couple && user.Couple == null)
+            ThrowError(r => r.JobGender, "couple job not allowed");
 
         var job = new Job {
             WageRate = req.WageRate,
-            UserId = int.Parse(User.FindFirst("user_id")!.Value),
             JobCategory = req.JobCategory,
-            JobType = req.JobType,
             JobExperience = req.JobExperience,
-            Locale = req.Locale,
-            JobGender = req.JobGender
+            JobGender = req.JobGender,
+            JobType = req.JobType,
+            Locale = req.Locale
         };
 
-        DbContext.Jobs.Add(job);
+        user.WorkerDetails!.Jobs!.Add(job);
         await DbContext.SaveChangesAsync();
 
         await SendResultAsync(Results.Ok(job));
     }
 
-    // TODO: Deserialize as strings
     public record struct Request(
         int WageRate,
-        JobGender JobGender,
         JobCategory JobCategory,
-        JobType JobType,
         JobExperience JobExperience,
+        JobGender JobGender,
+        JobType JobType,
         string Locale);
 
     public class RequestValidator : Validator<Request> {

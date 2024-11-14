@@ -11,6 +11,7 @@ namespace sproj.Features.Registration;
 public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
     public required JwtCreator JwtCreator { get; set; }
+    public required PasswordHasher PasswordHasher { get; set; }
 
     public override void Configure() {
         Post("/users/register");
@@ -21,14 +22,13 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
         var normalizedPhoneNumber = Utils.NormalizePhoneNumber(req.PhoneNumber);
 
         if (await DbContext.Users.AnyAsync(u => u.PhoneNumber == normalizedPhoneNumber))
-            AddError(r => r.PhoneNumber, "phone number is already in use");
-
-        ThrowIfAnyErrors();
+            ThrowError(r => r.PhoneNumber, "phone number is already in use");
 
         var user = new User {
             PhoneNumber = Utils.NormalizePhoneNumber(req.PhoneNumber),
-            Password = Utils.HashPassword(req.Password),
+            Password = PasswordHasher.HashPassword(req.Password),
             Role = Role.Unregistered,
+
             FullName = req.FullName,
             Address = req.Address,
             Birthdate = req.Birthdate,
@@ -39,10 +39,7 @@ public class RegisterEndpoint : Endpoint<RegisterEndpoint.Request, EmptyResponse
         await DbContext.SaveChangesAsync();
 
         await SendResultAsync(Results.Ok(new {
-            Status = "success",
-            Data = new {
-                Token = JwtCreator.CreateJwt(user)
-            }
+            Token = JwtCreator.CreateJwt(user)
         }));
     }
 

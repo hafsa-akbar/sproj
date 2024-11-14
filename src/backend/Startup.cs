@@ -55,6 +55,7 @@ public static class Startup {
     private static void AddCustomServices(this WebApplicationBuilder builder) {
         builder.Services.AddScoped<CodeVerifier>();
         builder.Services.AddSingleton<JwtCreator>();
+        builder.Services.AddSingleton<PasswordHasher>();
 
         if (!builder.Environment.IsDevelopment())
             builder.Services.AddScoped<ICnicVerificationService, CnicVerificationService>();

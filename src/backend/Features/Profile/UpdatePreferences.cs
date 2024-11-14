@@ -5,37 +5,36 @@ using sproj.Data;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace sproj.Features.Registration;
+namespace sproj.Features.Profile;
 
-public class UpdateUserPreferencesEndpoint : Endpoint<UpdateUserPreferencesEndpoint.Request, EmptyResponse> {
+public class UpdatePreferences : Endpoint<UpdatePreferences.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
-        Post("/user/preferences");
+        Patch("/preferences");
         Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
-        if (req.JobCategories is null) req.JobCategories = new List<JobCategory>();
-        if (req.JobTypes is null) req.JobTypes = new List<JobType>();
-        if (req.JobExperiences is null) req.JobExperiences = new List<JobExperience>();
-
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
 
         var user = await DbContext.Users
             .Include(u => u.UserPreferences)
             .FirstAsync(u => u.UserId == userId);
 
-        user.UserPreferences = new UserPreferences {
-            UserId = userId,
-            JobLocale = req.Locale,
-            JobCategories = req.JobCategories,
-            JobTypes = req.JobTypes,
-            JobExperiences = req.JobExperiences
-        };
+        if (req.Locale is not null)
+            user.UserPreferences.JobLocale = req.Locale;
 
-        await DbContext.SaveChangesAsync(ct);
+        if (req.JobCategories is not null)
+            user.UserPreferences.JobCategories = req.JobCategories.Distinct().ToList();
 
+        if (req.JobExperiences is not null)
+            user.UserPreferences.JobExperiences = req.JobExperiences.Distinct().ToList();
+
+        if (req.JobTypes is not null)
+            user.UserPreferences.JobTypes = req.JobTypes.Distinct().ToList();
+
+        await DbContext.SaveChangesAsync();
         await SendResultAsync(Results.Ok(user.UserPreferences));
     }
 

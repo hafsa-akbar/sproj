@@ -1,11 +1,10 @@
 using FastEndpoints;
-using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace sproj.Features.Registration;
+namespace sproj.Features.Profile;
 
 public class AddCoupleEndpoint : Endpoint<AddCoupleEndpoint.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
@@ -20,25 +19,17 @@ public class AddCoupleEndpoint : Endpoint<AddCoupleEndpoint.Request, EmptyRespon
         var user = await DbContext.Users.FirstAsync(u => u.UserId == userId);
         var couple = await DbContext.Users.FirstOrDefaultAsync(u => u.UserId == req.Couple);
 
-        if (couple is null) {
-            var error = new ErrorResponse([new ValidationFailure("couple", "user does not exist")]);
-            await error.ExecuteAsync(HttpContext);
-            return;
-        }
+        if (couple is null)
+            ThrowError("user does not exist");
 
-        if (couple.Gender == user.Gender) {
-            var error = new ErrorResponse([new ValidationFailure("couple", "gender must be different")]);
-            await error.ExecuteAsync(HttpContext);
-            return;
-        }
+        if (couple.Gender == user.Gender)
+            ThrowError("gender must be different");
 
         user.Couple = couple;
         couple.Couple = user;
         await DbContext.SaveChangesAsync();
 
-        await SendResultAsync(Results.Ok(new {
-            Status = "success"
-        }));
+        await SendOkAsync();
     }
 
     public record Request(int Couple);
