@@ -10,6 +10,7 @@ public class AppDbContext : DbContext {
 
     public DbSet<User> Users { get; set; }
     public DbSet<Job> Jobs { get; set; }
+    public DbSet<PastJob> PastJobs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         modelBuilder.Entity<Job>().HasOne(j => j.WorkerDetails).WithOne().HasForeignKey<Job>(j => j.UserId);
@@ -98,7 +99,6 @@ public class PastJob {
     public required JobGender JobGender { get; set; }
     public required JobType JobType { get; set; }
     [MaxLength(64)] public required string Locale { get; set; }
-
 
     [MaxLength(15)] public required string EmployerPhoneNumber { get; set; }
     public required bool IsVerified { get; set; }

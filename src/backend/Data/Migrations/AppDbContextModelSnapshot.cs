@@ -140,7 +140,7 @@ namespace sproj.Data.Migrations
 
                     b.HasIndex("WorkerDetailsUserId");
 
-                    b.ToTable("PastJob");
+                    b.ToTable("PastJobs");
                 });
 
             modelBuilder.Entity("sproj.Data.PermanentJob", b =>

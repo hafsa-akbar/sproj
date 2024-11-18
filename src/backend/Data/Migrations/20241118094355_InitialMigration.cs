@@ -149,7 +149,7 @@ namespace sproj.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PastJob",
+                name: "PastJobs",
                 columns: table => new
                 {
                     PastJobId = table.Column<int>(type: "integer", nullable: false)
@@ -167,15 +167,15 @@ namespace sproj.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PastJob", x => x.PastJobId);
+                    table.PrimaryKey("PK_PastJobs", x => x.PastJobId);
                     table.ForeignKey(
-                        name: "FK_PastJob_WorkerDetails_UserId",
+                        name: "FK_PastJobs_WorkerDetails_UserId",
                         column: x => x.UserId,
                         principalTable: "WorkerDetails",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PastJob_WorkerDetails_WorkerDetailsUserId",
+                        name: "FK_PastJobs_WorkerDetails_WorkerDetailsUserId",
                         column: x => x.WorkerDetailsUserId,
                         principalTable: "WorkerDetails",
                         principalColumn: "UserId");
@@ -211,14 +211,14 @@ namespace sproj.Data.Migrations
                 column: "WorkerDetailsUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PastJob_UserId",
-                table: "PastJob",
+                name: "IX_PastJobs_UserId",
+                table: "PastJobs",
                 column: "UserId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PastJob_WorkerDetailsUserId",
-                table: "PastJob",
+                name: "IX_PastJobs_WorkerDetailsUserId",
+                table: "PastJobs",
                 column: "WorkerDetailsUserId");
 
             migrationBuilder.CreateIndex(
@@ -234,7 +234,7 @@ namespace sproj.Data.Migrations
                 name: "CnicVerification");
 
             migrationBuilder.DropTable(
-                name: "PastJob");
+                name: "PastJobs");
 
             migrationBuilder.DropTable(
                 name: "PermanentJob");

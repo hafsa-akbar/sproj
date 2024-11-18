@@ -13,7 +13,7 @@ using sproj.Data;
 namespace sproj.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241114095223_InitialMigration")]
+    [Migration("20241118094355_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -143,7 +143,7 @@ namespace sproj.Data.Migrations
 
                     b.HasIndex("WorkerDetailsUserId");
 
-                    b.ToTable("PastJob");
+                    b.ToTable("PastJobs");
                 });
 
             modelBuilder.Entity("sproj.Data.PermanentJob", b =>
