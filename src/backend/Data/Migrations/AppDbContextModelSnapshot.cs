@@ -18,7 +18,7 @@ namespace sproj.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0-rc.2.24474.1")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "job_category", new[] { "babysitting", "cleaning", "cooking", "driving", "gardening", "laundry", "pet_care", "security_guard" });

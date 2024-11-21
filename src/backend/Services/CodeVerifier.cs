@@ -27,7 +27,7 @@ public class CodeVerifier {
 
         await _appDbContext.SaveChangesAsync();
 
-        return GenerateRandomCode();
+        return smsVerification.VerificationCode;
     }
 
     public async Task<bool> VerifyCode(string phoneNumber, string code) {
@@ -39,7 +39,7 @@ public class CodeVerifier {
         if (user?.SmsVerifications == null) return false;
 
         return user.SmsVerifications.VerificationCode == code &&
-               user.SmsVerifications.ExpiresAt > DateTime.Now;
+               user.SmsVerifications.ExpiresAt > DateTime.Now.ToUniversalTime();
     }
 
     private string GenerateRandomCode(int length = 6) {

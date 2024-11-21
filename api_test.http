@@ -1,28 +1,21 @@
-POST http://localhost:1811/check_identity
-Content-Type: multipart/form-data; boundary=WebAppBoundary
+@base-url = http://localhost:5000
 
---WebAppBoundary
-Content-Disposition: form-data; name="image"; filename="nadra.png"
-
-< src/ocr/nadra.png
---WebAppBoundary--
-
-###
-###
-POST http://localhost:5000/users/register
+POST {{base-url}}/users/register
 Content-Type: application/json
 
 {
-  "phonenumber": "03355423333",
+  "phoneNumber": "03356423333",
   "password": "password",
-  "fullname": "Hadeed Ahmad",
-  "address": "147",
-  "birthdate": "2002-03-08",
+  "fullName": "Hadeed Ahmad",
+  "address": "LUMS",
   "gender": 1
 }
 
+> {% if (response.body.token) client.global.set("jwt", response.body.token); %}
+
 ###
-POST http://localhost:5000/users/login
+
+POST {{base-url}}/users/login
 Content-Type: application/json
 
 {
@@ -30,26 +23,21 @@ Content-Type: application/json
   "password": "password"
 }
 
-###
-POST http://localhost:5000/users/send-sms-code
-Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzE1NTgwNjYsImlhdCI6MTczMTQ3MTY2NiwidXNlcl9pZCI6IjEiLCJwaG9uZV9udW1iZXIiOiIrOTIzMDk5NDExNDExIiwicm9sZSI6IlVucmVnaXN0ZXJlZCIsIm5iZiI6MTczMTQ3MTY2Nn0.nG8bQfYrPX09ggzLhnhmiOeWzMHUzrKUJ0Tu9DqWtzs
+> {% if (response.body.token) client.global.set("jwt", response.body.token); %}
 
 ###
-POST http://localhost:5000/users/verify-sms-code
-Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZU51bWJlciI6Iis5MjMzNTY0MjMzMzMiLCJpc1Bob25lVmVyaWZpZWQiOiJmYWxzZSIsImV4cCI6MTczMDcyMzAwOCwiaWF0IjoxNzMwNjM2NjA4LCJuYmYiOjE3MzA2MzY2MDh9.kNmiHAGVswXzEBo9QL5v9QMh5xZWkEI1-miJpep6gFo
-Content-Type: application/json
 
-{"code": "473486"}
+POST {{base-url}}/verify/start-sms
+Authorization: Bearer {{jwt}}
 
 ###
-POST http://localhost:5000/jobs
-Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInBob25lX251bWJlciI6Iis5MjMzNTY0MjMzMzMiLCJyb2xlIjoiMyIsImV4cCI6MTczMTAyODk1NCwiaWF0IjoxNzMwOTQyNTU0LCJuYmYiOjE3MzA5NDI1NTR9.JwjIsHWzB88lek3-AhVgcQVsgI6kqsEHjKIXU3GXCjc
+
+POST {{base-url}}/verify/end-sms
+Authorization: Bearer {{jwt}}
 Content-Type: application/json
 
 {
-  "wageRate": 30,
-  "jobCategory": 1,
-  "jobType": 2,
-  "jobExperience": 2,
-  "locale": 1
+  "code": "413961"
 }
+
+> {% if (response.body.token) client.global.set("jwt", response.body.token); %}

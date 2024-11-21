@@ -14,6 +14,14 @@ namespace sproj.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:job_category", "babysitting,cleaning,cooking,driving,gardening,laundry,pet_care,security_guard")
+                .Annotation("Npgsql:Enum:job_experience", "beginner,expert,intermediate")
+                .Annotation("Npgsql:Enum:job_gender", "couple,female,male")
+                .Annotation("Npgsql:Enum:job_type", "one_shot,permanent_hire")
+                .Annotation("Npgsql:Enum:role", "employer,unregistered,worker")
+                .Annotation("Npgsql:Enum:user_gender", "female,male");
+
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
