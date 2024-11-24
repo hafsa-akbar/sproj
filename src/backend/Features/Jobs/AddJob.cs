@@ -39,7 +39,15 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
         user.WorkerDetails!.Jobs!.Add(job);
         await DbContext.SaveChangesAsync();
 
-        await SendResultAsync(Results.Ok(job));
+        await SendResultAsync(Results.Ok(new {
+            job.JobId,
+            job.WageRate,
+            job.JobCategory,
+            job.JobExperience,
+            job.JobGender,
+            job.JobType,
+            job.Locale
+        }));
     }
 
     public record struct Request(

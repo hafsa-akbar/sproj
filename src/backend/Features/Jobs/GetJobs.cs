@@ -6,7 +6,6 @@ using sproj.Data;
 
 namespace sproj.Features.Jobs;
 
-// TODO: Only selective data should be sent
 public class GetJobs : Endpoint<EmptyRequest, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
 
@@ -18,6 +17,14 @@ public class GetJobs : Endpoint<EmptyRequest, EmptyResponse> {
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {
         var jobs = await DbContext.Jobs.ToListAsync();
 
-        await SendResultAsync(Results.Ok(jobs));
+        await SendResultAsync(Results.Ok(jobs.Select(j => new {
+            j.JobId,
+            j.WageRate,
+            j.JobCategory,
+            j.JobExperience,
+            j.JobGender,
+            j.JobType,
+            j.Locale
+        })));
     }
 }

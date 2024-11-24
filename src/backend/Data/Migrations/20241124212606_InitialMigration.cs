@@ -15,6 +15,7 @@ namespace sproj.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:id_document_type", "cnic,driving_license")
                 .Annotation("Npgsql:Enum:job_category", "babysitting,cleaning,cooking,driving,gardening,laundry,pet_care,security_guard")
                 .Annotation("Npgsql:Enum:job_experience", "beginner,expert,intermediate")
                 .Annotation("Npgsql:Enum:job_gender", "couple,female,male")
@@ -55,7 +56,7 @@ namespace sproj.Data.Migrations
                 {
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     IdImage = table.Column<byte[]>(type: "bytea", nullable: false),
-                    IdType = table.Column<int>(type: "integer", nullable: false)
+                    IdType = table.Column<IdType>(type: "id_document_type", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -132,23 +133,17 @@ namespace sproj.Data.Migrations
                     JobId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
+                    WorkerDetailsUserId = table.Column<int>(type: "integer", nullable: true),
                     WageRate = table.Column<int>(type: "integer", nullable: false),
                     JobCategory = table.Column<JobCategory>(type: "job_category", nullable: false),
                     JobExperience = table.Column<JobExperience>(type: "job_experience", nullable: false),
                     JobGender = table.Column<JobGender>(type: "job_gender", nullable: false),
                     JobType = table.Column<JobType>(type: "job_type", nullable: false),
-                    Locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    WorkerDetailsUserId = table.Column<int>(type: "integer", nullable: true)
+                    Locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Jobs", x => x.JobId);
-                    table.ForeignKey(
-                        name: "FK_Jobs_WorkerDetails_UserId",
-                        column: x => x.UserId,
-                        principalTable: "WorkerDetails",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Jobs_WorkerDetails_WorkerDetailsUserId",
                         column: x => x.WorkerDetailsUserId,
@@ -163,6 +158,7 @@ namespace sproj.Data.Migrations
                     PastJobId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
+                    WorkerDetailsUserId = table.Column<int>(type: "integer", nullable: true),
                     JobCategory = table.Column<JobCategory>(type: "job_category", nullable: false),
                     JobGender = table.Column<JobGender>(type: "job_gender", nullable: false),
                     JobType = table.Column<JobType>(type: "job_type", nullable: false),
@@ -170,18 +166,11 @@ namespace sproj.Data.Migrations
                     EmployerPhoneNumber = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
                     IsVerified = table.Column<bool>(type: "boolean", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: true),
-                    Comments = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    WorkerDetailsUserId = table.Column<int>(type: "integer", nullable: true)
+                    Comments = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PastJobs", x => x.PastJobId);
-                    table.ForeignKey(
-                        name: "FK_PastJobs_WorkerDetails_UserId",
-                        column: x => x.UserId,
-                        principalTable: "WorkerDetails",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PastJobs_WorkerDetails_WorkerDetailsUserId",
                         column: x => x.WorkerDetailsUserId,
@@ -208,21 +197,9 @@ namespace sproj.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Jobs_UserId",
-                table: "Jobs",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Jobs_WorkerDetailsUserId",
                 table: "Jobs",
                 column: "WorkerDetailsUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PastJobs_UserId",
-                table: "PastJobs",
-                column: "UserId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PastJobs_WorkerDetailsUserId",

@@ -9,11 +9,13 @@ Content-Type: application/json
   "fullName": "Hadeed Ahmad",
   "address": "LUMS",
   "birthdate": "2002-03-08",
-  "gender": 2
+  "gender": 1
 }
 
 > {%
+
  if (response.body.token) client.global.set("jwt", response.body.token);
+
 %}
 
 ###
@@ -27,7 +29,9 @@ Content-Type: application/json
 }
 
 > {%
+
  if (response.body.token) client.global.set("jwt", response.body.token);
+
 %}
 
 ###
@@ -42,11 +46,13 @@ Authorization: Bearer {{jwt}}
 Content-Type: application/json
 
 {
-  "code": "837211"
+  "code": "397513"
 }
 
 > {%
+
  if (response.body.token) client.global.set("jwt", response.body.token);
+
 %}
 
 ###
@@ -78,7 +84,9 @@ Content-Disposition: form-data; name="cnic"; filename="nadra.png"
 --WebAppBoundary--
 
 > {%
+
  if (response.body.token) client.global.set("jwt", response.body.token);
+
 %}
 
 ###

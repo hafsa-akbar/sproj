@@ -27,7 +27,7 @@ public class Register : Endpoint<Register.Request, EmptyResponse> {
         var user = new User {
             PhoneNumber = Utils.NormalizePhoneNumber(req.PhoneNumber),
             Password = PasswordHasher.HashPassword(req.Password),
-            Role = Env.IsDevelopment() ? Role.Worker : Role.Unregistered,
+            Role = Role.Unregistered,
 
             FullName = req.FullName,
             Address = req.Address,

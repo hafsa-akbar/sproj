@@ -32,6 +32,7 @@ public static class Startup {
             optionsBuilder.MapEnum<JobType>("job_type");
             optionsBuilder.MapEnum<UserGender>("user_gender");
             optionsBuilder.MapEnum<JobGender>("job_gender");
+            optionsBuilder.MapEnum<IdType>("id_document_type");
         }));
 
         builder.AddCustomServices();

@@ -3,12 +3,12 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 using sproj.Services;
+using Twilio.Rest.Preview.Wireless.Sim;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace sproj.Features.Verification;
 
-// TODO: Save CNIC?
 public class StartCnicVerification : Endpoint<StartCnicVerification.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
     public required JwtCreator JwtCreator { get; set; }
@@ -23,7 +23,7 @@ public class StartCnicVerification : Endpoint<StartCnicVerification.Request, Emp
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
-        var user = await DbContext.Users.FirstAsync(u => u.UserId == userId);
+        var user = await DbContext.Users.Include(u => u.CnicVerification).FirstAsync(u => u.UserId == userId);
 
         if (user.Role == Role.Worker) {
             await SendUnauthorizedAsync();
@@ -31,9 +31,21 @@ public class StartCnicVerification : Endpoint<StartCnicVerification.Request, Emp
         }
 
         using var fileStream = req.Cnic.OpenReadStream();
+        using var ms = new MemoryStream();
+        fileStream.CopyTo(ms);
+
+        user.CnicVerification = new CnicVerification {
+            IdImage = ms.ToArray(),
+            IdType = IdType.Cnic
+        };
+
+        var saveImage = DbContext.SaveChangesAsync();
+
         var cnic = await CnicVerificationService.VerifyCnicAsync(user, fileStream);
 
-        if (cnic is null) ThrowError("cnic verification failed");
+        await saveImage;
+        if (cnic is null)
+            ThrowError("cnic verification failed");
 
         user.CnicNumber = cnic;
         user.Role = Role.Worker;

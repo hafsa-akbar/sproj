@@ -11,11 +11,6 @@ public class AppDbContext : DbContext {
     public DbSet<User> Users { get; set; }
     public DbSet<Job> Jobs { get; set; }
     public DbSet<PastJob> PastJobs { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.Entity<Job>().HasOne(j => j.WorkerDetails).WithOne().HasForeignKey<Job>(j => j.UserId);
-        modelBuilder.Entity<PastJob>().HasOne(j => j.WorkerDetails).WithOne().HasForeignKey<PastJob>(j => j.UserId);
-    }
 }
 
 public class User {
@@ -37,8 +32,8 @@ public class User {
     [MaxLength(32)] public string? DrivingLicense { get; set; }
 
     public UserPreferences? UserPreferences { get; set; }
-    public SmsVerification? SmsVerifications { get; set; }
-    public CnicVerification? CnicVerifications { get; set; }
+    public SmsVerification? SmsVerification { get; set; }
+    public CnicVerification? CnicVerification { get; set; }
     public WorkerDetails? WorkerDetails { get; set; }
 }
 

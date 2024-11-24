@@ -20,10 +20,10 @@ public class CodeVerifier {
 
         var user = await _appDbContext.Users
             .Where(u => u.PhoneNumber == phoneNumber)
-            .Include(u => u.SmsVerifications)
+            .Include(u => u.SmsVerification)
             .FirstAsync();
 
-        user.SmsVerifications = smsVerification;
+        user.SmsVerification = smsVerification;
 
         await _appDbContext.SaveChangesAsync();
 
@@ -33,13 +33,13 @@ public class CodeVerifier {
     public async Task<bool> VerifyCode(string phoneNumber, string code) {
         var user = await _appDbContext.Users
             .Where(u => u.PhoneNumber == phoneNumber)
-            .Include(u => u.SmsVerifications)
+            .Include(u => u.SmsVerification)
             .FirstOrDefaultAsync();
 
-        if (user?.SmsVerifications == null) return false;
+        if (user?.SmsVerification == null) return false;
 
-        return user.SmsVerifications.VerificationCode == code &&
-               user.SmsVerifications.ExpiresAt > DateTime.Now.ToUniversalTime();
+        return user.SmsVerification.VerificationCode == code &&
+               user.SmsVerification.ExpiresAt > DateTime.Now.ToUniversalTime();
     }
 
     private string GenerateRandomCode(int length = 6) {

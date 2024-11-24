@@ -21,8 +21,18 @@ public class PendingReviews : Endpoint<EmptyRequest, EmptyResponse> {
         var pendingReviews = await DbContext.PastJobs
             .Where(p => p.EmployerPhoneNumber == user.PhoneNumber && !p.IsVerified)
             .Include(p => p.WorkerDetails)
+            .ThenInclude(w => w!.User)
             .ToListAsync();
 
-        await SendResultAsync(Results.Ok(pendingReviews));
+        await SendResultAsync(Results.Ok(pendingReviews.Select(p => new {
+            p.PastJobId,
+            p.JobCategory,
+            p.JobGender,
+            p.JobType,
+            Worker = new {
+                p.WorkerDetails!.UserId,
+                p.WorkerDetails!.User!.FullName,
+            }
+        })));
     }
 }

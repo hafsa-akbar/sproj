@@ -13,7 +13,7 @@ using sproj.Data;
 namespace sproj.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241121005953_InitialMigration")]
+    [Migration("20241124212606_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -24,6 +24,7 @@ namespace sproj.Data.Migrations
                 .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "id_document_type", new[] { "cnic", "driving_license" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "job_category", new[] { "babysitting", "cleaning", "cooking", "driving", "gardening", "laundry", "pet_care", "security_guard" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "job_experience", new[] { "beginner", "expert", "intermediate" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "job_gender", new[] { "couple", "female", "male" });
@@ -41,8 +42,8 @@ namespace sproj.Data.Migrations
                         .IsRequired()
                         .HasColumnType("bytea");
 
-                    b.Property<int>("IdType")
-                        .HasColumnType("integer");
+                    b.Property<IdType>("IdType")
+                        .HasColumnType("id_document_type");
 
                     b.HasKey("UserId");
 
@@ -84,9 +85,6 @@ namespace sproj.Data.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("JobId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.HasIndex("WorkerDetailsUserId");
 
@@ -137,9 +135,6 @@ namespace sproj.Data.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("PastJobId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.HasIndex("WorkerDetailsUserId");
 
@@ -271,7 +266,7 @@ namespace sproj.Data.Migrations
             modelBuilder.Entity("sproj.Data.CnicVerification", b =>
                 {
                     b.HasOne("sproj.Data.User", null)
-                        .WithOne("CnicVerifications")
+                        .WithOne("CnicVerification")
                         .HasForeignKey("sproj.Data.CnicVerification", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -280,12 +275,6 @@ namespace sproj.Data.Migrations
             modelBuilder.Entity("sproj.Data.Job", b =>
                 {
                     b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
-                        .WithOne()
-                        .HasForeignKey("sproj.Data.Job", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("sproj.Data.WorkerDetails", null)
                         .WithMany("Jobs")
                         .HasForeignKey("WorkerDetailsUserId");
 
@@ -295,12 +284,6 @@ namespace sproj.Data.Migrations
             modelBuilder.Entity("sproj.Data.PastJob", b =>
                 {
                     b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
-                        .WithOne()
-                        .HasForeignKey("sproj.Data.PastJob", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("sproj.Data.WorkerDetails", null)
                         .WithMany("PastJobs")
                         .HasForeignKey("WorkerDetailsUserId");
 
@@ -319,7 +302,7 @@ namespace sproj.Data.Migrations
             modelBuilder.Entity("sproj.Data.SmsVerification", b =>
                 {
                     b.HasOne("sproj.Data.User", null)
-                        .WithOne("SmsVerifications")
+                        .WithOne("SmsVerification")
                         .HasForeignKey("sproj.Data.SmsVerification", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -361,9 +344,9 @@ namespace sproj.Data.Migrations
 
             modelBuilder.Entity("sproj.Data.User", b =>
                 {
-                    b.Navigation("CnicVerifications");
+                    b.Navigation("CnicVerification");
 
-                    b.Navigation("SmsVerifications");
+                    b.Navigation("SmsVerification");
 
                     b.Navigation("UserPreferences");
 

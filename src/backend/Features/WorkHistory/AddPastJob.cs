@@ -45,7 +45,7 @@ public class AddPastJob : Endpoint<AddPastJob.Request, EmptyRequest> {
         user.WorkerDetails!.PastJobs!.Add(job);
         await DbContext.SaveChangesAsync();
 
-        await SendResultAsync(Results.Ok(job));
+        await SendOkAsync();
     }
 
     public record struct Request(
@@ -57,9 +57,9 @@ public class AddPastJob : Endpoint<AddPastJob.Request, EmptyRequest> {
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
-            RuleFor(r => r.JobGender).NotEmpty() .IsInEnum();
-            RuleFor(r => r.JobCategory).NotEmpty() .IsInEnum();
-            RuleFor(r => r.JobType).NotEmpty() .IsInEnum();
+            RuleFor(r => r.JobGender).NotEmpty().IsInEnum();
+            RuleFor(r => r.JobCategory).NotEmpty().IsInEnum();
+            RuleFor(r => r.JobType).NotEmpty().IsInEnum();
             RuleFor(r => r.Locale).NotEmpty();
 
             RuleFor(r => r.EmployerPhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber);
