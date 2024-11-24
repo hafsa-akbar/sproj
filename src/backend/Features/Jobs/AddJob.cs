@@ -7,6 +7,7 @@ using sproj.Data;
 
 namespace sproj.Features.Jobs;
 
+// TODO: Debug this
 public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
     public required AppDbContext DbContext { get; set; }
 
@@ -17,11 +18,14 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
-        var user = await DbContext.Users.Include(u => u.Couple).Include(u => u.WorkerDetails)
+        var user = await DbContext.Users
+            .Include(u => u.Couple)
+            .Include(u => u.WorkerDetails)
+            .ThenInclude(w => w!.Jobs!)
             .FirstAsync(u => u.UserId == userId);
 
         if (req.JobGender == JobGender.Couple && user.Couple == null)
-            ThrowError(r => r.JobGender, "couple job not allowed");
+            ThrowError(r => r.JobGender, "user not a couple");
 
         var job = new Job {
             WageRate = req.WageRate,
@@ -48,22 +52,13 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
-            RuleFor(r => r.WageRate).NotNull()
-                .GreaterThan(0).WithMessage("Wage rate must be greater than 0.");
+            RuleFor(r => r.WageRate).NotEmpty().GreaterThan(0);
 
-            RuleFor(r => r.JobGender).NotNull()
-                .IsInEnum().WithMessage("Job gender must be a valid value.");
-
-            RuleFor(r => r.JobCategory).NotNull()
-                .IsInEnum().WithMessage("Job category must be a valid value.");
-
-            RuleFor(r => r.JobType).NotNull()
-                .IsInEnum().WithMessage("Job type must be a valid value.");
-
-            RuleFor(r => r.JobExperience).NotNull()
-                .IsInEnum().WithMessage("Job experience must be a valid value.");
-
-            RuleFor(r => r.Locale).NotNull();
+            RuleFor(r => r.JobCategory).NotEmpty().IsInEnum();
+            RuleFor(r => r.JobExperience).NotEmpty().IsInEnum();
+            RuleFor(r => r.JobGender).NotEmpty().IsInEnum();
+            RuleFor(r => r.JobType).NotEmpty().IsInEnum();
+            RuleFor(r => r.Locale).NotEmpty();
         }
     }
 }

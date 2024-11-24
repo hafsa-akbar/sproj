@@ -6,11 +6,13 @@ using sproj.Data;
 
 namespace sproj.Features.Profile;
 
+// TODO: Add by phone number instead
+// TODO: Approval system
 public class AddCouple : Endpoint<AddCouple.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
-        Post("/users/add-couple");
+        Post("/profile/add-couple");
         Policy(p => p.RequireClaim("role", Role.Worker.ToString()));
     }
 

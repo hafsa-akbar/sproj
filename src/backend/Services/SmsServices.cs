@@ -9,8 +9,8 @@ public interface ISmsSender {
 }
 
 public class SmsSender : ISmsSender {
-    private readonly TwilioOptions _twilioOptions;
     private readonly ILogger<SmsSender> _logger;
+    private readonly TwilioOptions _twilioOptions;
 
     public SmsSender(TwilioOptions twilioOptions, ILogger<SmsSender> logger) {
         TwilioClient.Init(twilioOptions.AccountSid, twilioOptions.AuthToken);
@@ -27,8 +27,7 @@ public class SmsSender : ISmsSender {
             );
 
             _logger.LogInformation("SMS sent to {recipient}. Status: {status}", to, messageResource.Status);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             _logger.LogError("Error sending sms to {recipient}: {exception}", to, ex.Message);
         }
     }

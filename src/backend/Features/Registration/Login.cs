@@ -41,8 +41,7 @@ public class Login : Endpoint<Login.Request, EmptyResponse> {
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
-            RuleFor(x => x.PhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber)
-                .WithMessage("phone number is invalid");
+            RuleFor(x => x.PhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber);
             RuleFor(x => x.Password).NotEmpty().MinimumLength(8);
         }
     }

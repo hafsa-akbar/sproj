@@ -11,7 +11,7 @@ public class UpdatePreferences : Endpoint<UpdatePreferences.Request, EmptyRespon
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
-        Patch("/preferences");
+        Patch("/profile/preferences");
         Policy(p => p.RequireClaim("role", Role.Employer.ToString(), Role.Worker.ToString()));
     }
 
@@ -22,33 +22,34 @@ public class UpdatePreferences : Endpoint<UpdatePreferences.Request, EmptyRespon
             .Include(u => u.UserPreferences)
             .FirstAsync(u => u.UserId == userId);
 
-        if (req.Locale is not null)
-            user.UserPreferences!.JobLocale = req.Locale;
+        if (req.JobLocale is not null)
+            user.UserPreferences!.JobLocale = req.JobLocale;
 
         if (req.JobCategories is not null)
-            user.UserPreferences!.JobCategories = req.JobCategories.Distinct().ToList();
+            user.UserPreferences!.JobCategories = req.JobCategories.Distinct().Order().ToList();
 
         if (req.JobExperiences is not null)
-            user.UserPreferences!.JobExperiences = req.JobExperiences.Distinct().ToList();
+            user.UserPreferences!.JobExperiences = req.JobExperiences.Distinct().Order().ToList();
 
         if (req.JobTypes is not null)
-            user.UserPreferences!.JobTypes = req.JobTypes.Distinct().ToList();
+            user.UserPreferences!.JobTypes = req.JobTypes.Distinct().Order().ToList();
 
         await DbContext.SaveChangesAsync();
         await SendResultAsync(Results.Ok(user.UserPreferences));
     }
 
     public record struct Request(
-        string? Locale,
+        string? JobLocale,
         List<JobCategory>? JobCategories,
         List<JobType>? JobTypes,
         List<JobExperience>? JobExperiences);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
-            RuleForEach(r => r.JobCategories).IsInEnum().WithMessage("Job category ID must be a valid number.");
-            RuleForEach(r => r.JobTypes).IsInEnum().WithMessage("Job type ID must be a valid number.");
-            RuleForEach(r => r.JobExperiences).IsInEnum().WithMessage("Job experience ID must be a valid number.");
+            RuleFor(r => r.JobLocale).MaximumLength(64);
+            RuleForEach(r => r.JobCategories).IsInEnum();
+            RuleForEach(r => r.JobTypes).IsInEnum();
+            RuleForEach(r => r.JobExperiences).IsInEnum();
         }
     }
 }

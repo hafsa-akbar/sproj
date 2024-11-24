@@ -10,7 +10,7 @@ public class GetPreferences : Endpoint<EmptyRequest, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
-        Get("/preferences");
+        Get("/profile/preferences");
         Policy(p => p.RequireClaim("role", Role.Employer.ToString(), Role.Worker.ToString()));
     }
 

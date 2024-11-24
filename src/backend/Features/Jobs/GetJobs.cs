@@ -6,6 +6,7 @@ using sproj.Data;
 
 namespace sproj.Features.Jobs;
 
+// TODO: Only selective data should be sent
 public class GetJobs : Endpoint<EmptyRequest, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
 

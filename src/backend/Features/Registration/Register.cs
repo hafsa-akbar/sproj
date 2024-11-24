@@ -27,7 +27,7 @@ public class Register : Endpoint<Register.Request, EmptyResponse> {
         var user = new User {
             PhoneNumber = Utils.NormalizePhoneNumber(req.PhoneNumber),
             Password = PasswordHasher.HashPassword(req.Password),
-            Role = Role.Unregistered,
+            Role = Env.IsDevelopment() ? Role.Worker : Role.Unregistered,
 
             FullName = req.FullName,
             Address = req.Address,
@@ -53,11 +53,11 @@ public class Register : Endpoint<Register.Request, EmptyResponse> {
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
-            RuleFor(x => x.PhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber)
-                .WithMessage("phone number is invalid");
+            RuleFor(x => x.PhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber);
             RuleFor(x => x.Password).NotEmpty().MinimumLength(6);
             RuleFor(x => x.FullName).NotEmpty().MaximumLength(128);
             RuleFor(x => x.Address).NotEmpty().MaximumLength(512);
+            RuleFor(x => x.Birthdate).NotEmpty();
             RuleFor(x => x.Gender).NotEmpty().IsInEnum();
         }
     }

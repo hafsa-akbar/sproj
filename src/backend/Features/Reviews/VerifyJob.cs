@@ -11,7 +11,7 @@ public class VerifyJob : Endpoint<VerifyJob.Request, EmptyResponse> {
 
     public override void Configure() {
         Post("/verify-review");
-        Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
+        Policy(p => p.RequireClaim("role", Role.Employer.ToString(), Role.Worker.ToString()));
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
@@ -23,7 +23,7 @@ public class VerifyJob : Endpoint<VerifyJob.Request, EmptyResponse> {
             .Where(p => p.EmployerPhoneNumber == user.PhoneNumber)
             .Where(p => p.PastJobId == req.PastJobId)
             .FirstOrDefault();
-        
+
         if (pendingJob is null) {
             await SendResultAsync(Results.BadRequest());
             return;

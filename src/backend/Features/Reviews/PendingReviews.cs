@@ -22,7 +22,7 @@ public class PendingReviews : Endpoint<EmptyRequest, EmptyResponse> {
             .Where(p => p.EmployerPhoneNumber == user.PhoneNumber && !p.IsVerified)
             .Include(p => p.WorkerDetails)
             .ToListAsync();
-        
+
         await SendResultAsync(Results.Ok(pendingReviews));
     }
 }

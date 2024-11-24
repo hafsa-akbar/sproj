@@ -10,6 +10,7 @@ namespace sproj.Features.WorkHistory;
 
 public class AddPastJob : Endpoint<AddPastJob.Request, EmptyRequest> {
     public required AppDbContext DbContext { get; set; }
+    public required ISmsSender SmsSender { get; set; }
 
     public override void Configure() {
         Post("/past-jobs");
@@ -21,14 +22,25 @@ public class AddPastJob : Endpoint<AddPastJob.Request, EmptyRequest> {
         var user = await DbContext.Users.Include(u => u.Couple).Include(u => u.WorkerDetails)
             .FirstAsync(u => u.UserId == userId);
 
+        var empPhoneNumber = Utils.NormalizePhoneNumber(req.EmployerPhoneNumber);
+        if (user.PhoneNumber == empPhoneNumber) {
+            await SendUnauthorizedAsync();
+            return;
+        }
+
         var job = new PastJob {
             JobCategory = req.JobCategory,
             JobGender = req.JobGender,
             JobType = req.JobType,
             Locale = req.Locale,
-            EmployerPhoneNumber = Utils.NormalizePhoneNumber(req.EmployerPhoneNumber),
+            EmployerPhoneNumber = empPhoneNumber,
             IsVerified = false
         };
+
+        var employer = await DbContext.Users.FirstOrDefaultAsync(u => u.PhoneNumber == empPhoneNumber);
+        if (employer is null)
+            SmsSender.SendMessage(empPhoneNumber,
+                $"{user.FullName} has asked for a reccomendation for their work in {job.JobCategory.ToString()}. Sign up at DaamPeKaam to reccomend them.");
 
         user.WorkerDetails!.PastJobs!.Add(job);
         await DbContext.SaveChangesAsync();
@@ -45,19 +57,12 @@ public class AddPastJob : Endpoint<AddPastJob.Request, EmptyRequest> {
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
-            RuleFor(r => r.JobGender).NotNull()
-                .IsInEnum().WithMessage("Job gender must be a valid value.");
+            RuleFor(r => r.JobGender).NotEmpty() .IsInEnum();
+            RuleFor(r => r.JobCategory).NotEmpty() .IsInEnum();
+            RuleFor(r => r.JobType).NotEmpty() .IsInEnum();
+            RuleFor(r => r.Locale).NotEmpty();
 
-            RuleFor(r => r.JobCategory).NotNull()
-                .IsInEnum().WithMessage("Job category must be a valid value.");
-
-            RuleFor(r => r.JobType).NotNull()
-                .IsInEnum().WithMessage("Job type must be a valid value.");
-
-            RuleFor(r => r.Locale).NotNull();
-
-            RuleFor(r => r.EmployerPhoneNumber).NotNull().Must(Utils.ValidatePhoneNumber)
-                .WithMessage("phone number is invalid");
+            RuleFor(r => r.EmployerPhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber);
         }
     }
 }

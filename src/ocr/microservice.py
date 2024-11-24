@@ -1,16 +1,16 @@
 import base64
 import hashlib
 import json
-
+import os
+import re
 from dateutil import parser
 from flask import Flask, request, jsonify
 from google.cloud import documentai_v1 as documentai
-import os
-import re
 
 app = Flask(__name__)
 
 CACHE_FILE = "cache.json"
+
 
 def load_cache():
     if os.path.exists(CACHE_FILE):
@@ -18,12 +18,15 @@ def load_cache():
             return json.load(file)
     return {}
 
+
 def save_cache(cache):
     with open(CACHE_FILE, "w") as file:
         json.dump(cache, file)
 
+
 def get_cache_key(image_data):
     return hashlib.sha256(image_data).hexdigest()
+
 
 def initialize_document_ai_client():
     return documentai.DocumentProcessorServiceClient()
@@ -121,6 +124,7 @@ def check_identity():
         return jsonify(id_details), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     script_directory = os.path.dirname(os.path.abspath(__file__))

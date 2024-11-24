@@ -62,8 +62,8 @@ create table users
     full_name       varchar(128) not null,
     address         text         not null,
     birthdate       date         not null,
-    cnic_number     varchar(32)  null,
-    driving_license varchar(32)  null,
+    cnic_number     varchar(32) null,
+    driving_license varchar(32) null,
 
     foreign key (role_id) references roles (role_id)
 );

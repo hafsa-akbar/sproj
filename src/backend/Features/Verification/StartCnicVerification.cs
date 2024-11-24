@@ -8,6 +8,7 @@ using sproj.Services;
 
 namespace sproj.Features.Verification;
 
+// TODO: Save CNIC?
 public class StartCnicVerification : Endpoint<StartCnicVerification.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
     public required JwtCreator JwtCreator { get; set; }
@@ -23,6 +24,11 @@ public class StartCnicVerification : Endpoint<StartCnicVerification.Request, Emp
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
         var user = await DbContext.Users.FirstAsync(u => u.UserId == userId);
+
+        if (user.Role == Role.Worker) {
+            await SendUnauthorizedAsync();
+            return;
+        }
 
         using var fileStream = req.Cnic.OpenReadStream();
         var cnic = await CnicVerificationService.VerifyCnicAsync(user, fileStream);

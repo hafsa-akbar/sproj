@@ -4,14 +4,17 @@ POST {{base-url}}/users/register
 Content-Type: application/json
 
 {
-  "phoneNumber": "03356423333",
+  "phoneNumber": "03356423335",
   "password": "password",
   "fullName": "Hadeed Ahmad",
   "address": "LUMS",
-  "gender": 1
+  "birthdate": "2002-03-08",
+  "gender": 2
 }
 
-> {% if (response.body.token) client.global.set("jwt", response.body.token); %}
+> {%
+ if (response.body.token) client.global.set("jwt", response.body.token);
+%}
 
 ###
 
@@ -23,7 +26,9 @@ Content-Type: application/json
   "password": "password"
 }
 
-> {% if (response.body.token) client.global.set("jwt", response.body.token); %}
+> {%
+ if (response.body.token) client.global.set("jwt", response.body.token);
+%}
 
 ###
 
@@ -37,7 +42,70 @@ Authorization: Bearer {{jwt}}
 Content-Type: application/json
 
 {
-  "code": "413961"
+  "code": "837211"
 }
 
-> {% if (response.body.token) client.global.set("jwt", response.body.token); %}
+> {%
+ if (response.body.token) client.global.set("jwt", response.body.token);
+%}
+
+###
+
+GET {{base-url}}/profile/preferences
+Authorization: Bearer {{jwt}}
+
+###
+
+PATCH {{base-url}}/profile/preferences
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "jobCategories": [2, 1],
+  "jobLocale": "lahore"
+}
+
+###
+
+POST {{base-url}}/verify/cnic
+Authorization: Bearer {{jwt}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="cnic"; filename="nadra.png"
+
+< ./src/ocr/nadra.png
+--WebAppBoundary--
+
+> {%
+ if (response.body.token) client.global.set("jwt", response.body.token);
+%}
+
+###
+
+POST {{base-url}}/profile/add-couple
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "couple": 1
+}
+
+###
+
+GET {{base-url}}/jobs
+
+###
+
+POST {{base-url}}/jobs
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "wageRate": 5,
+  "jobCategory": 1,
+  "jobExperience": 1,
+  "jobGender": 1,
+  "jobType": 1,
+  "locale": "lahore"
+}
