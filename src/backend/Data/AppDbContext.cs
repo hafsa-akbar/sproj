@@ -8,6 +8,10 @@ namespace sproj.Data;
 public class AppDbContext : DbContext {
     public AppDbContext(DbContextOptions options) : base(options) { }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        base.OnConfiguring(optionsBuilder.UseSnakeCaseNamingConvention());
+    }
+
     public DbSet<User> Users { get; set; }
     public DbSet<Job> Jobs { get; set; }
     public DbSet<PastJob> PastJobs { get; set; }

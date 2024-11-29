@@ -13,7 +13,7 @@ using sproj.Data;
 namespace sproj.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241124212606_InitialMigration")]
+    [Migration("20241129041806_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -36,231 +36,287 @@ namespace sproj.Data.Migrations
             modelBuilder.Entity("sproj.Data.CnicVerification", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
                     b.Property<byte[]>("IdImage")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("bytea")
+                        .HasColumnName("id_image");
 
                     b.Property<IdType>("IdType")
-                        .HasColumnType("id_document_type");
+                        .HasColumnType("id_document_type")
+                        .HasColumnName("id_type");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId")
+                        .HasName("pk_cnic_verification");
 
-                    b.ToTable("CnicVerification");
+                    b.ToTable("cnic_verification", (string)null);
                 });
 
             modelBuilder.Entity("sproj.Data.Job", b =>
                 {
                     b.Property<int>("JobId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("job_id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("JobId"));
 
                     b.Property<JobCategory>("JobCategory")
-                        .HasColumnType("job_category");
+                        .HasColumnType("job_category")
+                        .HasColumnName("job_category");
 
                     b.Property<JobExperience>("JobExperience")
-                        .HasColumnType("job_experience");
+                        .HasColumnType("job_experience")
+                        .HasColumnName("job_experience");
 
                     b.Property<JobGender>("JobGender")
-                        .HasColumnType("job_gender");
+                        .HasColumnType("job_gender")
+                        .HasColumnName("job_gender");
 
                     b.Property<JobType>("JobType")
-                        .HasColumnType("job_type");
+                        .HasColumnType("job_type")
+                        .HasColumnName("job_type");
 
                     b.Property<string>("Locale")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("locale");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
                     b.Property<int>("WageRate")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("wage_rate");
 
                     b.Property<int?>("WorkerDetailsUserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("worker_details_user_id");
 
-                    b.HasKey("JobId");
+                    b.HasKey("JobId")
+                        .HasName("pk_jobs");
 
-                    b.HasIndex("WorkerDetailsUserId");
+                    b.HasIndex("WorkerDetailsUserId")
+                        .HasDatabaseName("ix_jobs_worker_details_user_id");
 
-                    b.ToTable("Jobs");
+                    b.ToTable("jobs", (string)null);
                 });
 
             modelBuilder.Entity("sproj.Data.PastJob", b =>
                 {
                     b.Property<int>("PastJobId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("past_job_id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PastJobId"));
 
                     b.Property<string>("Comments")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("comments");
 
                     b.Property<string>("EmployerPhoneNumber")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("character varying(15)");
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("employer_phone_number");
 
                     b.Property<bool>("IsVerified")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_verified");
 
                     b.Property<JobCategory>("JobCategory")
-                        .HasColumnType("job_category");
+                        .HasColumnType("job_category")
+                        .HasColumnName("job_category");
 
                     b.Property<JobGender>("JobGender")
-                        .HasColumnType("job_gender");
+                        .HasColumnType("job_gender")
+                        .HasColumnName("job_gender");
 
                     b.Property<JobType>("JobType")
-                        .HasColumnType("job_type");
+                        .HasColumnType("job_type")
+                        .HasColumnName("job_type");
 
                     b.Property<string>("Locale")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("locale");
 
                     b.Property<int?>("Rating")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("rating");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
                     b.Property<int?>("WorkerDetailsUserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("worker_details_user_id");
 
-                    b.HasKey("PastJobId");
+                    b.HasKey("PastJobId")
+                        .HasName("pk_past_jobs");
 
-                    b.HasIndex("WorkerDetailsUserId");
+                    b.HasIndex("WorkerDetailsUserId")
+                        .HasDatabaseName("ix_past_jobs_worker_details_user_id");
 
-                    b.ToTable("PastJobs");
+                    b.ToTable("past_jobs", (string)null);
                 });
 
             modelBuilder.Entity("sproj.Data.PermanentJob", b =>
                 {
                     b.Property<int>("JobId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("job_id");
 
                     b.Property<int>("TrialPeriod")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("trial_period");
 
-                    b.HasKey("JobId");
+                    b.HasKey("JobId")
+                        .HasName("pk_permanent_job");
 
-                    b.ToTable("PermanentJob");
+                    b.ToTable("permanent_job", (string)null);
                 });
 
             modelBuilder.Entity("sproj.Data.SmsVerification", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
                     b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
 
                     b.Property<string>("VerificationCode")
                         .IsRequired()
                         .HasMaxLength(6)
-                        .HasColumnType("character varying(6)");
+                        .HasColumnType("character varying(6)")
+                        .HasColumnName("verification_code");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId")
+                        .HasName("pk_sms_verification");
 
-                    b.ToTable("SmsVerification");
+                    b.ToTable("sms_verification", (string)null);
                 });
 
             modelBuilder.Entity("sproj.Data.User", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
+                        .HasColumnType("character varying(512)")
+                        .HasColumnName("address");
 
                     b.Property<DateOnly>("Birthdate")
-                        .HasColumnType("date");
+                        .HasColumnType("date")
+                        .HasColumnName("birthdate");
 
                     b.Property<string>("CnicNumber")
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("cnic_number");
 
                     b.Property<int?>("CoupleUserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("couple_user_id");
 
                     b.Property<string>("DrivingLicense")
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("driving_license");
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("full_name");
 
                     b.Property<UserGender>("Gender")
-                        .HasColumnType("user_gender");
+                        .HasColumnType("user_gender")
+                        .HasColumnName("gender");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("password");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("character varying(15)");
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("phone_number");
 
                     b.Property<Role>("Role")
-                        .HasColumnType("role");
+                        .HasColumnType("role")
+                        .HasColumnName("role");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId")
+                        .HasName("pk_users");
 
-                    b.HasIndex("CoupleUserId");
+                    b.HasIndex("CoupleUserId")
+                        .HasDatabaseName("ix_users_couple_user_id");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("sproj.Data.UserPreferences", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
                     b.PrimitiveCollection<List<JobCategory>>("JobCategories")
                         .IsRequired()
-                        .HasColumnType("job_category[]");
+                        .HasColumnType("job_category[]")
+                        .HasColumnName("job_categories");
 
                     b.PrimitiveCollection<List<JobExperience>>("JobExperiences")
                         .IsRequired()
-                        .HasColumnType("job_experience[]");
+                        .HasColumnType("job_experience[]")
+                        .HasColumnName("job_experiences");
 
                     b.Property<string>("JobLocale")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("job_locale");
 
                     b.PrimitiveCollection<List<JobType>>("JobTypes")
                         .IsRequired()
-                        .HasColumnType("job_type[]");
+                        .HasColumnType("job_type[]")
+                        .HasColumnName("job_types");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId")
+                        .HasName("pk_user_preferences");
 
-                    b.ToTable("UserPreferences");
+                    b.ToTable("user_preferences", (string)null);
                 });
 
             modelBuilder.Entity("sproj.Data.WorkerDetails", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId")
+                        .HasName("pk_worker_details");
 
-                    b.ToTable("WorkerDetails");
+                    b.ToTable("worker_details", (string)null);
                 });
 
             modelBuilder.Entity("sproj.Data.CnicVerification", b =>
@@ -269,14 +325,16 @@ namespace sproj.Data.Migrations
                         .WithOne("CnicVerification")
                         .HasForeignKey("sproj.Data.CnicVerification", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_cnic_verification_users_user_id");
                 });
 
             modelBuilder.Entity("sproj.Data.Job", b =>
                 {
                     b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
                         .WithMany("Jobs")
-                        .HasForeignKey("WorkerDetailsUserId");
+                        .HasForeignKey("WorkerDetailsUserId")
+                        .HasConstraintName("fk_jobs_worker_details_worker_details_user_id");
 
                     b.Navigation("WorkerDetails");
                 });
@@ -285,7 +343,8 @@ namespace sproj.Data.Migrations
                 {
                     b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
                         .WithMany("PastJobs")
-                        .HasForeignKey("WorkerDetailsUserId");
+                        .HasForeignKey("WorkerDetailsUserId")
+                        .HasConstraintName("fk_past_jobs_worker_details_worker_details_user_id");
 
                     b.Navigation("WorkerDetails");
                 });
@@ -296,7 +355,8 @@ namespace sproj.Data.Migrations
                         .WithOne("PermanentJobDetails")
                         .HasForeignKey("sproj.Data.PermanentJob", "JobId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_permanent_job_jobs_job_id");
                 });
 
             modelBuilder.Entity("sproj.Data.SmsVerification", b =>
@@ -305,14 +365,16 @@ namespace sproj.Data.Migrations
                         .WithOne("SmsVerification")
                         .HasForeignKey("sproj.Data.SmsVerification", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_sms_verification_users_user_id");
                 });
 
             modelBuilder.Entity("sproj.Data.User", b =>
                 {
                     b.HasOne("sproj.Data.User", "Couple")
                         .WithMany()
-                        .HasForeignKey("CoupleUserId");
+                        .HasForeignKey("CoupleUserId")
+                        .HasConstraintName("fk_users_users_couple_user_id");
 
                     b.Navigation("Couple");
                 });
@@ -323,7 +385,8 @@ namespace sproj.Data.Migrations
                         .WithOne("UserPreferences")
                         .HasForeignKey("sproj.Data.UserPreferences", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_user_preferences_users_user_id");
                 });
 
             modelBuilder.Entity("sproj.Data.WorkerDetails", b =>
@@ -332,7 +395,8 @@ namespace sproj.Data.Migrations
                         .WithOne("WorkerDetails")
                         .HasForeignKey("sproj.Data.WorkerDetails", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_worker_details_users_user_id");
 
                     b.Navigation("User");
                 });
