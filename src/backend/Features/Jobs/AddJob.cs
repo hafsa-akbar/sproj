@@ -3,11 +3,8 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Features.Jobs;
 
-// TODO: Debug this
 public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
     public required AppDbContext DbContext { get; set; }
 

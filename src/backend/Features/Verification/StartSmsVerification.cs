@@ -2,8 +2,6 @@ using FastEndpoints;
 using sproj.Data;
 using sproj.Services;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Features.Verification;
 
 public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {

@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 using sproj.Services;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Features.Registration;
 
 public class Register : Endpoint<Register.Request, EmptyResponse> {

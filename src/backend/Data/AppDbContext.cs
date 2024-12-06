@@ -1,20 +1,32 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Data;
 
 public class AppDbContext : DbContext {
     public AppDbContext(DbContextOptions options) : base(options) { }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        base.OnConfiguring(optionsBuilder.UseSnakeCaseNamingConvention());
-    }
-
     public DbSet<User> Users { get; set; }
     public DbSet<Job> Jobs { get; set; }
     public DbSet<PastJob> PastJobs { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        optionsBuilder.UseSnakeCaseNamingConvention();
+
+        base.OnConfiguring(optionsBuilder);
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        modelBuilder.HasPostgresEnum<Role>();
+        modelBuilder.HasPostgresEnum<JobCategory>();
+        modelBuilder.HasPostgresEnum<JobExperience>();
+        modelBuilder.HasPostgresEnum<JobType>();
+        modelBuilder.HasPostgresEnum<UserGender>();
+        modelBuilder.HasPostgresEnum<JobGender>();
+        modelBuilder.HasPostgresEnum<IdType>();
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
 
 public class User {

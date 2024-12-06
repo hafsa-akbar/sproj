@@ -3,9 +3,6 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 using sproj.Services;
-using Twilio.Rest.Preview.Wireless.Sim;
-
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace sproj.Features.Verification;
 

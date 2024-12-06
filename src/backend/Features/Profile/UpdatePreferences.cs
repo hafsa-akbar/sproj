@@ -3,8 +3,6 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Features.Profile;
 
 public class UpdatePreferences : Endpoint<UpdatePreferences.Request, EmptyResponse> {

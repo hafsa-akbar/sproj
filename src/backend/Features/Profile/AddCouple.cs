@@ -2,8 +2,6 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Features.Profile;
 
 // TODO: Add by phone number instead

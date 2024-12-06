@@ -3,8 +3,6 @@ using FluentValidation;
 using sproj.Data;
 using sproj.Services;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Features.Registration;
 
 public class Login : Endpoint<Login.Request, EmptyResponse> {

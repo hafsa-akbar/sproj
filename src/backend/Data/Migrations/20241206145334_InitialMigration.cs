@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using sproj.Data;
 
 #nullable disable
 
@@ -15,13 +13,13 @@ namespace sproj.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:id_document_type", "cnic,driving_license")
-                .Annotation("Npgsql:Enum:job_category", "babysitting,cleaning,cooking,driving,gardening,laundry,pet_care,security_guard")
-                .Annotation("Npgsql:Enum:job_experience", "beginner,expert,intermediate")
-                .Annotation("Npgsql:Enum:job_gender", "couple,female,male")
+                .Annotation("Npgsql:Enum:id_type", "driving_license,cnic")
+                .Annotation("Npgsql:Enum:job_category", "cooking,cleaning,driving,laundry,gardening,babysitting,pet_care,security_guard")
+                .Annotation("Npgsql:Enum:job_experience", "beginner,intermediate,expert")
+                .Annotation("Npgsql:Enum:job_gender", "male,female,couple")
                 .Annotation("Npgsql:Enum:job_type", "one_shot,permanent_hire")
-                .Annotation("Npgsql:Enum:role", "employer,unregistered,worker")
-                .Annotation("Npgsql:Enum:user_gender", "female,male");
+                .Annotation("Npgsql:Enum:role", "unregistered,employer,worker")
+                .Annotation("Npgsql:Enum:user_gender", "male,female");
 
             migrationBuilder.CreateTable(
                 name: "users",
@@ -31,12 +29,12 @@ namespace sproj.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
                     password = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    role = table.Column<Role>(type: "role", nullable: false),
+                    role = table.Column<int>(type: "integer", nullable: false),
                     couple_user_id = table.Column<int>(type: "integer", nullable: true),
                     full_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     address = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     birthdate = table.Column<DateOnly>(type: "date", nullable: false),
-                    gender = table.Column<UserGender>(type: "user_gender", nullable: false),
+                    gender = table.Column<int>(type: "integer", nullable: false),
                     cnic_number = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
                     driving_license = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true)
                 },
@@ -56,7 +54,7 @@ namespace sproj.Data.Migrations
                 {
                     user_id = table.Column<int>(type: "integer", nullable: false),
                     id_image = table.Column<byte[]>(type: "bytea", nullable: false),
-                    id_type = table.Column<IdType>(type: "id_document_type", nullable: false)
+                    id_type = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -93,9 +91,9 @@ namespace sproj.Data.Migrations
                 columns: table => new
                 {
                     user_id = table.Column<int>(type: "integer", nullable: false),
-                    job_categories = table.Column<List<JobCategory>>(type: "job_category[]", nullable: false),
-                    job_experiences = table.Column<List<JobExperience>>(type: "job_experience[]", nullable: false),
-                    job_types = table.Column<List<JobType>>(type: "job_type[]", nullable: false),
+                    job_categories = table.Column<int[]>(type: "integer[]", nullable: false),
+                    job_experiences = table.Column<int[]>(type: "integer[]", nullable: false),
+                    job_types = table.Column<int[]>(type: "integer[]", nullable: false),
                     job_locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true)
                 },
                 constraints: table =>
@@ -135,10 +133,10 @@ namespace sproj.Data.Migrations
                     user_id = table.Column<int>(type: "integer", nullable: false),
                     worker_details_user_id = table.Column<int>(type: "integer", nullable: true),
                     wage_rate = table.Column<int>(type: "integer", nullable: false),
-                    job_category = table.Column<JobCategory>(type: "job_category", nullable: false),
-                    job_experience = table.Column<JobExperience>(type: "job_experience", nullable: false),
-                    job_gender = table.Column<JobGender>(type: "job_gender", nullable: false),
-                    job_type = table.Column<JobType>(type: "job_type", nullable: false),
+                    job_category = table.Column<int>(type: "integer", nullable: false),
+                    job_experience = table.Column<int>(type: "integer", nullable: false),
+                    job_gender = table.Column<int>(type: "integer", nullable: false),
+                    job_type = table.Column<int>(type: "integer", nullable: false),
                     locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
@@ -159,9 +157,9 @@ namespace sproj.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_id = table.Column<int>(type: "integer", nullable: false),
                     worker_details_user_id = table.Column<int>(type: "integer", nullable: true),
-                    job_category = table.Column<JobCategory>(type: "job_category", nullable: false),
-                    job_gender = table.Column<JobGender>(type: "job_gender", nullable: false),
-                    job_type = table.Column<JobType>(type: "job_type", nullable: false),
+                    job_category = table.Column<int>(type: "integer", nullable: false),
+                    job_gender = table.Column<int>(type: "integer", nullable: false),
+                    job_type = table.Column<int>(type: "integer", nullable: false),
                     locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     employer_phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
                     is_verified = table.Column<bool>(type: "boolean", nullable: false),

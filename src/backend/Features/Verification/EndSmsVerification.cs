@@ -3,8 +3,6 @@ using FluentValidation;
 using sproj.Data;
 using sproj.Services;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Features.Verification;
 
 public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, EmptyResponse> {

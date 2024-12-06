@@ -23,31 +23,24 @@ public static class Startup {
         builder.Services.AddAuthenticationJwtBearer(s => s.SigningKey = config["jwt:key"]);
         builder.Services.AddAuthorization();
 
-        // TODO: How to move enum config to AppDbContext?
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString, optionsBuilder => {
-            optionsBuilder.MapEnum<Role>("role");
-            optionsBuilder.MapEnum<JobCategory>("job_category");
-            optionsBuilder.MapEnum<JobExperience>("job_experience");
-            optionsBuilder.MapEnum<JobType>("job_type");
-            optionsBuilder.MapEnum<UserGender>("user_gender");
-            optionsBuilder.MapEnum<JobGender>("job_gender");
-            optionsBuilder.MapEnum<IdType>("id_document_type");
-        }));
+        builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
 
         builder.AddCustomServices();
     }
 
     private static void AddOptions(this WebApplicationBuilder builder) {
         builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)
-            .Validate(o => o.Key != null, "no jwt secret key").ValidateOnStart();
+            .Validate(o => o.Key != null)
+            .Validate(o => o.Duration > 0)
+            .ValidateOnStart();
         builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JwtOptions>>().Value);
 
         if (!builder.Environment.IsDevelopment()) {
             builder.Services.AddOptions<TwilioOptions>().BindConfiguration(TwilioOptions.SectionName)
-                .Validate(o => o.AccountSid != null, "no account sid")
-                .Validate(o => o.AuthToken != null, "no auth token")
-                .Validate(o => o.PhoneNumber != null, "no twilio phone number")
+                .Validate(o => o.AccountSid != null)
+                .Validate(o => o.AuthToken != null)
+                .Validate(o => o.PhoneNumber != null)
                 .ValidateOnStart();
             builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<TwilioOptions>>().Value);
         }

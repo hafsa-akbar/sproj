@@ -169,7 +169,3 @@ create table permanent_job
 
     foreign key (job_id) references job (job_id)
 );
-
--- TODO:
--- 1. End of interaction (payment chat)
--- 2. Recomendation system

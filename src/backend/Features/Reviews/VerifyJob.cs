@@ -2,8 +2,6 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace sproj.Features.Reviews;
 
 public class VerifyJob : Endpoint<VerifyJob.Request, EmptyResponse> {
