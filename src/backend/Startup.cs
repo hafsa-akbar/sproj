@@ -21,6 +21,14 @@ public static class Startup {
         builder.Services.AddProblemDetails();
         builder.Services.AddFastEndpoints();
 
+        builder.Services.AddCors(options => {
+            options.AddDefaultPolicy(policy => {
+                policy.WithOrigins("http://localhost:5173")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+
         builder.Services.AddAuthentication()
             .AddScheme<AuthenticationSchemeOptions, AuthenticationHandler>("cookie", null);
         builder.Services.AddAuthorization(o => o.AddAuthorizationPolicies());
@@ -64,6 +72,8 @@ public static class Startup {
 
         app.UseSerilogRequestLogging();
         app.UseStatusCodePages();
+
+        app.UseCors();
 
         app.UseAuthentication();
         app.UseAuthorization();
