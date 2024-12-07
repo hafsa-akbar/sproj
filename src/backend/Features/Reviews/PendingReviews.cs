@@ -9,7 +9,7 @@ public class PendingReviews : Endpoint<EmptyRequest, EmptyResponse> {
 
     public override void Configure() {
         Post("/pending-jobs");
-        Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
+        Policies("EmployerOrWorker");
     }
 
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {

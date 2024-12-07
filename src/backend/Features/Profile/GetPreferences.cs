@@ -9,7 +9,7 @@ public class GetPreferences : Endpoint<EmptyRequest, EmptyResponse> {
 
     public override void Configure() {
         Get("/profile/preferences");
-        Policy(p => p.RequireClaim("role", Role.Employer.ToString(), Role.Worker.ToString()));
+        Policies("EmployerOrWorker");
     }
 
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {

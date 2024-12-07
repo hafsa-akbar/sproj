@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using sproj.Authentication;
 using sproj.Data;
 using sproj.Services;
 
@@ -8,12 +10,12 @@ namespace sproj.Features.Verification;
 
 public class StartCnicVerification : Endpoint<StartCnicVerification.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
-    public required JwtCreator JwtCreator { get; set; }
+    public required ISessionStore SessionStore { get; set; }
     public required ICnicVerificationService CnicVerificationService { get; set; }
 
     public override void Configure() {
         Post("/verify/cnic");
-        Policy(p => p.RequireClaim("role", Role.Employer.ToString()));
+        Policies("Unregistered");
 
         AllowFileUploads();
     }
@@ -49,9 +51,15 @@ public class StartCnicVerification : Endpoint<StartCnicVerification.Request, Emp
         user.WorkerDetails = new WorkerDetails();
         await DbContext.SaveChangesAsync();
 
-        await SendResultAsync(Results.Ok(new {
-            Token = JwtCreator.CreateJwt(user)
-        }));
+        var sessionId = Guid.Parse(User.FindFirst("session_id")!.Value);
+        var session = SessionStore.GetSession(sessionId)!;
+
+        session.Claims.RemoveClaim(session.Claims.FindFirst("role"));
+        session.Claims.AddClaim(new Claim("role", user.Role.ToString()));
+
+        SessionStore.UpdateSession(sessionId, session);
+
+        await SendResultAsync(Results.Ok());
     }
 
     public record Request(IFormFile Cnic);

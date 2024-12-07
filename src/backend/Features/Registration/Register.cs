@@ -1,6 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using sproj.Authentication;
 using sproj.Data;
 using sproj.Services;
 
@@ -8,7 +9,7 @@ namespace sproj.Features.Registration;
 
 public class Register : Endpoint<Register.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
-    public required JwtCreator JwtCreator { get; set; }
+    public required ISessionStore SessionStore { get; set; }
     public required PasswordHasher PasswordHasher { get; set; }
 
     public override void Configure() {
@@ -36,9 +37,13 @@ public class Register : Endpoint<Register.Request, EmptyResponse> {
         DbContext.Users.Add(user);
         await DbContext.SaveChangesAsync();
 
-        await SendResultAsync(Results.Ok(new {
-            Token = JwtCreator.CreateJwt(user)
-        }));
+        var sessionId = SessionStore.AddSession(new Session(user));
+        HttpContext.Response.Cookies.Append("session", sessionId.ToString(), new CookieOptions {
+            HttpOnly = true,
+            Secure = true
+        });
+
+        await SendResultAsync(Results.Ok());
     }
 
     public record struct Request(

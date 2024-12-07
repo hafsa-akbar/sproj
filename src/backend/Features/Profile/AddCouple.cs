@@ -11,7 +11,7 @@ public class AddCouple : Endpoint<AddCouple.Request, EmptyResponse> {
 
     public override void Configure() {
         Post("/profile/add-couple");
-        Policy(p => p.RequireClaim("role", Role.Worker.ToString()));
+        Policies("Worker");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {

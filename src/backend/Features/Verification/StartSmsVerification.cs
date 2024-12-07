@@ -11,7 +11,7 @@ public class SendSmsCodeEndpoint : Endpoint<EmptyRequest, EmptyResponse> {
 
     public override void Configure() {
         Post("/verify/start-sms");
-        Policy(p => p.RequireClaim("role", Role.Unregistered.ToString()));
+        Policies("Unregistered");
     }
 
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {

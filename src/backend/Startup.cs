@@ -1,8 +1,9 @@
 using FastEndpoints;
-using FastEndpoints.Security;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
+using sproj.Authentication;
 using sproj.Data;
 using sproj.Services;
 
@@ -20,8 +21,9 @@ public static class Startup {
         builder.Services.AddProblemDetails();
         builder.Services.AddFastEndpoints();
 
-        builder.Services.AddAuthenticationJwtBearer(s => s.SigningKey = config["jwt:key"]);
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthentication()
+            .AddScheme<AuthenticationSchemeOptions, AuthenticationHandler>("cookie", null);
+        builder.Services.AddAuthorization(o => o.AddAuthorizationPolicies());
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
@@ -30,12 +32,6 @@ public static class Startup {
     }
 
     private static void AddOptions(this WebApplicationBuilder builder) {
-        builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName)
-            .Validate(o => o.Key != null)
-            .Validate(o => o.Duration > 0)
-            .ValidateOnStart();
-        builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<JwtOptions>>().Value);
-
         if (!builder.Environment.IsDevelopment()) {
             builder.Services.AddOptions<TwilioOptions>().BindConfiguration(TwilioOptions.SectionName)
                 .Validate(o => o.AccountSid != null)
@@ -47,8 +43,9 @@ public static class Startup {
     }
 
     private static void AddCustomServices(this WebApplicationBuilder builder) {
+        builder.Services.AddSingleton<ISessionStore, MemorySessionStore>();
+
         builder.Services.AddScoped<CodeVerifier>();
-        builder.Services.AddSingleton<JwtCreator>();
         builder.Services.AddSingleton<PasswordHasher>();
 
         if (!builder.Environment.IsDevelopment())

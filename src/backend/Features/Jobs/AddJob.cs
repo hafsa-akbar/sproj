@@ -10,7 +10,7 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
 
     public override void Configure() {
         Post("/jobs");
-        Policy(p => p.RequireClaim("role", Role.Worker.ToString()));
+        Policies("Worker");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {

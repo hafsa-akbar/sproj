@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
+using sproj.Authentication;
 using sproj.Data;
 using sproj.Services;
 
@@ -7,12 +9,12 @@ namespace sproj.Features.Verification;
 
 public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
-    public required JwtCreator JwtCreator { get; set; }
+    public required ISessionStore SessionStore { get; set; }
     public required CodeVerifier CodeVerifier { get; set; }
 
     public override void Configure() {
         Post("/verify/end-sms");
-        Policy(p => p.RequireClaim("role", Role.Unregistered.ToString()));
+        Policies("Unregistered");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
@@ -32,9 +34,15 @@ public class VerifySmsCodeEndpoint : Endpoint<VerifySmsCodeEndpoint.Request, Emp
 
         await DbContext.SaveChangesAsync();
 
-        await SendResultAsync(Results.Ok(new {
-            Token = JwtCreator.CreateJwt(user)
-        }));
+        var sessionId = Guid.Parse(User.FindFirst("session_id")!.Value);
+        var session = SessionStore.GetSession(sessionId)!;
+
+        session.Claims.RemoveClaim(session.Claims.FindFirst("role"));
+        session.Claims.AddClaim(new Claim("role", user.Role.ToString()));
+
+        SessionStore.UpdateSession(sessionId, session);
+
+        await SendResultAsync(Results.Ok());
     }
 
     public record struct Request(string Code);

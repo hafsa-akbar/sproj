@@ -2,13 +2,6 @@
 
 namespace sproj.Services;
 
-public class JwtOptions {
-    public const string SectionName = "JWT";
-
-    public string Key { get; set; }
-    public int Duration { get; set; }
-}
-
 public class TwilioOptions {
     public const string SectionName = "Twilio";
 
