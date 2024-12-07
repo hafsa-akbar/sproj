@@ -9,7 +9,7 @@ namespace sproj.Features.Registration;
 
 public class Register : Endpoint<Register.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
-    public required ISessionStore SessionStore { get; set; }
+    public required SessionStore SessionStore { get; set; }
     public required PasswordHasher PasswordHasher { get; set; }
 
     public override void Configure() {
@@ -37,7 +37,7 @@ public class Register : Endpoint<Register.Request, EmptyResponse> {
         DbContext.Users.Add(user);
         await DbContext.SaveChangesAsync();
 
-        var sessionId = SessionStore.AddSession(new Session(user));
+        var sessionId = SessionStore.CreateSession(user);
         HttpContext.Response.Cookies.Append("session", sessionId.ToString(), new CookieOptions {
             HttpOnly = true,
             Secure = true

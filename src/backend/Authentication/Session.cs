@@ -1,39 +1,47 @@
 ﻿using System.Collections.Concurrent;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using sproj.Data;
 
 namespace sproj.Authentication;
 
 public class Session {
-    public Session(ClaimsIdentity claims) {
-        Claims = claims;
-    }
-
-    public Session(User user) {
-        Claims = new ClaimsIdentity(new[] {
-            new Claim("user_id", user.UserId.ToString()),
-            new Claim("phone_number", user.PhoneNumber),
-            new Claim("role", user.Role.ToString())
-        }, "cookie", "user_id", "role");
-    }
-
-    public ClaimsIdentity Claims { get; }
+    public required ClaimsIdentity ClaimsIdentity { get; init; }
 }
 
-public interface ISessionStore {
-    Guid AddSession(Session session);
-    void DeleteSession(Guid sessionId);
-    Session? GetSession(Guid sessionId);
-    void UpdateSession(Guid sessionId, Session session);
+public abstract class SessionStore {
+    public abstract string CreateSession(Session session);
+    public abstract void DeleteSession(string sessionId);
+    public abstract Session? GetSession(string sessionId);
+    public abstract void SetSession(string sessionId, Session session);
+
+    protected TimeSpan SessionLifetime { get; } = TimeSpan.FromMinutes(15);
+
+    public string CreateSession(User user) {
+        var session = new Session {
+            ClaimsIdentity = new ClaimsIdentity(new[] {
+                new Claim("user_id", user.UserId.ToString()),
+                new Claim("phone_number", user.PhoneNumber),
+                new Claim("role", user.Role.ToString())
+            }, "cookie", "user_id", "role")
+        };
+
+        return CreateSession(session);
+    }
+
+    protected virtual string GetSessionId() {
+        Span<byte> byteArray = stackalloc byte[16];
+        RandomNumberGenerator.Fill(byteArray);
+        return BitConverter.ToString(byteArray.ToArray()).Replace("-", "");
+    }
 }
 
-public class MemorySessionStore : ISessionStore {
-    private readonly TimeSpan _sessionLifetime = TimeSpan.FromMinutes(15);
-    private readonly ConcurrentDictionary<Guid, (DateTime ExpirationTime, Session Session)> _sessions = new();
+public class MemorySessionStore : SessionStore {
+    private readonly ConcurrentDictionary<string, (DateTime ExpirationTime, Session Session)> _sessions = new();
 
-    public Guid AddSession(Session session) {
-        var sessionId = Guid.NewGuid();
-        var expirationTime = DateTime.UtcNow.Add(_sessionLifetime);
+    public override string CreateSession(Session session) {
+        var sessionId = GetSessionId();
+        var expirationTime = DateTime.UtcNow.Add(SessionLifetime);
 
         if (!_sessions.TryAdd(sessionId, (expirationTime, session)))
             throw new InvalidOperationException("Failed to add session.");
@@ -41,11 +49,11 @@ public class MemorySessionStore : ISessionStore {
         return sessionId;
     }
 
-    public void DeleteSession(Guid sessionId) {
+    public override void DeleteSession(string sessionId) {
         _sessions.TryRemove(sessionId, out _);
     }
 
-    public Session? GetSession(Guid sessionId) {
+    public override Session? GetSession(string sessionId) {
         if (!_sessions.TryGetValue(sessionId, out var session))
             return null;
 
@@ -54,24 +62,11 @@ public class MemorySessionStore : ISessionStore {
             return null;
         }
 
-        return new Session(session.Session.Claims.Clone());
+        return new Session { ClaimsIdentity = session.Session.ClaimsIdentity.Clone() };
     }
 
-    public void UpdateSession(Guid sessionId, Session session) {
-        var expirationTime = DateTime.UtcNow.Add(_sessionLifetime);
-
-        if (_sessions.ContainsKey(sessionId))
-            _sessions[sessionId] = (expirationTime, session);
-        else
-            AddSession(session);
-    }
-
-    public void CleanupExpiredSessions() {
-        var expiredSessionIds = _sessions
-            .Where(kvp => kvp.Value.ExpirationTime <= DateTime.UtcNow)
-            .Select(kvp => kvp.Key)
-            .ToList();
-
-        expiredSessionIds.ForEach(DeleteSession);
+    public override void SetSession(string sessionId, Session session) {
+        var expirationTime = DateTime.UtcNow.Add(SessionLifetime);
+        _sessions[sessionId] = (expirationTime, session);
     }
 }

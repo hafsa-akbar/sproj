@@ -43,7 +43,7 @@ public static class Startup {
     }
 
     private static void AddCustomServices(this WebApplicationBuilder builder) {
-        builder.Services.AddSingleton<ISessionStore, MemorySessionStore>();
+        builder.Services.AddSingleton<SessionStore, MemorySessionStore>();
 
         builder.Services.AddScoped<CodeVerifier>();
         builder.Services.AddSingleton<PasswordHasher>();

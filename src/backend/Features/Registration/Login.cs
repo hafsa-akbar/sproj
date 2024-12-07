@@ -8,7 +8,7 @@ namespace sproj.Features.Registration;
 
 public class Login : Endpoint<Login.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
-    public required ISessionStore SessionStore { get; set; }
+    public required SessionStore SessionStore { get; set; }
     public required PasswordHasher PasswordHasher { get; set; }
 
     public override void Configure() {
@@ -30,7 +30,7 @@ public class Login : Endpoint<Login.Request, EmptyResponse> {
             return;
         }
 
-        var sessionId = SessionStore.AddSession(new Session(user));
+        var sessionId = SessionStore.CreateSession(user);
         HttpContext.Response.Cookies.Append("session", sessionId.ToString(), new CookieOptions {
             HttpOnly = true,
             Secure = true

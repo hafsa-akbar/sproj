@@ -10,7 +10,7 @@ namespace sproj.Features.Verification;
 
 public class StartCnicVerification : Endpoint<StartCnicVerification.Request, EmptyResponse> {
     public required AppDbContext DbContext { get; set; }
-    public required ISessionStore SessionStore { get; set; }
+    public required SessionStore SessionStore { get; set; }
     public required ICnicVerificationService CnicVerificationService { get; set; }
 
     public override void Configure() {
@@ -51,13 +51,13 @@ public class StartCnicVerification : Endpoint<StartCnicVerification.Request, Emp
         user.WorkerDetails = new WorkerDetails();
         await DbContext.SaveChangesAsync();
 
-        var sessionId = Guid.Parse(User.FindFirst("session_id")!.Value);
+        var sessionId = User.FindFirst("session_id")!.Value;
         var session = SessionStore.GetSession(sessionId)!;
 
-        session.Claims.RemoveClaim(session.Claims.FindFirst("role"));
-        session.Claims.AddClaim(new Claim("role", user.Role.ToString()));
+        session.ClaimsIdentity.RemoveClaim(session.ClaimsIdentity.FindFirst("role"));
+        session.ClaimsIdentity.AddClaim(new Claim("role", user.Role.ToString()));
 
-        SessionStore.UpdateSession(sessionId, session);
+        SessionStore.SetSession(sessionId, session);
 
         await SendResultAsync(Results.Ok());
     }
