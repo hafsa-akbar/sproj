@@ -64,7 +64,9 @@ Content-Disposition: form-data; name="cnic"; filename="nadra.png"
 
 > {%
 
+
  if (response.body.token) client.global.set("jwt", response.body.token);
+
 
 %}
 

@@ -5,7 +5,9 @@ using sproj.Data;
 namespace sproj.Authentication;
 
 public class Session {
-    public Session(ClaimsIdentity claims) => Claims = claims;
+    public Session(ClaimsIdentity claims) {
+        Claims = claims;
+    }
 
     public Session(User user) {
         Claims = new ClaimsIdentity(new[] {
@@ -26,8 +28,8 @@ public interface ISessionStore {
 }
 
 public class MemorySessionStore : ISessionStore {
-    private readonly ConcurrentDictionary<Guid, (DateTime ExpirationTime, Session Session)> _sessions = new();
     private readonly TimeSpan _sessionLifetime = TimeSpan.FromMinutes(15);
+    private readonly ConcurrentDictionary<Guid, (DateTime ExpirationTime, Session Session)> _sessions = new();
 
     public Guid AddSession(Session session) {
         var sessionId = Guid.NewGuid();
@@ -39,7 +41,9 @@ public class MemorySessionStore : ISessionStore {
         return sessionId;
     }
 
-    public void DeleteSession(Guid sessionId) => _sessions.TryRemove(sessionId, out _);
+    public void DeleteSession(Guid sessionId) {
+        _sessions.TryRemove(sessionId, out _);
+    }
 
     public Session? GetSession(Guid sessionId) {
         if (!_sessions.TryGetValue(sessionId, out var session))
@@ -56,11 +60,10 @@ public class MemorySessionStore : ISessionStore {
     public void UpdateSession(Guid sessionId, Session session) {
         var expirationTime = DateTime.UtcNow.Add(_sessionLifetime);
 
-        if (_sessions.ContainsKey(sessionId)) {
+        if (_sessions.ContainsKey(sessionId))
             _sessions[sessionId] = (expirationTime, session);
-        } else {
+        else
             AddSession(session);
-        }
     }
 
     public void CleanupExpiredSessions() {

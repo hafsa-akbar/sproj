@@ -29,7 +29,7 @@ public class PendingReviews : Endpoint<EmptyRequest, EmptyResponse> {
             p.JobType,
             Worker = new {
                 p.WorkerDetails!.UserId,
-                p.WorkerDetails!.User!.FullName,
+                p.WorkerDetails!.User!.FullName
             }
         })));
     }
