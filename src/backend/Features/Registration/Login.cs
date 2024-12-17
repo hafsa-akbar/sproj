@@ -31,7 +31,7 @@ public class Login : Endpoint<Login.Request, EmptyResponse> {
         }
 
         var sessionId = SessionStore.CreateSession(user);
-        HttpContext.Response.Cookies.Append("session", sessionId.ToString(), new CookieOptions {
+        HttpContext.Response.Cookies.Append("session", sessionId, new CookieOptions {
             HttpOnly = true,
             Secure = true
         });

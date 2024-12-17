@@ -38,7 +38,7 @@ public class Register : Endpoint<Register.Request, EmptyResponse> {
         await DbContext.SaveChangesAsync();
 
         var sessionId = SessionStore.CreateSession(user);
-        HttpContext.Response.Cookies.Append("session", sessionId.ToString(), new CookieOptions {
+        HttpContext.Response.Cookies.Append("session", sessionId, new CookieOptions {
             HttpOnly = true,
             Secure = true
         });
