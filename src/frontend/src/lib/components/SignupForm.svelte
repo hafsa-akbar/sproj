@@ -26,8 +26,12 @@
   
       try {
         const response = await register(user);
-        loginUser(response.user);
-        goto('/'); // Redirect to home after signup
+        if (response.user) {
+          loginUser(response.user);
+          goto('/'); // TO BE CHANGED
+        } else {
+          errorMessage.set('Invalid response from server');
+        }
       } catch (error) {
         errorMessage.set(error.message);
       }

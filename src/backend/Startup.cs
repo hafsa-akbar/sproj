@@ -25,7 +25,8 @@ public static class Startup {
             options.AddDefaultPolicy(policy => {
                 policy.WithOrigins("http://localhost:5173")
                     .AllowAnyHeader()
-                    .AllowAnyMethod();
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             });
         });
 

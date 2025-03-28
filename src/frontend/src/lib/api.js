@@ -4,6 +4,7 @@ export async function login(user) {
   const response = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(user),
   });
 
@@ -19,6 +20,7 @@ export async function register(user) {
   const response = await fetch(`${BASE_URL}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(user),
   });
 
@@ -27,5 +29,5 @@ export async function register(user) {
     throw new Error(data.message || 'Signup failed');
   }
 
-  return data;
+  return {user: data};
 }
