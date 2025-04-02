@@ -2,7 +2,6 @@
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using sproj.Data;
 
@@ -10,7 +9,6 @@ namespace sproj.Authentication;
 
 public class AuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions> {
     private readonly SessionStore _sessionStore;
-    private readonly ILogger<AuthenticationHandler> _logger;
 
     public AuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
@@ -19,27 +17,17 @@ public class AuthenticationHandler : AuthenticationHandler<AuthenticationSchemeO
         SessionStore sessionStore)
         : base(options, logger, encoder) {
         _sessionStore = sessionStore;
-        _logger = logger.CreateLogger<AuthenticationHandler>();
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync() {
-        _logger.LogInformation("Starting authentication process");
-        
-        if (!Request.Cookies.TryGetValue("session", out var sessionId)) {
-            _logger.LogWarning("No session cookie found in request");
+        if (!Request.Cookies.TryGetValue("session", out var sessionId))
             return Task.FromResult(AuthenticateResult.Fail("Session cookie missing."));
-        }
-        
-        _logger.LogInformation("Found session cookie with ID: {SessionId}", sessionId);
 
         var session = _sessionStore.GetSession(sessionId);
 
-        if (session == null) {
-            _logger.LogWarning("Invalid or expired session: {SessionId}", sessionId);
+        if (session == null)
             return Task.FromResult(AuthenticateResult.Fail("Invalid or expired session."));
-        }
 
-        _logger.LogInformation("Valid session found for user: {UserId}", session.ClaimsIdentity.Name);
         session.ClaimsIdentity.AddClaim(new Claim("session_id", sessionId));
         
         var principal = new ClaimsPrincipal(session.ClaimsIdentity);

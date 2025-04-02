@@ -1,6 +1,14 @@
 <script>
 	import '../app.css';
-	let { children } = $props();
+	import { ToastContainer, FlatToast } from 'svelte-toasts';
+	import Navbar from '$lib/components/Navbar.svelte';
 </script>
 
-{@render children()}
+<Navbar />
+
+<slot />
+
+<ToastContainer let:data>	
+	<FlatToast {data} />
+</ToastContainer>
+  

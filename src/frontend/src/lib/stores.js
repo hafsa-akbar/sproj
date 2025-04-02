@@ -11,10 +11,3 @@ export function logoutUser() {
   authUser.set(null);
   localStorage.removeItem('authUser');
 }
-
-if (typeof window !== 'undefined') {
-  const storedUser = localStorage.getItem('authUser');
-  if (storedUser) {
-    authUser.set(JSON.parse(storedUser));
-  }
-}

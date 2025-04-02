@@ -1,1 +1,13 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+@theme {
+    --font-poppins: Poppins, sans-serif;
+    --color-primary: #EBD96B;
+    --color-secondary: #678D58;
+    --color-tertiary: #8B8B8B;
+}
+
+.split-bg {
+    min-height: 100vh;
+    background: linear-gradient(to left, var(--color-primary) 50%, #ffffff 50%);
+}

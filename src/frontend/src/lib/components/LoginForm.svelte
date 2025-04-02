@@ -15,8 +15,8 @@
 
     try {
       const response = await login(user);
-      loginUser(response.user);
-      goto('/'); // Redirect to home after login
+      loginUser(response);
+      goto('/');
     } catch (error) {
       errorMessage.set(error.message);
     }
@@ -28,12 +28,12 @@
 
   <form on:submit|preventDefault={handleLogin} class="space-y-4">
     <input type="text" bind:value={$phoneNumber} placeholder="Phone Number"
-      class="w-full p-2 border rounded-md" required />
+      class="w-full p-2 border border-gray-600 rounded-md" required />
 
     <input type="password" bind:value={$password} placeholder="Password"
-      class="w-full p-2 border rounded-md" required />
+      class="w-full p-2 border border-gray-600 rounded-md" required />
 
-    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md">
+    <button type="submit" class="w-full bg-secondary text-white p-2 rounded-md hover:opacity-90">
       Login
     </button>
 
@@ -43,6 +43,6 @@
   </form>
 
   <p class="mt-4 text-sm">
-    Don't have an account? <a href="/signup" class="text-blue-500">Sign up</a>
+    Don't have an account? <a href="/signup" class="text-secondary">Sign up</a>
   </p>
 </div>

@@ -6,7 +6,7 @@ using sproj.Services;
 
 namespace sproj.Features.Registration;
 
-public class Login : Endpoint<Login.Request, EmptyResponse> {
+public class Login : Endpoint<Login.Request, Login.UserResponse> {
     public required AppDbContext DbContext { get; set; }
     public required SessionStore SessionStore { get; set; }
     public required PasswordHasher PasswordHasher { get; set; }
@@ -21,12 +21,12 @@ public class Login : Endpoint<Login.Request, EmptyResponse> {
 
         var user = DbContext.Users.SingleOrDefault(u => u.PhoneNumber == normalizedPhoneNumber);
         if (user is null) {
-            await SendUnauthorizedAsync();
+            await SendUnauthorizedAsync(ct);
             return;
         }
 
         if (!PasswordHasher.VerifyHashedPassword(user.Password, req.Password)) {
-            await SendUnauthorizedAsync();
+            await SendUnauthorizedAsync(ct);
             return;
         }
 
@@ -36,11 +36,30 @@ public class Login : Endpoint<Login.Request, EmptyResponse> {
             Secure = true
         });
 
-        await SendResultAsync(Results.Ok());
+        var response = new UserResponse(
+            UserId: user.UserId,
+            PhoneNumber: user.PhoneNumber,
+            FullName: user.FullName,
+            Address: user.Address,
+            Birthdate: user.Birthdate,
+            Gender: user.Gender,
+            Role: user.Role
+        );
+
+        await SendOkAsync(response, ct);
     }
 
-
     public record struct Request(string PhoneNumber, string Password);
+
+    public record UserResponse(
+        int UserId,
+        string PhoneNumber,
+        string FullName,
+        string Address,
+        DateOnly Birthdate,
+        UserGender Gender,
+        Role Role
+    );
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
@@ -49,3 +68,5 @@ public class Login : Endpoint<Login.Request, EmptyResponse> {
         }
     }
 }
+
+// TODO: Add proper error handling with reasons - 401 when password incorrect
