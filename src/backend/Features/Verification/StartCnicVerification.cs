@@ -15,7 +15,7 @@ public class StartCnicVerification : Endpoint<StartCnicVerification.Request, Emp
 
     public override void Configure() {
         Post("/verify/cnic");
-        Policies("Unregistered");
+        Policies("EmployerOrWorker");
 
         AllowFileUploads();
     }
@@ -24,10 +24,11 @@ public class StartCnicVerification : Endpoint<StartCnicVerification.Request, Emp
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
         var user = await DbContext.Users.Include(u => u.CnicVerification).FirstAsync(u => u.UserId == userId);
 
-        if (user.Role == Role.Worker) {
-            await SendUnauthorizedAsync();
-            return;
-        }
+        // worker can later update cnic to driver's lisc or vise versa
+        // if (user.Role == Role.Worker) {
+        //     await SendUnauthorizedAsync();
+        //     return;
+        // }
 
         using var fileStream = req.Cnic.OpenReadStream();
         using var ms = new MemoryStream();
