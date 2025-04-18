@@ -1,6 +1,10 @@
 <script>
   import { authUser, logoutUser } from '$lib/stores';
   import { goto } from '$app/navigation';
+  import { toasts } from 'svelte-toasts';
+  import AddJobModal from '$lib/components/AddJobModal.svelte';
+
+  let showAddJob = false;
 
   function handleLogout() {
     logoutUser();
@@ -9,9 +13,9 @@
 
   function handleAddJob() {
     if ($authUser?.role === 3) {
-      alert('can successfully add job');
+      showAddJob = true;
     } else {
-      alert('not authorized');
+      toasts.add({ title: 'Error', description: 'Cannot post job', type: 'error' });
     }
   }
 </script>
@@ -52,3 +56,7 @@
     {/if}
   </div>
 </nav>
+
+{#if showAddJob}
+  <AddJobModal on:close={() => (showAddJob = false)} />
+{/if}

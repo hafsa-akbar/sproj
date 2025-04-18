@@ -1,27 +1,24 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import FilterDropdown from '$lib/components/FilterDropdown.svelte';
-  
+  import FilterDropdown from './FilterDropdown.svelte';
+  import { 
+    jobTypeOptions,
+    experienceLevelOptions as experienceOptions,
+    GenderType
+  } from '$lib/config/jobConfig';
+
   const dispatch = createEventDispatcher();
-  
-  export let filters;
+
+  export let filters = {};
   export let sortOption = '';
   export let jobs = [];
 
-  const jobTypeOptions = [
-    { value: '1', label: 'One Shot Job' },
-    { value: '2', label: 'Permanent Hire' }
-  ];
   const genderOptions = [
-    { value: '1', label: 'Male' },
-    { value: '2', label: 'Female' },
-    { value: '3', label: 'Couple' }
+    { value: GenderType.MALE.toString(), label: 'Male' },
+    { value: GenderType.FEMALE.toString(), label: 'Female' },
+    { value: GenderType.COUPLE.toString(), label: 'Couple' }
   ];
-  const experienceOptions = [
-    { value: '1', label: 'Beginner' },
-    { value: '2', label: 'Intermediate' },
-    { value: '3', label: 'Expert' }
-  ];
+
   const sortOptions = [
     { value: 'Wage: Low to High', label: 'Wage: Low to High' },
     { value: 'Wage: High to Low', label: 'Wage: High to Low' },
@@ -32,80 +29,82 @@
   $: cityOptions = Array.from(new Set(jobs.map(j => j.locale.toLowerCase())))
     .map(c => ({ value: c, label: c.charAt(0).toUpperCase() + c.slice(1) }));
 
-  $: wageBands = (() => {
-    if (!jobs.length) return { low: 0, high: 0 };
-    const arr = jobs.map(j => j.wageRate).sort((a, b) => a - b);
-    const n = arr.length;
-    return { low: arr[Math.floor(n * 0.4)], high: arr[Math.floor(n * 0.8)] };
-  })();
+  function updateFilters() {
+    dispatch('updateFilters', { filters, sortOption });
+  }
 
-    function handleChange(event) {
-     const { field, selected } = event.detail;
-     if (field === 'sortOption') {
-       // single‑select
-       sortOption = selected[0] || '';
-    } else {
-       // multi‑select: write back into filters[field]
-       filters[field] = new Set(selected);
-    }
-     dispatch('updateFilters', { filters, sortOption });
-    }
+  function clearFilters() {
+    filters.jobTypes = new Set();
+    filters.genders = new Set();
+    filters.experiences = new Set();
+    filters.locales = new Set();
+    filters.wageFilters = new Set();
+    sortOption = '';
+    updateFilters();
+  }
 </script>
 
 <div class="hidden md:block space-y-6">
-  <div class="flex flex-wrap gap-4 items-center">
-    <FilterDropdown 
-      label="Job Type" 
-      field="jobTypes" 
-      options={jobTypeOptions} 
-      selectedSet={filters.jobTypes}
-      on:change={handleChange}
-    />
-    <FilterDropdown 
-      label="Gender" 
-      field="genders" 
-      options={genderOptions} 
-      selectedSet={filters.genders}
-      on:change={handleChange}
-    />
-    <FilterDropdown 
-      label="Experience" 
-      field="experiences" 
-      options={experienceOptions} 
-      selectedSet={filters.experiences}
-      on:change={handleChange}
-    />
-    <FilterDropdown 
-      label="City" 
-      field="locales" 
-      options={cityOptions} 
-      selectedSet={filters.locales}
-      on:change={handleChange}
-    />
-    <FilterDropdown 
-      label="Budget" 
-      field="wageFilters" 
-      options={[
-        { value: 'Value', label: 'Value' }, 
-        { value: 'Mid-range', label: 'Mid-range' }, 
-        { value: 'High-end', label: 'High-end' }
-      ]} 
-      selectedSet={filters.wageFilters} 
-      wageBands={wageBands} 
-      isWage={true}
-      on:change={handleChange}
-    />
-  </div>
-
-  <div class="flex justify-end">
+  <div class="flex flex-wrap items-center gap-2">
     <FilterDropdown
-      label="Sort by"
-      field="sortOption"
-      options={sortOptions}
-      selectedSet={sortOption ? [sortOption] : []}
-      isSortBy={true}
-      on:change={handleChange}
+      label="Job Type"
+      field="jobTypes"
+      options={jobTypeOptions}
+      selectedSet={filters.jobTypes}
+      on:change={updateFilters}
     />
+
+    <FilterDropdown
+      label="Gender"
+      field="genders"
+      options={genderOptions}
+      selectedSet={filters.genders}
+      on:change={updateFilters}
+    />
+
+    <FilterDropdown
+      label="Experience"
+      field="experiences"
+      options={experienceOptions}
+      selectedSet={filters.experiences}
+      on:change={updateFilters}
+    />
+
+    <FilterDropdown
+      label="Location"
+      field="locales"
+      options={cityOptions}
+      selectedSet={filters.locales}
+      on:change={updateFilters}
+    />
+
+    <FilterDropdown
+      label="Wage"
+      field="wageFilters"
+      options={[
+        { value: 'Value', label: 'Value' },
+        { value: 'Mid-range', label: 'Mid-range' },
+        { value: 'High-end', label: 'High-end' }
+      ]}
+      selectedSet={filters.wageFilters}
+      on:change={updateFilters}
+    />
+
+    <div class="ml-auto flex items-center gap-2">
+      <button
+        class="text-sm text-gray-500 hover:text-gray-700"
+        on:click={clearFilters}
+      >
+        Clear all
+      </button>
+
+      <FilterDropdown
+        label="Sort By"
+        options={sortOptions}
+        bind:value={sortOption}
+        on:change={updateFilters}
+      />
+    </div>
   </div>
 </div>
 

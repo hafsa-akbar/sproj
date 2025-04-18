@@ -96,6 +96,7 @@ export async function verifyCnic(file) {
 
 export async function getJobs() {
   const res = await fetch(`${BASE_URL}/jobs`, {
+    credentials: 'include'
   });
   if (!res.ok) {
     const text = await res.text();
@@ -103,4 +104,22 @@ export async function getJobs() {
     throw new Error(parseErrorMessage(err, 'Failed to load jobs'));
   }
   return await res.json();
+}
+
+export async function createJob(jobData) {
+  const response = await fetch(`${BASE_URL}/jobs`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(jobData)
+  });
+
+  let text = await response.text();
+  let data = text ? JSON.parse(text) : {};
+
+  if (!response.ok) {
+    throw new Error(parseErrorMessage(data, 'Failed to create job'));
+  }
+
+  return data;
 }

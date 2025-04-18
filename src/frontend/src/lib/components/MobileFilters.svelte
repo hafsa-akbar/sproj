@@ -1,42 +1,38 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { 
+    jobTypeOptions,
+    experienceLevelOptions as experienceOptions,
+    GenderType
+  } from '$lib/config/jobConfig';
 
-  export let filters;
-  export let sortOption;
+  const dispatch = createEventDispatcher();
+
+  export let filters = {};
+  export let sortOption = '';
   export let jobs = [];
   export let showMobileFilters;
   export let close;
 
-  const dispatch = createEventDispatcher();
-
-  const jobTypeOptions = [
-    { value: '1', label: 'One Shot Job' },
-    { value: '2', label: 'Permanent Hire' }
-  ];
-
   const genderOptions = [
-    { value: '1', label: 'Male' },
-    { value: '2', label: 'Female' },
-    { value: '3', label: 'Couple' }
-  ];
-
-  const experienceOptions = [
-    { value: '1', label: 'Beginner' },
-    { value: '2', label: 'Intermediate' },
-    { value: '3', label: 'Expert' }
+    { value: GenderType.MALE.toString(), label: 'Male' },
+    { value: GenderType.FEMALE.toString(), label: 'Female' },
+    { value: GenderType.COUPLE.toString(), label: 'Couple' }
   ];
 
   $: cityOptions = Array.from(new Set(jobs.map(j => j.locale.toLowerCase())))
     .map(c => ({ value: c, label: c.charAt(0).toUpperCase() + c.slice(1) }));
 
-  function clearAll() {
+  function clearFilters() {
     filters.jobTypes = new Set();
     filters.genders = new Set();
     filters.experiences = new Set();
-    filters.locales = new Set();
-    filters.wageFilters = new Set();
+    sortOption = '';
+    updateFilters();
+  }
+
+  function updateFilters() {
     dispatch('updateFilters', { filters, sortOption });
-    close();
   }
 </script>
 
@@ -75,7 +71,7 @@
                       const s = new Set(filters[group.field]);
                       s.has(opt.value) ? s.delete(opt.value) : s.add(opt.value);
                       filters[group.field] = s;
-                      dispatch('updateFilters', { filters, sortOption });
+                      updateFilters();
                     }}
                   />
                   <span class="text-sm">{opt.label}</span>
@@ -89,7 +85,7 @@
       <div class="mt-auto p-6">
         <button
           class="w-full text-sm text-[var(--color-secondary)] font-medium py-2"
-          on:click={clearAll}
+          on:click={clearFilters}
         >
           Clear all
         </button>
