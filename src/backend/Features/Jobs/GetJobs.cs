@@ -13,7 +13,10 @@ public class GetJobs : Endpoint<EmptyRequest, EmptyResponse> {
     }
 
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {
-        var jobs = await DbContext.Jobs.ToListAsync();
+        var jobs = await DbContext.Jobs
+            .Include(j => j.WorkerDetails)
+              .ThenInclude(w => w.User)
+            .ToListAsync();
 
         await SendResultAsync(Results.Ok(jobs.Select(j => new {
             j.JobId,
@@ -22,7 +25,8 @@ public class GetJobs : Endpoint<EmptyRequest, EmptyResponse> {
             j.JobExperience,
             j.JobGender,
             j.JobType,
-            j.Locale
+            j.Locale,
+            WorkerName = j.WorkerDetails?.User?.FullName
         })));
     }
 }

@@ -12,7 +12,7 @@ using sproj.Data;
 namespace sproj.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250330171818_InitialMigration")]
+    [Migration("20250416190421_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -92,7 +92,7 @@ namespace sproj.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("wage_rate");
 
-                    b.Property<int?>("WorkerDetailsUserId")
+                    b.Property<int>("WorkerDetailsUserId")
                         .HasColumnType("integer")
                         .HasColumnName("worker_details_user_id");
 
@@ -155,7 +155,7 @@ namespace sproj.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("user_id");
 
-                    b.Property<int?>("WorkerDetailsUserId")
+                    b.Property<int>("WorkerDetailsUserId")
                         .HasColumnType("integer")
                         .HasColumnName("worker_details_user_id");
 
@@ -333,6 +333,8 @@ namespace sproj.Data.Migrations
                     b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
                         .WithMany("Jobs")
                         .HasForeignKey("WorkerDetailsUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_jobs_worker_details_worker_details_user_id");
 
                     b.Navigation("WorkerDetails");
@@ -343,6 +345,8 @@ namespace sproj.Data.Migrations
                     b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
                         .WithMany("PastJobs")
                         .HasForeignKey("WorkerDetailsUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_past_jobs_worker_details_worker_details_user_id");
 
                     b.Navigation("WorkerDetails");

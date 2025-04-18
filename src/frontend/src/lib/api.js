@@ -13,7 +13,6 @@ export async function login(user) {
   const response = await fetch(`${BASE_URL}/users/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(user),
   });
 
@@ -31,7 +30,6 @@ export async function register(user) {
   const response = await fetch(`${BASE_URL}/users/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(user),
   });
 
@@ -94,4 +92,15 @@ export async function verifyCnic(file) {
   }
 
   return response;
+}
+
+export async function getJobs() {
+  const res = await fetch(`${BASE_URL}/jobs`, {
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    const err = text ? JSON.parse(text) : {};
+    throw new Error(parseErrorMessage(err, 'Failed to load jobs'));
+  }
+  return await res.json();
 }

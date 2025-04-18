@@ -88,7 +88,7 @@ public class Job {
     public int JobId { get; set; }
 
     public int UserId { get; set; }
-    public WorkerDetails? WorkerDetails { get; set; }
+    public WorkerDetails WorkerDetails { get; set; } = null!; 
 
     public required int WageRate { get; set; }
     public required JobCategory JobCategory { get; set; }
@@ -104,7 +104,7 @@ public class PastJob {
     public int PastJobId { get; set; }
 
     public int UserId { get; set; }
-    public WorkerDetails? WorkerDetails { get; set; }
+    public WorkerDetails WorkerDetails { get; set; } = null!; 
 
     public required JobCategory JobCategory { get; set; }
     public required JobGender JobGender { get; set; }

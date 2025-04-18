@@ -1,13 +1,18 @@
 import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
 
-export const authUser = writable(null);
+const initial = browser && localStorage.getItem('authUser')
+  ? JSON.parse(localStorage.getItem('authUser'))
+  : null;
+
+export const authUser = writable(initial);
 
 export function loginUser(user) {
   authUser.set(user);
-  localStorage.setItem('authUser', JSON.stringify(user));
+  if (browser) localStorage.setItem('authUser', JSON.stringify(user));
 }
 
 export function logoutUser() {
   authUser.set(null);
-  localStorage.removeItem('authUser');
+  if (browser) localStorage.removeItem('authUser');
 }

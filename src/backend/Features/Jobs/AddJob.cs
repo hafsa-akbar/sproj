@@ -10,8 +10,7 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
 
     public override void Configure() {
         Post("/jobs");
-        // Policies("Worker");
-        AllowAnonymous();
+        Policies("Worker");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {

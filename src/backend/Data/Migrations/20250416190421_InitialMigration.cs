@@ -131,7 +131,7 @@ namespace sproj.Data.Migrations
                     job_id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_id = table.Column<int>(type: "integer", nullable: false),
-                    worker_details_user_id = table.Column<int>(type: "integer", nullable: true),
+                    worker_details_user_id = table.Column<int>(type: "integer", nullable: false),
                     wage_rate = table.Column<int>(type: "integer", nullable: false),
                     job_category = table.Column<int>(type: "integer", nullable: false),
                     job_experience = table.Column<int>(type: "integer", nullable: false),
@@ -146,7 +146,8 @@ namespace sproj.Data.Migrations
                         name: "fk_jobs_worker_details_worker_details_user_id",
                         column: x => x.worker_details_user_id,
                         principalTable: "worker_details",
-                        principalColumn: "user_id");
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,7 +157,7 @@ namespace sproj.Data.Migrations
                     past_job_id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_id = table.Column<int>(type: "integer", nullable: false),
-                    worker_details_user_id = table.Column<int>(type: "integer", nullable: true),
+                    worker_details_user_id = table.Column<int>(type: "integer", nullable: false),
                     job_category = table.Column<int>(type: "integer", nullable: false),
                     job_gender = table.Column<int>(type: "integer", nullable: false),
                     job_type = table.Column<int>(type: "integer", nullable: false),
@@ -173,7 +174,8 @@ namespace sproj.Data.Migrations
                         name: "fk_past_jobs_worker_details_worker_details_user_id",
                         column: x => x.worker_details_user_id,
                         principalTable: "worker_details",
-                        principalColumn: "user_id");
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
