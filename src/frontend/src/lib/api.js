@@ -1,4 +1,23 @@
+import { sessionId } from './stores';
+
 const BASE_URL = 'http://localhost:5000';
+
+let currentSessionId;
+sessionId.subscribe(value => {
+  currentSessionId = value;
+});
+
+function getAuthHeaders() {
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+  
+  if (currentSessionId) {
+    headers['Cookie'] = `session=${currentSessionId}`;
+  }
+  
+  return headers;
+}
 
 function parseErrorMessage(data, defaultMessage) {
   console.log(data);
@@ -7,6 +26,11 @@ function parseErrorMessage(data, defaultMessage) {
     errorMessage += ': ' + data.errors[0]['reason'];
   }
   return errorMessage;
+}
+
+function getSessionIdFromCookie() {
+  const match = document.cookie.match(/session=([^;]+)/);
+  return match ? match[1] : null;
 }
 
 export async function login(user) {
@@ -21,6 +45,11 @@ export async function login(user) {
 
   if (!response.ok) {
     throw new Error('Login failed');
+  }
+
+  const sid = getSessionIdFromCookie();
+  if (sid) {
+    data.sessionId = sid;
   }
 
   return data;
@@ -39,13 +68,18 @@ export async function register(user) {
     throw new Error(parseErrorMessage(data, 'Signup failed'));
   }
 
+  const sid = getSessionIdFromCookie();
+  if (sid) {
+    data.sessionId = sid;
+  }
+
   return { user: data };
 }
 
 export async function startSmsVerification() {
   const response = await fetch(`${BASE_URL}/verify/start-sms`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     credentials: 'include'
   });
   
@@ -62,7 +96,7 @@ export async function startSmsVerification() {
 export async function verifySmsCode(code) {
   const response = await fetch(`${BASE_URL}/verify/end-sms`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     credentials: 'include',
     body: JSON.stringify({ code })
   });
@@ -81,8 +115,14 @@ export async function verifyCnic(file) {
   const formData = new FormData();
   formData.append('cnic', file);
 
+  const headers = {};
+  if (currentSessionId) {
+    headers['Cookie'] = `session=${currentSessionId}`;
+  }
+
   const response = await fetch(`${BASE_URL}/verify/cnic`, {
     method: 'POST',
+    headers,
     body: formData,
     credentials: 'include'
   });
@@ -96,7 +136,7 @@ export async function verifyCnic(file) {
 
 export async function getJobs() {
   const res = await fetch(`${BASE_URL}/jobs`, {
-    credentials: 'include'
+    headers: getAuthHeaders(),
   });
   if (!res.ok) {
     const text = await res.text();
@@ -109,8 +149,8 @@ export async function getJobs() {
 export async function createJob(jobData) {
   const response = await fetch(`${BASE_URL}/jobs`, {
     method: 'POST',
+    headers: getAuthHeaders(),
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(jobData)
   });
 
