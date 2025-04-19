@@ -13,11 +13,18 @@
   export let jobs = [];
   export let showMobileFilters;
   export let close;
+  export let wageBands;
 
   const genderOptions = [
     { value: GenderType.MALE.toString(), label: 'Male' },
     { value: GenderType.FEMALE.toString(), label: 'Female' },
     { value: GenderType.COUPLE.toString(), label: 'Couple' }
+  ];
+
+  const wageOptions = [
+    { value: 'Value', label: 'Value' },
+    { value: 'Mid-range', label: 'Mid-range' },
+    { value: 'High-end', label: 'High-end' }
   ];
 
   $: cityOptions = Array.from(new Set(jobs.map(j => j.locale.toLowerCase())))
@@ -27,12 +34,28 @@
     filters.jobTypes = new Set();
     filters.genders = new Set();
     filters.experiences = new Set();
+    filters.locales = new Set();
+    filters.wageFilters = new Set();
     sortOption = '';
     updateFilters();
   }
 
   function updateFilters() {
     dispatch('updateFilters', { filters, sortOption });
+  }
+
+  function getWageRange(option) {
+    if (!wageBands) return '';
+    switch (option) {
+      case 'Value':
+        return `PKR ${wageBands.low}/hr or less`;
+      case 'Mid-range':
+        return `PKR ${wageBands.low}/hr - ${wageBands.high}/hr`;
+      case 'High-end':
+        return `PKR ${wageBands.high}/hr or more`;
+      default:
+        return '';
+    }
   }
 </script>
 
@@ -56,16 +79,17 @@
           { title: 'Job Type', field: 'jobTypes', opts: jobTypeOptions },
           { title: 'Gender', field: 'genders', opts: genderOptions },
           { title: 'Experience', field: 'experiences', opts: experienceOptions },
-          { title: 'City', field: 'locales', opts: cityOptions }
+          { title: 'City', field: 'locales', opts: cityOptions },
+          { title: 'Budget', field: 'wageFilters', opts: wageOptions }
         ] as group}
           <div class="mb-6">
             <h3 class="font-semibold mb-2">{group.title}</h3>
             <div class="space-y-2">
               {#each group.opts as opt}
-                <label class="flex items-center gap-2">
+                <label class="flex items-start gap-2">
                   <input
                     type="checkbox"
-                    class="h-4 w-4 accent-[var(--color-secondary)]"
+                    class="h-4 w-4 mt-1 accent-[var(--color-secondary)]"
                     checked={filters[group.field].has(opt.value)}
                     on:change={() => {
                       const s = new Set(filters[group.field]);
@@ -74,7 +98,12 @@
                       updateFilters();
                     }}
                   />
-                  <span class="text-sm">{opt.label}</span>
+                  <div>
+                    <span class="text-sm">{opt.label}</span>
+                    {#if group.field === 'wageFilters' && wageBands}
+                      <div class="text-xs text-gray-500">{getWageRange(opt.value)}</div>
+                    {/if}
+                  </div>
                 </label>
               {/each}
             </div>
@@ -92,7 +121,7 @@
       </div>
     </aside>
 
-    <!-- Invisible click‑catcher on the rest of the screen -->
+    <!-- Invisible click‑catcher -->
     <div
       class="flex-1"
       role="button"

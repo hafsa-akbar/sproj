@@ -29,7 +29,7 @@
   $: cityOptions = Array.from(new Set(jobs.map(j => j.locale.toLowerCase())))
     .map(c => ({ value: c, label: c.charAt(0).toUpperCase() + c.slice(1) }));
 
-  function updateFilters() {
+  function handleFilterChange() {
     dispatch('updateFilters', { filters, sortOption });
   }
 
@@ -40,42 +40,42 @@
     filters.locales = new Set();
     filters.wageFilters = new Set();
     sortOption = '';
-    updateFilters();
+    handleFilterChange();
   }
 </script>
 
-<div class="hidden md:block space-y-6">
+<div class="hidden md:block">
   <div class="flex flex-wrap items-center gap-2">
     <FilterDropdown
       label="Job Type"
       field="jobTypes"
       options={jobTypeOptions}
-      selectedSet={filters.jobTypes}
-      on:change={updateFilters}
+      bind:selectedSet={filters.jobTypes}
+      on:change={handleFilterChange}
     />
 
     <FilterDropdown
       label="Gender"
       field="genders"
       options={genderOptions}
-      selectedSet={filters.genders}
-      on:change={updateFilters}
+      bind:selectedSet={filters.genders}
+      on:change={handleFilterChange}
     />
 
     <FilterDropdown
       label="Experience"
       field="experiences"
       options={experienceOptions}
-      selectedSet={filters.experiences}
-      on:change={updateFilters}
+      bind:selectedSet={filters.experiences}
+      on:change={handleFilterChange}
     />
 
     <FilterDropdown
       label="Location"
       field="locales"
       options={cityOptions}
-      selectedSet={filters.locales}
-      on:change={updateFilters}
+      bind:selectedSet={filters.locales}
+      on:change={handleFilterChange}
     />
 
     <FilterDropdown
@@ -86,23 +86,24 @@
         { value: 'Mid-range', label: 'Mid-range' },
         { value: 'High-end', label: 'High-end' }
       ]}
-      selectedSet={filters.wageFilters}
-      on:change={updateFilters}
+      bind:selectedSet={filters.wageFilters}
+      on:change={handleFilterChange}
     />
 
     <div class="ml-auto flex items-center gap-2">
-      <button
-        class="text-sm text-gray-500 hover:text-gray-700"
-        on:click={clearFilters}
-      >
-        Clear all
-      </button>
+      {#if Object.values(filters).some(set => set.size > 0)}
+        <button
+          class="text-sm text-gray-500 hover:text-gray-700"
+          on:click={clearFilters}
+        >
+          Clear all
+        </button>
+      {/if}
 
       <FilterDropdown
-        label="Sort By"
         options={sortOptions}
         bind:value={sortOption}
-        on:change={updateFilters}
+        on:change={handleFilterChange}
       />
     </div>
   </div>

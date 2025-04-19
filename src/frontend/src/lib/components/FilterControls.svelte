@@ -6,6 +6,7 @@
   export let filters;
   export let sortOption = '';
   export let jobs;
+  export let wageBands;
 
   let showMobileFilters = false;
 
@@ -38,11 +39,10 @@
     </div>
     <div class="flex justify-end">
       <FilterDropdown
-        label="Sort by"
-        field="sortOption"
+        field={undefined}
         options={sortOptions}
-        selectedSet={sortOption ? [sortOption] : []}
-        isSortBy={true}
+        value={sortOption}
+        on:change={(e) => sortOption = e.detail}
       />
     </div>
   </div>
@@ -52,13 +52,14 @@
     {filters}
     {sortOption}
     {jobs}
+    {wageBands}
     bind:showMobileFilters
     close={closeMobileFilters}
     on:updateFilters
   />
 
   <!-- Desktop Panel -->
-  <DesktopFilters {filters} {sortOption} {jobs} on:updateFilters />
+  <DesktopFilters {filters} {sortOption} {jobs} {wageBands} on:updateFilters />
 </div>
 
 <style>
@@ -66,4 +67,3 @@
     margin-top: 2rem;
   }
 </style>
-  

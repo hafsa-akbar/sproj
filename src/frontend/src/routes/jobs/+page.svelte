@@ -106,17 +106,19 @@
     </div>
 
     <!-- Heading Section -->
-    <div class="mb-6 text-left md:text-left">
+    <div class="mb-8 text-left md:text-left">
       <h1 class="text-4xl font-bold mb-2">Browse Job Postings</h1>
       <p class="text-gray-500 max-w-2xl">
         Lorem Ipsum is simply dummy text of the printing and typesetting industry.
       </p>
     </div>
 
-    <div class="my-6">
+    <!-- Filter Section -->
+    <div class="mb-12">
       <FilterControls {filters} {sortOption} {jobs} on:updateFilters={updateFilters}/>
     </div>
 
+    <!-- Job Cards Section -->
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-2 pt-2">
       {#if filteredJobs.length}
         {#each filteredJobs as job}
