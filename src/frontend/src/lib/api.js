@@ -1,6 +1,6 @@
 import { sessionId } from './stores';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = '/api';
 
 let currentSessionId;
 sessionId.subscribe(value => {
@@ -47,11 +47,6 @@ export async function login(user) {
     throw new Error('Login failed');
   }
 
-  const sid = getSessionIdFromCookie();
-  if (sid) {
-    data.sessionId = sid;
-  }
-
   return data;
 }
 
@@ -68,18 +63,13 @@ export async function register(user) {
     throw new Error(parseErrorMessage(data, 'Signup failed'));
   }
 
-  const sid = getSessionIdFromCookie();
-  if (sid) {
-    data.sessionId = sid;
-  }
-
   return { user: data };
 }
 
 export async function startSmsVerification() {
   const response = await fetch(`${BASE_URL}/verify/start-sms`, {
     method: 'POST',
-    headers: getAuthHeaders()
+    credentials: "include"
   });
   
   let text = await response.text();

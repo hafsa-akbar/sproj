@@ -20,29 +20,21 @@ public class AuthenticationHandler : AuthenticationHandler<AuthenticationSchemeO
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync() {
-        if (!Request.Cookies.TryGetValue("session", out var sessionId)) {
-            Console.WriteLine("[AuthHandler] Session cookie missing");
+        if (!Request.Cookies.TryGetValue("session", out var sessionId))
             return Task.FromResult(AuthenticateResult.Fail("Session cookie missing."));
-        }
-    
-        Console.WriteLine($"[AuthHandler] Received session ID: {sessionId}");
-    
+
         var session = _sessionStore.GetSession(sessionId);
-        if (session == null) {
-            Console.WriteLine($"[AuthHandler] No session found for ID: {sessionId}");
+
+        if (session == null)
             return Task.FromResult(AuthenticateResult.Fail("Invalid or expired session."));
-        }
-    
-        Console.WriteLine($"[AuthHandler] Session found. Role: {session.ClaimsIdentity.FindFirst("role")?.Value}");
-    
+
         session.ClaimsIdentity.AddClaim(new Claim("session_id", sessionId));
-    
+        
         var principal = new ClaimsPrincipal(session.ClaimsIdentity);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
-    
+
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
-
 }
 
 public static class AuthorizationExtensions {

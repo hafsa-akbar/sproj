@@ -33,7 +33,7 @@ public class Login : Endpoint<Login.Request, Login.UserResponse> {
         var sessionId = SessionStore.CreateSession(user);
         HttpContext.Response.Cookies.Append("session", sessionId, new CookieOptions {
             HttpOnly = true,
-            Secure = true
+            SameSite = SameSiteMode.Lax
         });
 
         var response = new UserResponse(

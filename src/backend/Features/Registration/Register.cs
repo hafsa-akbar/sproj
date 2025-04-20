@@ -38,10 +38,8 @@ public class Register : Endpoint<Register.Request, Register.Response> {
         await DbContext.SaveChangesAsync();
 
         var sessionId = SessionStore.CreateSession(user);
-        var isProduction = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production";
         HttpContext.Response.Cookies.Append("session", sessionId, new CookieOptions {
             HttpOnly = true,
-            Secure = isProduction,
             SameSite = SameSiteMode.Lax
         });
 
