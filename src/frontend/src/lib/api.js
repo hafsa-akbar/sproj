@@ -37,7 +37,7 @@ export async function login(user) {
   const response = await fetch(`${BASE_URL}/users/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(user),
+    body: JSON.stringify(user)
   });
 
   let text = await response.text();
@@ -59,7 +59,7 @@ export async function register(user) {
   const response = await fetch(`${BASE_URL}/users/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(user),
+    body: JSON.stringify(user)
   });
 
   const data = await response.json();
@@ -79,8 +79,7 @@ export async function register(user) {
 export async function startSmsVerification() {
   const response = await fetch(`${BASE_URL}/verify/start-sms`, {
     method: 'POST',
-    headers: getAuthHeaders(),
-    credentials: 'include'
+    headers: getAuthHeaders()
   });
   
   let text = await response.text();
@@ -97,7 +96,6 @@ export async function verifySmsCode(code) {
   const response = await fetch(`${BASE_URL}/verify/end-sms`, {
     method: 'POST',
     headers: getAuthHeaders(),
-    credentials: 'include',
     body: JSON.stringify({ code })
   });
   
@@ -123,8 +121,7 @@ export async function verifyCnic(file) {
   const response = await fetch(`${BASE_URL}/verify/cnic`, {
     method: 'POST',
     headers,
-    body: formData,
-    credentials: 'include'
+    body: formData
   });
 
   if (!response.ok) {
@@ -136,7 +133,7 @@ export async function verifyCnic(file) {
 
 export async function getJobs() {
   const res = await fetch(`${BASE_URL}/jobs`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders()
   });
   if (!res.ok) {
     const text = await res.text();
@@ -146,11 +143,22 @@ export async function getJobs() {
   return await res.json();
 }
 
+export async function getWorkerDetails(jobId) {
+  const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
+    headers: getAuthHeaders()
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    const err = text ? JSON.parse(text) : {};
+    throw new Error(parseErrorMessage(err, 'Failed to load worker details'));
+  }
+  return await res.json();
+}
+
 export async function createJob(jobData) {
   const response = await fetch(`${BASE_URL}/jobs`, {
     method: 'POST',
     headers: getAuthHeaders(),
-    credentials: 'include',
     body: JSON.stringify(jobData)
   });
 

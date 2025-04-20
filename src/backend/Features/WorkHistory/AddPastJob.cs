@@ -39,7 +39,11 @@ public class AddPastJob : Endpoint<AddPastJob.Request, EmptyRequest> {
         if (employer is null)
             SmsSender.SendMessage(empPhoneNumber,
                 $"{user.FullName} has asked for a reccomendation for their work in {job.JobCategory.ToString()}. Sign up at DaamPeKaam to reccomend them.");
-
+        
+        // how to ask for rec if employer exists on platform?
+        // -> persist the rec, should be part of user details for emp
+        // -> when empPhoneNumber signs up, the rec request should already be there
+        
         user.WorkerDetails!.PastJobs!.Add(job);
         await DbContext.SaveChangesAsync();
 
