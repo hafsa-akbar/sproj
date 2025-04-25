@@ -4,66 +4,104 @@ using sproj.Data;
 
 namespace sproj.Features.Jobs;
 
-public class GetWorkerDetails : Endpoint<GetWorkerDetails.Request, EmptyResponse> {
+public class GetWorkerDetails : Endpoint<EmptyRequest, GetWorkerDetails.Response> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
-        Get("/jobs/{JobId}");
-        Policies("EmployerOrWorker");
+        Get("/worker-details");
+        Policies("Worker");
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct) {
-        var job = await DbContext.Jobs
-            .Include(j => j.WorkerDetails)
-                .ThenInclude(w => w.User)
-            .Include(j => j.WorkerDetails.Jobs)
-            .Include(j => j.WorkerDetails.PastJobs)
+    public override async Task HandleAsync(EmptyRequest req, CancellationToken ct) {
+        var userId = int.Parse(User.FindFirst("user_id")!.Value);
+        var user = await DbContext.Users
             .AsSplitQuery()
-            .FirstOrDefaultAsync(j => j.JobId == req.JobId);
+            .Include(u => u.WorkerDetails)
+            .ThenInclude(w => w!.Jobs!.OrderByDescending(j => j.JobId))
+            .ThenInclude(j => j.WorkerDetails)
+            .ThenInclude(w => w.User)
+            .Include(u => u.WorkerDetails)
+            .ThenInclude(w => w!.PastJobs!.OrderByDescending(p => p.PastJobId))
+            .ThenInclude(p => p.WorkerDetails)
+            .ThenInclude(w => w.User)
+            .FirstAsync(u => u.UserId == userId, ct);
 
-
-        if (job == null) {
+        if (user.WorkerDetails == null) {
             await SendNotFoundAsync();
             return;
         }
 
-        var worker = job.WorkerDetails;
-        if (worker == null || worker.User == null) {
-            await SendNotFoundAsync();
-            return;
-        }
-
-        await SendResultAsync(Results.Ok(new {
-            worker = new {
-                worker.User.FullName,
-                worker.User.PhoneNumber,
-                worker.User.Address,
-                worker.User.Gender,
-                worker.User.CnicNumber,
-                worker.User.DrivingLicense,
-                isCouple = worker.User.CoupleUserId != null
-            },
-            activeJobs = worker.Jobs?.Select(j => new {
+        var workerDetails = user.WorkerDetails;
+        var jobs = (workerDetails.Jobs ?? Enumerable.Empty<Job>())
+            .Select(j => new Response.Job(
                 j.JobId,
                 j.WageRate,
                 j.JobCategory,
                 j.JobExperience,
                 j.JobGender,
                 j.JobType,
-                j.Locale
-            }).ToList(),
-            pastJobs = worker.PastJobs?.Select(p => new {
+                j.Locale,
+                j.Description,
+                j.PermanentJobDetails?.TrialPeriod,
+                j.WorkerDetails.Select(w => w.User!.FullName).ToList()
+            ))
+            .ToList();
+
+        var pastJobs = (workerDetails.PastJobs ?? Enumerable.Empty<PastJob>())
+            .Select(p => new Response.PastJob(
                 p.PastJobId,
                 p.JobCategory,
                 p.JobGender,
                 p.JobType,
                 p.Locale,
+                p.Description,
+                p.EmployerPhoneNumber,
                 p.IsVerified,
                 p.Rating,
-                p.Comments
-            }).ToList()
-        }));
+                p.Comments,
+                p.WorkerDetails.Select(w => w.User!.FullName).ToList()
+            ))
+            .ToList();
+
+        await SendResultAsync(Results.Ok(new Response(
+            workerDetails.Rating,
+            workerDetails.NumberOfRatings,
+            jobs,
+            pastJobs
+        )));
     }
 
-    public record struct Request(int JobId);
+    public record Response(
+        double? Rating,
+        int NumberOfRatings,
+        List<Response.Job> Jobs,
+        List<Response.PastJob> PastJobs
+    ) {
+        public record Job(
+            int JobId,
+            int WageRate,
+            JobCategory JobCategory,
+            JobExperience JobExperience,
+            JobGender JobGender,
+            JobType JobType,
+            string Locale,
+            string Description,
+            int? TrialPeriod,
+            List<string> WorkerNames
+        );
+
+        public record PastJob(
+            int PastJobId,
+            JobCategory JobCategory,
+            JobGender JobGender,
+            JobType JobType,
+            string Locale,
+            string Description,
+            string EmployerPhoneNumber,
+            bool IsVerified,
+            int? Rating,
+            string? Comments,
+            List<string> WorkerNames
+        );
+    }
 } 

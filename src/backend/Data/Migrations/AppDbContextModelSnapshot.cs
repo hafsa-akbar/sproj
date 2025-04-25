@@ -29,6 +29,44 @@ namespace sproj.Data.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_gender", new[] { "male", "female" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("JobWorkerDetails", b =>
+                {
+                    b.Property<int>("JobsJobId")
+                        .HasColumnType("integer")
+                        .HasColumnName("jobs_job_id");
+
+                    b.Property<int>("WorkerDetailsUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("worker_details_user_id");
+
+                    b.HasKey("JobsJobId", "WorkerDetailsUserId")
+                        .HasName("pk_job_worker_details");
+
+                    b.HasIndex("WorkerDetailsUserId")
+                        .HasDatabaseName("ix_job_worker_details_worker_details_user_id");
+
+                    b.ToTable("job_worker_details", (string)null);
+                });
+
+            modelBuilder.Entity("PastJobWorkerDetails", b =>
+                {
+                    b.Property<int>("PastJobsPastJobId")
+                        .HasColumnType("integer")
+                        .HasColumnName("past_jobs_past_job_id");
+
+                    b.Property<int>("WorkerDetailsUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("worker_details_user_id");
+
+                    b.HasKey("PastJobsPastJobId", "WorkerDetailsUserId")
+                        .HasName("pk_past_job_worker_details");
+
+                    b.HasIndex("WorkerDetailsUserId")
+                        .HasDatabaseName("ix_past_job_worker_details_worker_details_user_id");
+
+                    b.ToTable("past_job_worker_details", (string)null);
+                });
+
             modelBuilder.Entity("sproj.Data.CnicVerification", b =>
                 {
                     b.Property<int>("UserId")
@@ -58,6 +96,12 @@ namespace sproj.Data.Migrations
                         .HasColumnName("job_id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("JobId"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
 
                     b.Property<int>("JobCategory")
                         .HasColumnType("integer")
@@ -89,15 +133,8 @@ namespace sproj.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("wage_rate");
 
-                    b.Property<int>("WorkerDetailsUserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("worker_details_user_id");
-
                     b.HasKey("JobId")
                         .HasName("pk_jobs");
-
-                    b.HasIndex("WorkerDetailsUserId")
-                        .HasDatabaseName("ix_jobs_worker_details_user_id");
 
                     b.ToTable("jobs", (string)null);
                 });
@@ -115,6 +152,12 @@ namespace sproj.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
                         .HasColumnName("comments");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
 
                     b.Property<string>("EmployerPhoneNumber")
                         .IsRequired()
@@ -152,15 +195,8 @@ namespace sproj.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("user_id");
 
-                    b.Property<int>("WorkerDetailsUserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("worker_details_user_id");
-
                     b.HasKey("PastJobId")
                         .HasName("pk_past_jobs");
-
-                    b.HasIndex("WorkerDetailsUserId")
-                        .HasDatabaseName("ix_past_jobs_worker_details_user_id");
 
                     b.ToTable("past_jobs", (string)null);
                 });
@@ -309,10 +345,52 @@ namespace sproj.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("user_id");
 
+                    b.Property<int>("NumberOfRatings")
+                        .HasColumnType("integer")
+                        .HasColumnName("number_of_ratings");
+
+                    b.Property<double?>("Rating")
+                        .HasColumnType("double precision")
+                        .HasColumnName("rating");
+
                     b.HasKey("UserId")
                         .HasName("pk_worker_details");
 
                     b.ToTable("worker_details", (string)null);
+                });
+
+            modelBuilder.Entity("JobWorkerDetails", b =>
+                {
+                    b.HasOne("sproj.Data.Job", null)
+                        .WithMany()
+                        .HasForeignKey("JobsJobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_job_worker_details_jobs_jobs_job_id");
+
+                    b.HasOne("sproj.Data.WorkerDetails", null)
+                        .WithMany()
+                        .HasForeignKey("WorkerDetailsUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_job_worker_details_worker_details_worker_details_user_id");
+                });
+
+            modelBuilder.Entity("PastJobWorkerDetails", b =>
+                {
+                    b.HasOne("sproj.Data.PastJob", null)
+                        .WithMany()
+                        .HasForeignKey("PastJobsPastJobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_past_job_worker_details_past_jobs_past_jobs_past_job_id");
+
+                    b.HasOne("sproj.Data.WorkerDetails", null)
+                        .WithMany()
+                        .HasForeignKey("WorkerDetailsUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_past_job_worker_details_worker_details_worker_details_user_");
                 });
 
             modelBuilder.Entity("sproj.Data.CnicVerification", b =>
@@ -323,30 +401,6 @@ namespace sproj.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_cnic_verification_users_user_id");
-                });
-
-            modelBuilder.Entity("sproj.Data.Job", b =>
-                {
-                    b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
-                        .WithMany("Jobs")
-                        .HasForeignKey("WorkerDetailsUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_jobs_worker_details_worker_details_user_id");
-
-                    b.Navigation("WorkerDetails");
-                });
-
-            modelBuilder.Entity("sproj.Data.PastJob", b =>
-                {
-                    b.HasOne("sproj.Data.WorkerDetails", "WorkerDetails")
-                        .WithMany("PastJobs")
-                        .HasForeignKey("WorkerDetailsUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_past_jobs_worker_details_worker_details_user_id");
-
-                    b.Navigation("WorkerDetails");
                 });
 
             modelBuilder.Entity("sproj.Data.PermanentJob", b =>
@@ -415,13 +469,6 @@ namespace sproj.Data.Migrations
                     b.Navigation("UserPreferences");
 
                     b.Navigation("WorkerDetails");
-                });
-
-            modelBuilder.Entity("sproj.Data.WorkerDetails", b =>
-                {
-                    b.Navigation("Jobs");
-
-                    b.Navigation("PastJobs");
                 });
 #pragma warning restore 612, 618
         }

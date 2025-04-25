@@ -25,6 +25,17 @@ public class AppDbContext : DbContext {
         modelBuilder.HasPostgresEnum<JobGender>();
         modelBuilder.HasPostgresEnum<IdType>();
 
+        // Configure many-to-many relationships
+        modelBuilder.Entity<Job>()
+            .HasMany(j => j.WorkerDetails)
+            .WithMany(w => w.Jobs)
+            .UsingEntity(j => j.ToTable("job_worker_details"));
+
+        modelBuilder.Entity<PastJob>()
+            .HasMany(p => p.WorkerDetails)
+            .WithMany(w => w.PastJobs)
+            .UsingEntity(p => p.ToTable("past_job_worker_details"));
+
         base.OnModelCreating(modelBuilder);
     }
 }
@@ -80,6 +91,9 @@ public class WorkerDetails {
     [Key] public int UserId { get; set; }
     public User? User { get; set; }
 
+    public double? Rating { get; set; }
+    public int NumberOfRatings { get; set; }
+
     public List<Job>? Jobs { get; set; }
     public List<PastJob>? PastJobs { get; set; }
 }
@@ -88,7 +102,7 @@ public class Job {
     public int JobId { get; set; }
 
     public int UserId { get; set; }
-    public WorkerDetails WorkerDetails { get; set; } = null!; 
+    public List<WorkerDetails> WorkerDetails { get; set; } = new();
 
     public required int WageRate { get; set; }
     public required JobCategory JobCategory { get; set; }
@@ -96,6 +110,7 @@ public class Job {
     public required JobGender JobGender { get; set; }
     public required JobType JobType { get; set; }
     [MaxLength(64)] public required string Locale { get; set; }
+    [MaxLength(1000)] public required string Description { get; set; }
 
     public PermanentJob? PermanentJobDetails { get; set; }
 }
@@ -104,12 +119,13 @@ public class PastJob {
     public int PastJobId { get; set; }
 
     public int UserId { get; set; }
-    public WorkerDetails WorkerDetails { get; set; } = null!; 
+    public List<WorkerDetails> WorkerDetails { get; set; } = new();
 
     public required JobCategory JobCategory { get; set; }
     public required JobGender JobGender { get; set; }
     public required JobType JobType { get; set; }
     [MaxLength(64)] public required string Locale { get; set; }
+    [MaxLength(1000)] public required string Description { get; set; }
 
     [MaxLength(15)] public required string EmployerPhoneNumber { get; set; }
     public required bool IsVerified { get; set; }

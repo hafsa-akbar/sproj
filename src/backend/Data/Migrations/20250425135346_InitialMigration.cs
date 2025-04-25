@@ -22,6 +22,48 @@ namespace sproj.Data.Migrations
                 .Annotation("Npgsql:Enum:user_gender", "male,female");
 
             migrationBuilder.CreateTable(
+                name: "jobs",
+                columns: table => new
+                {
+                    job_id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    wage_rate = table.Column<int>(type: "integer", nullable: false),
+                    job_category = table.Column<int>(type: "integer", nullable: false),
+                    job_experience = table.Column<int>(type: "integer", nullable: false),
+                    job_gender = table.Column<int>(type: "integer", nullable: false),
+                    job_type = table.Column<int>(type: "integer", nullable: false),
+                    locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_jobs", x => x.job_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "past_jobs",
+                columns: table => new
+                {
+                    past_job_id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    job_category = table.Column<int>(type: "integer", nullable: false),
+                    job_gender = table.Column<int>(type: "integer", nullable: false),
+                    job_type = table.Column<int>(type: "integer", nullable: false),
+                    locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    employer_phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
+                    is_verified = table.Column<bool>(type: "boolean", nullable: false),
+                    rating = table.Column<int>(type: "integer", nullable: true),
+                    comments = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_past_jobs", x => x.past_job_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
                 {
@@ -46,6 +88,24 @@ namespace sproj.Data.Migrations
                         column: x => x.couple_user_id,
                         principalTable: "users",
                         principalColumn: "user_id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "permanent_job",
+                columns: table => new
+                {
+                    job_id = table.Column<int>(type: "integer", nullable: false),
+                    trial_period = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_permanent_job", x => x.job_id);
+                    table.ForeignKey(
+                        name: "fk_permanent_job_jobs_job_id",
+                        column: x => x.job_id,
+                        principalTable: "jobs",
+                        principalColumn: "job_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -111,7 +171,9 @@ namespace sproj.Data.Migrations
                 name: "worker_details",
                 columns: table => new
                 {
-                    user_id = table.Column<int>(type: "integer", nullable: false)
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    rating = table.Column<double>(type: "double precision", nullable: true),
+                    number_of_ratings = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -125,85 +187,61 @@ namespace sproj.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "jobs",
+                name: "job_worker_details",
                 columns: table => new
                 {
-                    job_id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    worker_details_user_id = table.Column<int>(type: "integer", nullable: false),
-                    wage_rate = table.Column<int>(type: "integer", nullable: false),
-                    job_category = table.Column<int>(type: "integer", nullable: false),
-                    job_experience = table.Column<int>(type: "integer", nullable: false),
-                    job_gender = table.Column<int>(type: "integer", nullable: false),
-                    job_type = table.Column<int>(type: "integer", nullable: false),
-                    locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                    jobs_job_id = table.Column<int>(type: "integer", nullable: false),
+                    worker_details_user_id = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_jobs", x => x.job_id);
+                    table.PrimaryKey("pk_job_worker_details", x => new { x.jobs_job_id, x.worker_details_user_id });
                     table.ForeignKey(
-                        name: "fk_jobs_worker_details_worker_details_user_id",
-                        column: x => x.worker_details_user_id,
-                        principalTable: "worker_details",
-                        principalColumn: "user_id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "past_jobs",
-                columns: table => new
-                {
-                    past_job_id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    worker_details_user_id = table.Column<int>(type: "integer", nullable: false),
-                    job_category = table.Column<int>(type: "integer", nullable: false),
-                    job_gender = table.Column<int>(type: "integer", nullable: false),
-                    job_type = table.Column<int>(type: "integer", nullable: false),
-                    locale = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    employer_phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
-                    is_verified = table.Column<bool>(type: "boolean", nullable: false),
-                    rating = table.Column<int>(type: "integer", nullable: true),
-                    comments = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_past_jobs", x => x.past_job_id);
-                    table.ForeignKey(
-                        name: "fk_past_jobs_worker_details_worker_details_user_id",
-                        column: x => x.worker_details_user_id,
-                        principalTable: "worker_details",
-                        principalColumn: "user_id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "permanent_job",
-                columns: table => new
-                {
-                    job_id = table.Column<int>(type: "integer", nullable: false),
-                    trial_period = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_permanent_job", x => x.job_id);
-                    table.ForeignKey(
-                        name: "fk_permanent_job_jobs_job_id",
-                        column: x => x.job_id,
+                        name: "fk_job_worker_details_jobs_jobs_job_id",
+                        column: x => x.jobs_job_id,
                         principalTable: "jobs",
                         principalColumn: "job_id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_job_worker_details_worker_details_worker_details_user_id",
+                        column: x => x.worker_details_user_id,
+                        principalTable: "worker_details",
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "past_job_worker_details",
+                columns: table => new
+                {
+                    past_jobs_past_job_id = table.Column<int>(type: "integer", nullable: false),
+                    worker_details_user_id = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_past_job_worker_details", x => new { x.past_jobs_past_job_id, x.worker_details_user_id });
+                    table.ForeignKey(
+                        name: "fk_past_job_worker_details_past_jobs_past_jobs_past_job_id",
+                        column: x => x.past_jobs_past_job_id,
+                        principalTable: "past_jobs",
+                        principalColumn: "past_job_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_past_job_worker_details_worker_details_worker_details_user_",
+                        column: x => x.worker_details_user_id,
+                        principalTable: "worker_details",
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_jobs_worker_details_user_id",
-                table: "jobs",
+                name: "ix_job_worker_details_worker_details_user_id",
+                table: "job_worker_details",
                 column: "worker_details_user_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_past_jobs_worker_details_user_id",
-                table: "past_jobs",
+                name: "ix_past_job_worker_details_worker_details_user_id",
+                table: "past_job_worker_details",
                 column: "worker_details_user_id");
 
             migrationBuilder.CreateIndex(
@@ -219,7 +257,10 @@ namespace sproj.Data.Migrations
                 name: "cnic_verification");
 
             migrationBuilder.DropTable(
-                name: "past_jobs");
+                name: "job_worker_details");
+
+            migrationBuilder.DropTable(
+                name: "past_job_worker_details");
 
             migrationBuilder.DropTable(
                 name: "permanent_job");
@@ -231,10 +272,13 @@ namespace sproj.Data.Migrations
                 name: "user_preferences");
 
             migrationBuilder.DropTable(
-                name: "jobs");
+                name: "past_jobs");
 
             migrationBuilder.DropTable(
                 name: "worker_details");
+
+            migrationBuilder.DropTable(
+                name: "jobs");
 
             migrationBuilder.DropTable(
                 name: "users");

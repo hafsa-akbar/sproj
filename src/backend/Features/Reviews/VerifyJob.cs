@@ -16,11 +16,13 @@ public class VerifyJob : Endpoint<VerifyJob.Request, EmptyResponse> {
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
         var user = await DbContext.Users.FirstAsync(u => u.UserId == userId);
 
-        var pendingJob = DbContext.PastJobs
+        var pendingJob = await DbContext.PastJobs
+            .Include(p => p.WorkerDetails)
+            .ThenInclude(w => w.User)
             .Where(p => !p.IsVerified)
             .Where(p => p.EmployerPhoneNumber == user.PhoneNumber)
             .Where(p => p.PastJobId == req.PastJobId)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync(ct);
 
         if (pendingJob is null) {
             await SendResultAsync(Results.BadRequest());
@@ -28,10 +30,25 @@ public class VerifyJob : Endpoint<VerifyJob.Request, EmptyResponse> {
         }
 
         pendingJob.IsVerified = true;
-        await DbContext.SaveChangesAsync();
+        pendingJob.Rating = req.Rating;
+        pendingJob.Comments = req.Comments;
 
+        // Update worker's rating if a rating was provided
+        if (req.Rating.HasValue) {
+            foreach (var workerDetails in pendingJob.WorkerDetails) {
+                var currentTotalRating = (workerDetails.Rating ?? 0) * workerDetails.NumberOfRatings;
+                workerDetails.NumberOfRatings++;
+                workerDetails.Rating = (currentTotalRating + req.Rating.Value) / workerDetails.NumberOfRatings;
+            }
+        }
+
+        await DbContext.SaveChangesAsync(ct);
         await SendResultAsync(Results.Ok());
     }
 
-    public record struct Request(int PastJobId);
+    public record struct Request(
+        int PastJobId,
+        int? Rating,
+        string? Comments
+    );
 }

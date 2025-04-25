@@ -18,7 +18,6 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
         var user = await DbContext.Users
             .Include(u => u.Couple)
             .Include(u => u.WorkerDetails)
-            .ThenInclude(w => w!.Jobs!)
             .FirstAsync(u => u.UserId == userId);
 
         if (req.JobGender == JobGender.Couple && user.Couple == null)
@@ -30,11 +29,29 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
             JobExperience = req.JobExperience,
             JobGender = req.JobGender,
             JobType = req.JobType,
-            Locale = req.Locale
+            Locale = req.Locale,
+            Description = req.Description
         };
 
-        user.WorkerDetails!.Jobs!.Add(job);
-        await DbContext.SaveChangesAsync();
+        if (req.JobType == JobType.PermanentHire) {
+            job.PermanentJobDetails = new PermanentJob {
+                TrialPeriod = req.TrialPeriod ?? 0
+            };
+        }
+
+        // Add job to the primary worker's jobs
+        job.WorkerDetails.Add(user.WorkerDetails!);
+
+        // If it's a couple job, add it to the couple's jobs as well
+        if (req.JobGender == JobGender.Couple && user.Couple != null) {
+            var couple = await DbContext.Users
+                .Include(u => u.WorkerDetails)
+                .FirstAsync(u => u.UserId == user.CoupleUserId);
+            job.WorkerDetails.Add(couple.WorkerDetails!);
+        }
+
+        await DbContext.Jobs.AddAsync(job, ct);
+        await DbContext.SaveChangesAsync(ct);
 
         await SendResultAsync(Results.Ok(new {
             job.JobId,
@@ -43,7 +60,9 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
             job.JobExperience,
             job.JobGender,
             job.JobType,
-            job.Locale
+            job.Locale,
+            job.Description,
+            TrialPeriod = job.PermanentJobDetails?.TrialPeriod
         }));
     }
 
@@ -53,7 +72,9 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
         JobExperience JobExperience,
         JobGender JobGender,
         JobType JobType,
-        string Locale);
+        string Locale,
+        string Description,
+        int? TrialPeriod);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
@@ -64,6 +85,15 @@ public class AddJob : Endpoint<AddJob.Request, EmptyRequest> {
             RuleFor(r => r.JobGender).NotEmpty().IsInEnum();
             RuleFor(r => r.JobType).NotEmpty().IsInEnum();
             RuleFor(r => r.Locale).NotEmpty();
+            RuleFor(r => r.Description).NotEmpty().MaximumLength(1000);
+            
+            When(r => r.JobType == JobType.PermanentHire, () => {
+                RuleFor(r => r.TrialPeriod)
+                    .NotNull()
+                    .WithMessage("Trial period is required for permanent jobs")
+                    .GreaterThanOrEqualTo(0)
+                    .WithMessage("Trial period must be non-negative");
+            });
         }
     }
 }

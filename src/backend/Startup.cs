@@ -65,8 +65,6 @@ public static class Startup {
         app.UseSerilogRequestLogging();
         app.UseStatusCodePages();
 
-        app.UseCors();
-
         app.UseAuthentication();
         app.UseAuthorization();
 

@@ -4,7 +4,7 @@ using sproj.Data;
 
 namespace sproj.Features.Jobs;
 
-public class GetJobs : Endpoint<EmptyRequest, EmptyResponse> {
+public class GetJobs : Endpoint<EmptyRequest, List<GetJobs.Response>> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
@@ -12,21 +12,39 @@ public class GetJobs : Endpoint<EmptyRequest, EmptyResponse> {
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(EmptyRequest _, CancellationToken ct) {
+    public override async Task HandleAsync(EmptyRequest req, CancellationToken ct) {
         var jobs = await DbContext.Jobs
+            .AsSplitQuery()
             .Include(j => j.WorkerDetails)
-              .ThenInclude(w => w.User)
-            .ToListAsync();
+            .ThenInclude(w => w.User)
+            .OrderByDescending(j => j.JobId)
+            .Select(j => new Response(
+                j.JobId,
+                j.WageRate,
+                j.JobCategory,
+                j.JobExperience,
+                j.JobGender,
+                j.JobType,
+                j.Locale,
+                j.Description,
+                j.PermanentJobDetails != null ? j.PermanentJobDetails.TrialPeriod : null,
+                j.WorkerDetails.Select(w => w.User != null ? w.User.FullName : "Unknown").ToList()
+            ))
+            .ToListAsync(ct);
 
-        await SendResultAsync(Results.Ok(jobs.Select(j => new {
-            j.JobId,
-            j.WageRate,
-            j.JobCategory,
-            j.JobExperience,
-            j.JobGender,
-            j.JobType,
-            j.Locale,
-            WorkerName = j.WorkerDetails?.User?.FullName
-        })));
+        await SendResultAsync(Results.Ok(jobs));
     }
+
+    public record Response(
+        int JobId,
+        int WageRate,
+        JobCategory JobCategory,
+        JobExperience JobExperience,
+        JobGender JobGender,
+        JobType JobType,
+        string Locale,
+        string Description,
+        int? TrialPeriod,
+        List<string> WorkerNames
+    );
 }
