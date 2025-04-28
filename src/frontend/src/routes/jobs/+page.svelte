@@ -1,13 +1,15 @@
 <script>
   import { onMount } from 'svelte';
-  import JobCategories from '$lib/components/JobCategories.svelte';
-  import FilterControls from '$lib/components/FilterControls.svelte';
-  import JobCard from '$lib/components/JobCard.svelte';
+  import JobCategories from '$lib/components/jobs/JobCategories.svelte';
+  import FilterControls from '$lib/components/jobs/FilterControls.svelte';
+  import JobCard from '$lib/components/jobs/JobCard.svelte';
+  import JobCardModal from '$lib/components/jobs/JobCardModal.svelte';
   import { getJobs } from '$lib/api.js';
 
   let jobs = [];
   let filteredJobs = [];
   let selectedCategories = new Set();
+  let selectedJobId = null;
 
   let filters = {
     jobTypes: new Set(),
@@ -70,9 +72,18 @@
     applyFilters();
   }
 
+  function handleJobClick(jobId) {
+    selectedJobId = jobId;
+  }
+
+  function closeModal() {
+    selectedJobId = null;
+  }
+
   onMount(async () => {
     try {
-      jobs = await getJobs();
+      const result = await getJobs();
+      jobs = result.jobs;
       applyFilters();
     } catch (err) {
       console.error('Could not load jobs:', err);
@@ -119,10 +130,10 @@
     </div>
 
     <!-- Job Cards Section -->
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-2 pt-2">
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-2 pt-2">
       {#if filteredJobs.length}
         {#each filteredJobs as job}
-          <JobCard {job} />
+        <JobCard {job} on:click={() => handleJobClick(job.jobId)} />
         {/each}
       {:else}
         <p class="col-span-full text-center text-gray-500 py-8">
@@ -130,5 +141,9 @@
         </p>
       {/if}
     </div>
+
+    {#if selectedJobId}
+      <JobCardModal jobId={selectedJobId} closeModal={closeModal} />
+    {/if}
   </div>
 </div>

@@ -4,7 +4,7 @@ using sproj.Data;
 
 namespace sproj.Features.Jobs;
 
-public class GetJobs : Endpoint<EmptyRequest, List<GetJobs.Response>> {
+public class GetJobs : EndpointWithoutRequest<GetJobs.Response> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
@@ -12,13 +12,13 @@ public class GetJobs : Endpoint<EmptyRequest, List<GetJobs.Response>> {
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(EmptyRequest req, CancellationToken ct) {
+    public override async Task HandleAsync(CancellationToken ct) {
         var jobs = await DbContext.Jobs
             .AsSplitQuery()
             .Include(j => j.WorkerDetails)
-            .ThenInclude(w => w.User)
-            .OrderByDescending(j => j.JobId)
-            .Select(j => new Response(
+                .ThenInclude(w => w.User)
+            .Include(j => j.PermanentJobDetails)
+            .Select(j => new Response.Job(
                 j.JobId,
                 j.WageRate,
                 j.JobCategory,
@@ -27,24 +27,34 @@ public class GetJobs : Endpoint<EmptyRequest, List<GetJobs.Response>> {
                 j.JobType,
                 j.Locale,
                 j.Description,
-                j.PermanentJobDetails != null ? j.PermanentJobDetails.TrialPeriod : null,
-                j.WorkerDetails.Select(w => w.User != null ? w.User.FullName : "Unknown").ToList()
+                j.PermanentJobDetails!.TrialPeriod,
+                j.WorkerDetails.Select(w => new Response.WorkerInfo(
+                    w.User!.FullName,
+                    w.User.Gender
+                )).ToList()
             ))
             .ToListAsync(ct);
 
-        await SendResultAsync(Results.Ok(jobs));
+        await SendResultAsync(Results.Ok(new Response(jobs)));
     }
 
-    public record Response(
-        int JobId,
-        int WageRate,
-        JobCategory JobCategory,
-        JobExperience JobExperience,
-        JobGender JobGender,
-        JobType JobType,
-        string Locale,
-        string Description,
-        int? TrialPeriod,
-        List<string> WorkerNames
-    );
+    public record Response(List<Response.Job> Jobs) {
+        public record Job(
+            int JobId,
+            int WageRate,
+            JobCategory JobCategory,
+            JobExperience JobExperience,
+            JobGender JobGender,
+            JobType JobType,
+            string Locale,
+            string Description,
+            int? TrialPeriod,
+            List<Response.WorkerInfo> Workers
+        );
+
+        public record WorkerInfo(
+            string FullName,
+            UserGender Gender
+        );
+    }
 }

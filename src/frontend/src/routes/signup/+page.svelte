@@ -1,9 +1,9 @@
 <script>
-    import SignupForm from '$lib/components/SignupForm.svelte';
-    import SmsVerification from '$lib/components/SmsVerification.svelte';
-    import AccountTypeSelection from '$lib/components/AccountTypeSelection.svelte';
-    import IdVerification from '$lib/components/IdVerification.svelte';
-    import ProgressBar from '$lib/components/ProgressBar.svelte';
+    import SignupForm from '$lib/components/auth/SignupForm.svelte';
+    import SmsVerification from '$lib/components/auth/SmsVerification.svelte';
+    import AccountTypeSelection from '$lib/components/auth/AccountTypeSelection.svelte';
+    import IdVerification from '$lib/components/auth/IdVerification.svelte';
+    import ProgressBar from '$lib/components/auth/ProgressBar.svelte';
     import { writable } from 'svelte/store';
     import { fly } from 'svelte/transition';
     import { loginUser } from '$lib/stores';

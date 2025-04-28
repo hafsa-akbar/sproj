@@ -1,7 +1,7 @@
 <script>
 	import '../app.css';
 	import { ToastContainer, FlatToast } from 'svelte-toasts';
-	import Navbar from '$lib/components/Navbar.svelte';
+	import Navbar from '$lib/components/layout/Navbar.svelte';
 </script>
 
 <Navbar />

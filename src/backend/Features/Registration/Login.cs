@@ -1,6 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 using sproj.Authentication;
+using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 using sproj.Services;
 
@@ -19,7 +20,10 @@ public class Login : Endpoint<Login.Request, Login.UserResponse> {
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var normalizedPhoneNumber = Utils.NormalizePhoneNumber(req.PhoneNumber);
 
-        var user = DbContext.Users.SingleOrDefault(u => u.PhoneNumber == normalizedPhoneNumber);
+        var user = await DbContext.Users
+            .Include(u => u.Couple)
+            .SingleOrDefaultAsync(u => u.PhoneNumber == normalizedPhoneNumber, ct);
+
         if (user is null) {
             await SendUnauthorizedAsync(ct);
             return;
@@ -43,7 +47,8 @@ public class Login : Endpoint<Login.Request, Login.UserResponse> {
             Address: user.Address,
             Birthdate: user.Birthdate,
             Gender: user.Gender,
-            Role: user.Role
+            Role: user.Role,
+            CoupleName: user.Couple?.FullName
         );
 
         await SendOkAsync(response, ct);
@@ -58,7 +63,8 @@ public class Login : Endpoint<Login.Request, Login.UserResponse> {
         string Address,
         DateOnly Birthdate,
         UserGender Gender,
-        Role Role
+        Role Role,
+        string? CoupleName
     );
 
     public class RequestValidator : Validator<Request> {

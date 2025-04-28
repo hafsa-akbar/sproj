@@ -1,102 +1,72 @@
-/**
- * Job Categories Enum
- * @readonly
- * @enum {number}
- */
-export const JobCategory = {
-  COOKING: 1,
-  CLEANING: 2,
-  DRIVING: 3,
-  LAUNDRY: 4,
-  GARDENING: 5,
-  BABYSITTING: 6,
-  PET_CARE: 7,
-  SECURITY: 8
+export const JobCategoryMap = {
+  1: 'Cooking',
+  2: 'Cleaning',
+  3: 'Driving',
+  4: 'Laundry',
+  5: 'Gardening',
+  6: 'Babysitting',
+  7: 'Pet Care',
+  8: 'Security Guard',
 };
 
-/**
- * Experience Levels Enum
- * @readonly
- * @enum {number}
- */
-export const ExperienceLevel = {
-  BEGINNER: 1,
-  INTERMEDIATE: 2,
-  EXPERT: 3
+export const JobExperienceMap = {
+  1: 'Beginner',
+  2: 'Intermediate',
+  3: 'Expert',
 };
 
-/**
- * Job Types Enum
- * @readonly
- * @enum {number}
- */
-export const JobType = {
-  ONE_SHOT: 1,
-  PERMANENT: 2
+export const JobTypeMap = {
+  1: 'One Shot',
+  2: 'Full Time',
 };
 
-/**
- * Gender Types Enum
- * @readonly
- * @enum {number}
- */
-export const GenderType = {
-  MALE: 1,
-  FEMALE: 2,
-  COUPLE: 3
+export const JobGenderMap = {
+  1: 'Male',
+  2: 'Female',
+  3: 'Couple',
 };
 
-/**
- * Job Categories Select Options
- * @readonly
- * @type {Array<{value: string, label: string}>}
- */
-export const jobCategoryOptions = [
-  { value: JobCategory.COOKING.toString(), label: 'Cooking' },
-  { value: JobCategory.CLEANING.toString(), label: 'Cleaning' },
-  { value: JobCategory.DRIVING.toString(), label: 'Driving' },
-  { value: JobCategory.LAUNDRY.toString(), label: 'Laundry' },
-  { value: JobCategory.GARDENING.toString(), label: 'Gardening' },
-  { value: JobCategory.BABYSITTING.toString(), label: 'Babysitting' },
-  { value: JobCategory.PET_CARE.toString(), label: 'Pet Care' },
-  { value: JobCategory.SECURITY.toString(), label: 'Security Guard' }
+export const GenderAvatarMap = {
+  1: 'boy',
+  2: 'girl',
+};
+
+export const UserGenderMap = {
+  1: 'Male',
+  2: 'Female',
+};
+
+export const IdTypeMap = {
+  1: 'Driving License',
+  2: 'CNIC',
+};
+
+export const wageOptions = [
+  { value: 'Value', label: 'Value' },
+  { value: 'Mid-range', label: 'Mid-range' },
+  { value: 'High-end', label: 'High-end' }
 ];
 
-/**
- * Experience Level Select Options
- * @readonly
- * @type {Array<{value: string, label: string}>}
- */
-export const experienceLevelOptions = [
-  { value: ExperienceLevel.BEGINNER.toString(), label: 'Beginner' },
-  { value: ExperienceLevel.INTERMEDIATE.toString(), label: 'Intermediate' },
-  { value: ExperienceLevel.EXPERT.toString(), label: 'Expert' }
-];
+export const ExperienceTooltip = "Experience Level reflects the worker's skill & expertise.";
+export const TrialPeriodTooltip = "Trial Period is a probation time for permanent hires.";
 
-/**
- * Job Type Select Options
- * @readonly
- * @type {Array<{value: string, label: string}>}
- */
-export const jobTypeOptions = [
-  { value: JobType.ONE_SHOT.toString(), label: 'One Shot' },
-  { value: JobType.PERMANENT.toString(), label: 'Permanent' }
-];
+// Select options for dropdowns
+export const jobCategoryOptions = Object.entries(JobCategoryMap).map(([value, label]) => ({
+  value,
+  label
+}));
 
-/**
- * Get gender label from type
- * @param {number} genderType
- * @returns {string}
- */
-export function getGenderLabel(genderType) {
-  switch (genderType) {
-    case GenderType.MALE:
-      return 'Male';
-    case GenderType.FEMALE:
-      return 'Female';
-    case GenderType.COUPLE:
-      return 'Couple';
-    default:
-      return 'Unknown';
-  }
-} 
+export const experienceLevelOptions = Object.entries(JobExperienceMap).map(([value, label]) => ({
+  value,
+  label
+}));
+
+export const jobTypeOptions = Object.entries(JobTypeMap).map(([value, label]) => ({
+  value,
+  label
+}));
+
+export const genderOptions = Object.entries(JobGenderMap).map(([value, label]) => ({
+  value,
+  label
+})); 

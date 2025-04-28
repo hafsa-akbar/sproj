@@ -15,7 +15,7 @@ public abstract class SessionStore {
     public abstract Session? GetSession(string sessionId);
     public abstract void SetSession(string sessionId, Session session);
 
-    protected TimeSpan SessionLifetime { get; } = TimeSpan.FromMinutes(15);
+    protected TimeSpan SessionLifetime { get; } = TimeSpan.FromMinutes(40);
 
     public string CreateSession(User user) {
         var session = new Session {

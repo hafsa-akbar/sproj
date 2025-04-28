@@ -2,8 +2,9 @@
   import { createEventDispatcher } from 'svelte';
   import { 
     jobTypeOptions,
-    experienceLevelOptions as experienceOptions,
-    GenderType
+    experienceLevelOptions,
+    genderOptions,
+    wageOptions
   } from '$lib/config/jobConfig';
 
   const dispatch = createEventDispatcher();
@@ -14,18 +15,6 @@
   export let showMobileFilters;
   export let close;
   export let wageBands;
-
-  const genderOptions = [
-    { value: GenderType.MALE.toString(), label: 'Male' },
-    { value: GenderType.FEMALE.toString(), label: 'Female' },
-    { value: GenderType.COUPLE.toString(), label: 'Couple' }
-  ];
-
-  const wageOptions = [
-    { value: 'Value', label: 'Value' },
-    { value: 'Mid-range', label: 'Mid-range' },
-    { value: 'High-end', label: 'High-end' }
-  ];
 
   $: cityOptions = Array.from(new Set(jobs.map(j => j.locale.toLowerCase())))
     .map(c => ({ value: c, label: c.charAt(0).toUpperCase() + c.slice(1) }));
@@ -78,7 +67,7 @@
         {#each [
           { title: 'Job Type', field: 'jobTypes', opts: jobTypeOptions },
           { title: 'Gender', field: 'genders', opts: genderOptions },
-          { title: 'Experience', field: 'experiences', opts: experienceOptions },
+          { title: 'Experience', field: 'experiences', opts: experienceLevelOptions },
           { title: 'City', field: 'locales', opts: cityOptions },
           { title: 'Budget', field: 'wageFilters', opts: wageOptions }
         ] as group}

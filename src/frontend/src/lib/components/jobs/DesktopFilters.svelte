@@ -1,10 +1,11 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import FilterDropdown from './FilterDropdown.svelte';
+  import FilterDropdown from '$lib/components/jobs/FilterDropdown.svelte';
   import { 
     jobTypeOptions,
-    experienceLevelOptions as experienceOptions,
-    GenderType
+    experienceLevelOptions,
+    genderOptions,
+    wageOptions
   } from '$lib/config/jobConfig';
 
   const dispatch = createEventDispatcher();
@@ -12,12 +13,6 @@
   export let filters = {};
   export let sortOption = '';
   export let jobs = [];
-
-  const genderOptions = [
-    { value: GenderType.MALE.toString(), label: 'Male' },
-    { value: GenderType.FEMALE.toString(), label: 'Female' },
-    { value: GenderType.COUPLE.toString(), label: 'Couple' }
-  ];
 
   const sortOptions = [
     { value: 'Wage: Low to High', label: 'Wage: Low to High' },
@@ -65,7 +60,7 @@
     <FilterDropdown
       label="Experience"
       field="experiences"
-      options={experienceOptions}
+      options={experienceLevelOptions}
       bind:selectedSet={filters.experiences}
       on:change={handleFilterChange}
     />
@@ -81,25 +76,12 @@
     <FilterDropdown
       label="Wage"
       field="wageFilters"
-      options={[
-        { value: 'Value', label: 'Value' },
-        { value: 'Mid-range', label: 'Mid-range' },
-        { value: 'High-end', label: 'High-end' }
-      ]}
+      options={wageOptions}
       bind:selectedSet={filters.wageFilters}
       on:change={handleFilterChange}
     />
 
     <div class="ml-auto flex items-center gap-2">
-      {#if Object.values(filters).some(set => set.size > 0)}
-        <button
-          class="text-sm text-gray-500 hover:text-gray-700"
-          on:click={clearFilters}
-        >
-          Clear all
-        </button>
-      {/if}
-
       <FilterDropdown
         options={sortOptions}
         bind:value={sortOption}

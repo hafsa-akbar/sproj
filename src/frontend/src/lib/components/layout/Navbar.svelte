@@ -2,7 +2,7 @@
   import { authUser, logoutUser } from '$lib/stores';
   import { goto } from '$app/navigation';
   import { toasts } from 'svelte-toasts';
-  import AddJobModal from '$lib/components/AddJobModal.svelte';
+  import AddJobModal from '$lib/components/jobs/AddJobModal.svelte';
 
   let showAddJob = false;
 
@@ -34,7 +34,7 @@
       <!-- Add Job button -->
       <button
         on:click={handleAddJob}
-        class="px-4 md:px-6 py-1 md:py-1.5 border border-[var(--color-secondary)] text-[var(--color-secondary)] text-sm md:text-base rounded-full transition hover:bg-gray-100"
+        class="px-4 md:px-6 py-1 md:py-1.5 border border-secondary text-secondary text-sm md:text-base rounded-full transition hover:bg-gray-100"
       >
         Add a Job
       </button>
@@ -42,7 +42,7 @@
       <!-- Logout button -->
       <button
         on:click={handleLogout}
-        class="px-3 md:px-4 py-1 md:py-1.5 text-gray-500 text-sm md:text-base rounded transition hover:text-[var(--color-secondary)]"
+        class="px-3 md:px-4 py-1 md:py-1.5 text-gray-500 text-sm md:text-base rounded transition hover:text-secondary"
       >
         Logout
       </button>

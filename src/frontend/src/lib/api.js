@@ -1,23 +1,4 @@
-import { sessionId } from './stores';
-
 const BASE_URL = '/api';
-
-let currentSessionId;
-sessionId.subscribe(value => {
-  currentSessionId = value;
-});
-
-function getAuthHeaders() {
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-  
-  if (currentSessionId) {
-    headers['Cookie'] = `session=${currentSessionId}`;
-  }
-  
-  return headers;
-}
 
 function parseErrorMessage(data, defaultMessage) {
   console.log(data);
@@ -26,11 +7,6 @@ function parseErrorMessage(data, defaultMessage) {
     errorMessage += ': ' + data.errors[0]['reason'];
   }
   return errorMessage;
-}
-
-function getSessionIdFromCookie() {
-  const match = document.cookie.match(/session=([^;]+)/);
-  return match ? match[1] : null;
 }
 
 export async function login(user) {
@@ -85,7 +61,7 @@ export async function startSmsVerification() {
 export async function verifySmsCode(code) {
   const response = await fetch(`${BASE_URL}/verify/end-sms`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code })
   });
   
@@ -103,14 +79,9 @@ export async function verifyCnic(file) {
   const formData = new FormData();
   formData.append('cnic', file);
 
-  const headers = {};
-  if (currentSessionId) {
-    headers['Cookie'] = `session=${currentSessionId}`;
-  }
-
   const response = await fetch(`${BASE_URL}/verify/cnic`, {
     method: 'POST',
-    headers,
+    headers: { 'Content-Type': 'multipart/form-data; boundary=WebAppBoundary' },
     body: formData
   });
 
@@ -123,7 +94,7 @@ export async function verifyCnic(file) {
 
 export async function getJobs() {
   const res = await fetch(`${BASE_URL}/jobs`, {
-    headers: getAuthHeaders()
+    headers: { 'Content-Type': 'application/json' },
   });
   if (!res.ok) {
     const text = await res.text();
@@ -135,7 +106,7 @@ export async function getJobs() {
 
 export async function getWorkerDetails(jobId) {
   const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
-    headers: getAuthHeaders()
+    headers: { 'Content-Type': 'application/json' },
   });
   if (!res.ok) {
     const text = await res.text();
@@ -148,7 +119,7 @@ export async function getWorkerDetails(jobId) {
 export async function createJob(jobData) {
   const response = await fetch(`${BASE_URL}/jobs`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(jobData)
   });
 
@@ -160,4 +131,12 @@ export async function createJob(jobData) {
   }
 
   return data;
+}
+
+export async function getJobDetails(jobId) {
+  const response = await fetch(`${BASE_URL}/jobs/${jobId}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch job details');
+  }
+  return response.json();
 }
