@@ -32,7 +32,7 @@ public class AddCouple : Endpoint<AddCouple.Request, AddCouple.Response> {
         if (couple.Couple is not null)
             ThrowError("user is already in a relationship");
         
-        if (couple.Role != 3)
+        if (couple.Role != Role.Worker)
             ThrowError("user is not a worker");
 
         user.Couple = couple;
