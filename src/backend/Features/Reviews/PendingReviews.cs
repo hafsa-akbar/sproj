@@ -8,7 +8,7 @@ public class PendingReviews : Endpoint<EmptyRequest, List<PendingReviews.Respons
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
-        Post("/pending-jobs");
+        Get("/pending-reviews");
         Policies("EmployerOrWorker");
     }
 

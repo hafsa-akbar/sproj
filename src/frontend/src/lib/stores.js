@@ -9,7 +9,6 @@ const getInitialUser = () => {
 
 export const authUser = writable(getInitialUser());
 
-// Subscribe to store changes and persist to sessionStorage
 authUser.subscribe((user) => {
   if (!browser) return;
   if (user) {
@@ -20,10 +19,11 @@ authUser.subscribe((user) => {
 });
 
 export function loginUser(user) {
-  console.log('loginUser', user);
   authUser.set(user);
 }
 
 export function logoutUser() {
   authUser.set(null);
 }
+
+export const jobsStore = writable([]);

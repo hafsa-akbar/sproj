@@ -22,6 +22,10 @@
   function handleClick() {
     dispatch('click', job.id);
   }
+
+  $: img_src = `https://avatar.iran.liara.run/public/${job.workers[0].gender === 1 ? 'boy' : 'girl'}?username=${job.workers[0].fullName.split(' ').join('')}`
+  $: img_src_couple = `https://avatar.iran.liara.run/public/${job.workers[1]?.gender === 1 ? 'boy' : 'girl'}?username=${job.workers[1]?.fullName.split(' ').join('')}`
+
 </script>
 
 <div 
@@ -36,30 +40,37 @@
   <!-- Floating images -->
   <div class="image-wrapper {isCouple ? 'couple-hover-wrapper' : ''}">
     {#if isCouple}
-      <div class="couple-images">
+    <div class="couple-images">
+      {#if img_src}
         <img
-          src={`https://avatar.iran.liara.run/public/${GenderAvatarMap[job.workers[0].gender]}?username=${job.workers[0].fullName}`}
+          src={img_src}
           alt="Worker 1"
           class="profile-image first"
           width="80"
           height="80"
         />
+      {/if}
+  
+      {#if img_src_couple}
         <img
-          src={`https://avatar.iran.liara.run/public/${GenderAvatarMap[job.workers[1].gender]}?username=${job.workers[1].fullName}`}
+          src={img_src_couple}
           alt="Worker 2"
           class="profile-image second"
           width="80"
           height="80"
         />
-      </div>
+      {/if}
+    </div>
     {:else}
+    {#if img_src}
       <img
-        src={`https://avatar.iran.liara.run/public/${GenderAvatarMap[job.workers[0].gender]}?username=${job.workers[0].fullName}`}
+        src={img_src}
         alt="Worker"
         class="profile-image"
         width="80"
         height="80"
       />
+      {/if}
     {/if}
   </div>
 

@@ -22,6 +22,7 @@ public class StartCnicVerification : Endpoint<StartCnicVerification.Request, Emp
 
     public override async Task HandleAsync(Request req, CancellationToken ct) {
         var userId = int.Parse(User.FindFirst("user_id")!.Value);
+        
         var user = await DbContext.Users.Include(u => u.CnicVerification).FirstAsync(u => u.UserId == userId);
 
         // worker can later update cnic to driver's lisc or vise versa

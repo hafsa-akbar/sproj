@@ -3,6 +3,7 @@
   import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
   import { goto } from '$app/navigation';
   import { verifyCnic } from '$lib/api';
+  import { authUser } from '$lib/stores';
 
   const dispatch = createEventDispatcher();
 
@@ -18,6 +19,7 @@
   let arrowElement;
   let isUploading = false;
   let uploadError = null;
+  $: user = $authUser;
 
   const idTypes = [
     { value: 'NADRA CNIC', label: 'NADRA CNIC' },
@@ -87,7 +89,7 @@
 
     try {
       await verifyCnic(selectedFile);
-      // If upload is successful, redirect to home page
+      user.role = 3;
       goto('/');
     } catch (error) {
       uploadError = "Failed to upload image. Please try again.";

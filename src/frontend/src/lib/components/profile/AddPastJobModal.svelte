@@ -2,12 +2,8 @@
   import { createEventDispatcher } from 'svelte';
   import { authUser } from '$lib/stores';
   import { toasts } from 'svelte-toasts';
-  import { createJob } from '$lib/api';
-  import {
-    jobCategoryOptions,
-    experienceLevelOptions,
-    jobTypeOptions
-  } from '$lib/config/jobConfig';
+  import { createPastJob } from '$lib/api';
+  import { jobCategoryOptions, jobTypeOptions } from '$lib/config/jobConfig';
   import * as Select from '../ui/select/index.js';
   import { Input } from '../ui/input/index.js';
   import { Textarea } from '../ui/textarea/index.js';
@@ -17,34 +13,24 @@
   const dispatch = createEventDispatcher();
 
   const initialFormState = {
-    wageRate: '',
     jobCategory: '',
-    jobExperience: '',
     jobType: '',
     locale: '',
     description: '',
-    postAsCouple: false,
-    trialPeriod: ''
+    employerPhoneNumber: '',
+    postAsCouple: false
   };
 
   let formData = { ...initialFormState };
   let isSubmitting = false;
 
   $: user = $authUser;
-  $: isPermanent = parseInt(formData.jobType) === 2;
 
-  // derive selected option objects for Radix Select
+  // derive selected option objects
   $: selectedCategory = formData.jobCategory
     ? {
         value: formData.jobCategory,
         label: jobCategoryOptions.find(o => String(o.value) === String(formData.jobCategory))?.label
-      }
-    : undefined;
-
-  $: selectedExperience = formData.jobExperience
-    ? {
-        value: formData.jobExperience,
-        label: experienceLevelOptions.find(o => String(o.value) === String(formData.jobExperience))?.label
       }
     : undefined;
 
@@ -58,28 +44,24 @@
   async function handleSubmit() {
     if (isSubmitting) return;
     isSubmitting = true;
-
     try {
       const jobData = {
-        wageRate: parseInt(formData.wageRate),
         jobCategory: parseInt(formData.jobCategory),
-        jobExperience: parseInt(formData.jobExperience),
-        jobGender: formData.postAsCouple? 3 : parseInt(user?.gender),
         jobType: parseInt(formData.jobType),
+        jobGender: formData.postAsCouple? 3: parseInt(user?.gender),
         locale: formData.locale,
         description: formData.description,
-        coupleName: user?.coupleName,
-        trialPeriod: isPermanent ? parseInt(formData.trialPeriod) : undefined
+        employerPhoneNumber: formData.employerPhoneNumber
       };
+      const newPast = await createPastJob(jobData);
 
-      const newJob = await createJob(jobData);
       toasts.add({
         title: 'Success',
         description: 'Job posted successfully!',
         type: 'success',
         duration: 3000
       });
-      dispatch('submit', newJob);
+      dispatch('submit', newPast);
       dispatch('close');
     } catch (error) {
       toasts.add({
@@ -100,60 +82,29 @@
 </script>
 
 <div
-  class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
-  style="background: rgba(0,0,0,0.1)"
+  class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/10"
+  role="dialog"
+  aria-modal="true"
 >
-  <!-- modal container -->
   <div
-    class="relative
-           bg-white
-           rounded-3xl
-           w-full max-w-xs sm:max-w-md
-           flex flex-col
-           max-h-[90vh]
-           my-8 sm:my-4
-           shadow-2xl border border-gray-100"
+    class="relative bg-white rounded-3xl w-full max-w-xs sm:max-w-md flex flex-col max-h-[90vh] shadow-2xl border border-gray-100"
   >
-    <!-- close button -->
     <button
       on:click={handleClose}
       aria-label="Close"
-      class="absolute top-4 right-4
-             text-gray-400 hover:text-secondary
-             focus:outline-none focus:ring-2 focus:ring-secondary"
-    >
-      &times;
-    </button>
+      class="absolute top-4 right-4 text-gray-400 hover:text-secondary focus:outline-none focus:ring-2 focus:ring-secondary"
+    >&times;</button>
 
-    <!-- header -->
     <div class="px-4 sm:px-8 pt-8 pb-4 text-center">
-      <h2 class="text-2xl font-bold">Add a Job</h2>
+      <h2 class="text-2xl font-bold">Add a Past Job</h2>
       <p class="text-sm text-gray-500">Fill in the details below</p>
     </div>
 
-    <!-- scrollable form body -->
     <form
       on:submit|preventDefault={handleSubmit}
-      class="flex-1
-             overflow-y-auto
-             px-4 sm:px-8
-             space-y-4 sm:space-y-5
-             pb-6"
+      class="flex-1 overflow-y-auto px-4 sm:px-8 space-y-4 pb-6"
     >
-      <!-- Wage Rate -->
-      <div>
-        <Label for="wageRate">Wage Rate</Label>
-        <Input
-          id="wageRate"
-          type="number"
-          bind:value={formData.wageRate}
-          placeholder="Enter wage rate"
-          required
-          class="placeholder-gray-400 focus:border-secondary focus:ring-secondary w-full"
-        />
-      </div>
-
-      <!-- Category & Experience -->
+      <!-- Category & Type -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label for="jobCategory">Category</Label>
@@ -161,7 +112,10 @@
             selected={selectedCategory}
             onSelectedChange={opt => formData.jobCategory = opt?.value ?? ''}
           >
-            <Select.Trigger aria-label="Category" class="w-full focus:border-secondary focus:ring-secondary">
+            <Select.Trigger
+              aria-label="Category"
+              class="w-full focus:border-secondary focus:ring-secondary"
+            >
               <Select.Value placeholder="Select category" />
             </Select.Trigger>
             <Select.Content>
@@ -172,32 +126,15 @@
           </Select.Root>
         </div>
         <div>
-          <Label for="jobExperience">Experience</Label>
-          <Select.Root
-            selected={selectedExperience}
-            onSelectedChange={opt => formData.jobExperience = opt?.value ?? ''}
-          >
-            <Select.Trigger aria-label="Experience" class="w-full focus:border-secondary focus:ring-secondary">
-              <Select.Value placeholder="Select experience" />
-            </Select.Trigger>
-            <Select.Content>
-              {#each experienceLevelOptions as opt}
-                <Select.Item value={opt.value} label={opt.label} />
-              {/each}
-            </Select.Content>
-          </Select.Root>
-        </div>
-      </div>
-
-      <!-- Type & Locale -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
           <Label for="jobType">Job Type</Label>
           <Select.Root
             selected={selectedType}
             onSelectedChange={opt => formData.jobType = opt?.value ?? ''}
           >
-            <Select.Trigger aria-label="Job Type" class="w-full focus:border-secondary focus:ring-secondary">
+            <Select.Trigger
+              aria-label="Job Type"
+              class="w-full focus:border-secondary focus:ring-secondary"
+            >
               <Select.Value placeholder="Select type" />
             </Select.Trigger>
             <Select.Content>
@@ -207,34 +144,20 @@
             </Select.Content>
           </Select.Root>
         </div>
-        <div>
-          <Label for="locale">Locale</Label>
-          <Input
-            id="locale"
-            type="text"
-            bind:value={formData.locale}
-            placeholder="Enter location"
-            required
-            class="placeholder-gray-400 focus:border-secondary focus:ring-secondary w-full"
-          />
-        </div>
       </div>
 
-      <!-- Trial Days (Permanent) -->
-      {#if isPermanent}
-        <div>
-          <Label for="trialPeriod">Trial Days</Label>
-          <Input
-            id="trialPeriod"
-            type="number"
-            min="0"
-            bind:value={formData.trialPeriod}
-            placeholder="Enter trial period"
-            required
-            class="placeholder-gray-400 focus:border-secondary focus:ring-secondary w-full"
-          />
-        </div>
-      {/if}
+      <!-- Locale -->
+      <div>
+        <Label for="locale">Locale</Label>
+        <Input
+          id="locale"
+          type="text"
+          bind:value={formData.locale}
+          placeholder="Enter location"
+          required
+          class="placeholder-gray-400 focus:border-secondary focus:ring-secondary w-full"
+        />
+      </div>
 
       <!-- Description -->
       <div>
@@ -248,10 +171,22 @@
         />
       </div>
 
-      <!-- Post as Couple -->
+      <!-- Employer Phone -->
+      <div>
+        <Label for="employerPhoneNumber">Employer Phone</Label>
+        <Input
+          id="employerPhoneNumber"
+          bind:value={formData.employerPhoneNumber}
+          type="tel"
+          placeholder="Enter phone number"
+          required
+          class="placeholder-gray-400 focus:border-secondary focus:ring-secondary w-full"
+        />
+      </div>
+
       {#if user?.coupleName}
-        <div class="flex items-center justify-end gap-2">
-          <span class="text-sm text-gray-600">Post as Couple</span>
+        <div class="flex items-center justify-start gap-2">
+          <span class="text-sm text-gray-600">Couple Job</span>
           <label class="relative inline-block w-12 h-6">
             <input type="checkbox" bind:checked={formData.postAsCouple} class="sr-only peer" />
             <div class="absolute inset-0 bg-gray-200 rounded-full peer-checked:bg-secondary peer-focus:ring-2 peer-focus:ring-secondary transition"></div>
@@ -262,10 +197,20 @@
 
       <!-- Actions -->
       <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
-        <Button variant="outline" on:click={handleClose} disabled={isSubmitting} class="w-full sm:w-auto">
+        <Button
+          variant="outline"
+          on:click={handleClose}
+          disabled={isSubmitting}
+          class="w-full sm:w-auto"
+        >
           Cancel
         </Button>
-        <Button variant="secondary" type="button" on:click={handleSubmit} disabled={isSubmitting} class="w-full sm:w-auto">
+        <Button
+          variant="secondary"
+          type="submit"
+          disabled={isSubmitting}
+          class="w-full sm:w-auto"
+        >
           {isSubmitting ? 'Posting...' : 'Post Job'}
         </Button>
       </div>

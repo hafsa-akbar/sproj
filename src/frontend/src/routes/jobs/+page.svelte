@@ -5,8 +5,9 @@
   import JobCard from '$lib/components/jobs/JobCard.svelte';
   import JobCardModal from '$lib/components/jobs/JobCardModal.svelte';
   import { getJobs } from '$lib/api.js';
+  import { jobsStore } from '$lib/stores';
 
-  let jobs = [];
+  let jobs = $jobsStore;
   let filteredJobs = [];
   let selectedCategories = new Set();
   let selectedJobId = null;
@@ -83,12 +84,18 @@
   onMount(async () => {
     try {
       const result = await getJobs();
-      jobs = result.jobs;
+      jobsStore.set(result.jobs);
       applyFilters();
     } catch (err) {
       console.error('Could not load jobs:', err);
     }
   });
+
+  // Watch for changes in jobs store and reapply filters
+  $: {
+    jobs = $jobsStore;
+    applyFilters();
+  }
 </script>
 
 <div class="relative min-h-screen">

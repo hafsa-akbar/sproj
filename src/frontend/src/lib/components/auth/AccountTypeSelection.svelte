@@ -35,4 +35,4 @@
       <span class="text-lg font-medium text-gray-700">Hiring</span>
     </button>
   </div>          
-</div> 
+</div>

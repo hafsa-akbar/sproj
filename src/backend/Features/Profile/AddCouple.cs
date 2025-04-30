@@ -8,7 +8,7 @@ namespace sproj.Features.Profile;
 
 // TODO: Add by phone number instead
 // TODO: Approval system
-public class AddCouple : Endpoint<AddCouple.Request, EmptyResponse> {
+public class AddCouple : Endpoint<AddCouple.Request, AddCouple.Response> {
     public required AppDbContext DbContext { get; set; }
 
     public override void Configure() {
@@ -28,15 +28,22 @@ public class AddCouple : Endpoint<AddCouple.Request, EmptyResponse> {
 
         if (couple.Gender == user.Gender)
             ThrowError("gender must be different");
+        
+        if (couple.Couple is not null)
+            ThrowError("user is already in a relationship");
+        
+        if (couple.Role != 3)
+            ThrowError("user is not a worker");
 
         user.Couple = couple;
         couple.Couple = user;
         await DbContext.SaveChangesAsync();
 
-        await SendOkAsync();
+        await SendOkAsync(new Response(couple.FullName), ct);
     }
 
     public record Request(string PhoneNumber);
+    public record struct Response(string CoupleName);
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {
             RuleFor(x => x.PhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber);

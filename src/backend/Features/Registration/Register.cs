@@ -7,7 +7,7 @@ using sproj.Services;
 
 namespace sproj.Features.Registration;
 
-public class Register : Endpoint<Register.Request, Register.Response> {
+public class Register : Endpoint<Register.Request, Register.UserResponse> {
     public required AppDbContext DbContext { get; set; }
     public required SessionStore SessionStore { get; set; }
     public required PasswordHasher PasswordHasher { get; set; }
@@ -43,7 +43,7 @@ public class Register : Endpoint<Register.Request, Register.Response> {
             SameSite = SameSiteMode.Lax
         });
 
-        await SendOkAsync(new Response(user.UserId, user.PhoneNumber, user.FullName, user.Role), ct);
+        await SendOkAsync(new UserResponse(user.UserId, user.PhoneNumber, user.FullName, user.Role, user.Gender, user.Address, user.Birthdate), ct);
     }
 
     public record struct Request(
@@ -54,11 +54,14 @@ public class Register : Endpoint<Register.Request, Register.Response> {
         DateOnly Birthdate,
         UserGender Gender);
 
-    public record struct Response(
+    public record struct UserResponse(
         int UserId,
         string PhoneNumber,
         string FullName,
-        Role Role);
+        Role Role,
+        UserGender Gender,
+        string Address,
+        DateOnly Birthdate);
 
     public class RequestValidator : Validator<Request> {
         public RequestValidator() {

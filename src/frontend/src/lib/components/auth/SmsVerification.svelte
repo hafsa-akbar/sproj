@@ -3,26 +3,25 @@
   import { toasts } from 'svelte-toasts';
   import { fly } from 'svelte/transition';
   import { startSmsVerification, verifySmsCode } from '$lib/api';
+  import { loginUser } from '$lib/stores';
+  import { register } from '$lib/api';
+  import { createEventDispatcher } from 'svelte';
 
-  export let onVerificationComplete;
-  export let phoneNumber;
+  const dispatch = createEventDispatcher();
+
+  export let userData;
 
   let verificationCode = writable('');
   let isLoading = writable(false);
   let error = '';
+  let resp = null;
 
   async function handleStartVerification() {
     try {
-      isLoading.set(true);
+      isLoading.set(true);      
+      resp = await register({...userData});
       await startSmsVerification();
-      
-      toasts.add({
-        title: 'Success',
-        description: 'Verification code sent to your phone',
-        duration: 3000,
-        type: 'success',
-        theme: 'dark'
-      });
+
     } catch (err) {
       error = err.message;
       toasts.add({
@@ -46,7 +45,8 @@
     try {
       isLoading.set(true);
       await verifySmsCode($verificationCode);
-      onVerificationComplete();
+      loginUser({...resp.user, role: 2});
+      dispatch('complete');
     } catch (err) {
       error = err.message;
       toasts.add({
@@ -67,7 +67,7 @@
 <div class="w-full max-w-md mx-auto text-center mb-4">
   <h2 class="text-2xl font-bold">Verify your account</h2>
   <p class="text-gray-600 mb-8 text-center my-1">
-    We've sent a verification code to {phoneNumber}
+    We've sent a verification code to {userData.phoneNumber}
   </p>
 </div>
 

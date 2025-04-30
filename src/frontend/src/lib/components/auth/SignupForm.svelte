@@ -1,135 +1,93 @@
 <script>
-  import { writable } from 'svelte/store';
   import { createEventDispatcher } from 'svelte';
   import { toasts } from 'svelte-toasts';
-  import { register } from '$lib/api';
+
+  export let initialData = {};
 
   const dispatch = createEventDispatcher();
 
-  let phoneNumber = writable('');
-  let password = writable('');
-  let fullName = writable('');
-  let address = writable('');
-  let birthdate = writable('');
-  let gender = writable('');
+  // Local form fields, seeded from initialData
+  let phoneNumber = initialData.phoneNumber || '';
+  let password    = initialData.password    || '';
+  let fullName    = initialData.fullName    || '';
+  let address     = initialData.address     || '';
+  let birthdate   = initialData.birthdate   || '';
+  let gender      = initialData.gender      || '';
 
+  // Validation state
   let errors = {
     phoneNumber: '',
-    password: '',
-    fullName: '',
-    address: '',
-    birthdate: '',
-    gender: ''
+    password:    '',
+    fullName:    '',
+    address:     '',
+    birthdate:   '',
+    gender:      ''
   };
 
-  // Validation functions
-  function validatePhoneNumber(value) {
-    if (!value || value.trim() === '') return 'Phone number is required';
-    // optionally add regex
-    return '';
-  }
-
-  function validatePassword(value) {
-    if (!value || value.trim() === '') return 'Password is required';
-    if (value.length < 6) return 'Password must be at least 6 characters';
-    return '';
-  }
-
-  function validateFullName(value) {
-    if (!value || value.trim() === '') return 'Full name is required';
-    return '';
-  }
-
-  function validateAddress(value) {
-    if (!value || value.trim() === '') return 'Address is required';
-    return '';
-  }
-
-  function validateBirthdate(value) {
-    if (!value) return 'Birthdate is required';
-    const today = new Date();
-    const bDate = new Date(value);
-    let age = today.getFullYear() - bDate.getFullYear();
-    const monthDiff = today.getMonth() - bDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < bDate.getDate())) {
-      age--;
-    }
-    if (age < 18) return 'You must be at least 18 years old';
-    return '';
-  }
-
-  function validateGender(value) {
-    if (!value) return 'Gender is required';
-    return '';
-  }
+  // Simple validators
+  const validatePhoneNumber = v => !v.trim() ? 'Phone number is required' : '';
+  const validatePassword    = v => !v.trim() 
+    ? 'Password is required' 
+    : v.length < 6 
+      ? 'Password must be at least 6 characters' 
+      : '';
+  const validateFullName    = v => !v.trim() ? 'Full name is required' : '';
+  const validateAddress     = v => !v.trim() ? 'Address is required' : '';
+  const validateBirthdate   = v => {
+    if (!v) return 'Birthdate is required';
+    const today = new Date(), b = new Date(v);
+    let age = today.getFullYear() - b.getFullYear();
+    const m = today.getMonth() - b.getMonth();
+    if (m<0 || (m===0 && today.getDate()<b.getDate())) age--;
+    return age < 18 ? 'You must be at least 18 years old' : '';
+  };
+  const validateGender      = v => !v ? 'Gender is required' : '';
 
   function validateForm() {
-    errors.phoneNumber = validatePhoneNumber($phoneNumber);
-    errors.password = validatePassword($password);
-    errors.fullName = validateFullName($fullName);
-    errors.address = validateAddress($address);
-    errors.birthdate = validateBirthdate($birthdate);
-    errors.gender = validateGender($gender);
-    return !Object.values(errors).some(error => error !== '');
+    errors.phoneNumber = validatePhoneNumber(phoneNumber);
+    errors.password    = validatePassword(password);
+    errors.fullName    = validateFullName(fullName);
+    errors.address     = validateAddress(address);
+    errors.birthdate   = validateBirthdate(birthdate);
+    errors.gender      = validateGender(gender);
+    return !Object.values(errors).some(e => e);
   }
 
-  async function handleSignup() {
+  function handleSubmit() {
     if (!validateForm()) {
       toasts.add({
         title: 'Error',
-        description: 'Please fix all errors before submitting',
-        duration: 3000,
+        description: 'Please fix all errors before proceeding.',
         type: 'error',
-        theme: 'dark'
+        duration: 3000
       });
       return;
     }
-
-    const userData = {
-      phoneNumber: $phoneNumber,
-      password: $password,
-      fullName: $fullName,
-      address: $address,
-      birthdate: $birthdate,
-      gender: +$gender
-    };
-
-    try {
-      const response = await register(userData);
-      if (response.user) {
-        dispatch('complete', userData);
-      }
-    } catch (error) {
-      toasts.add({
-        title: 'Error',
-        description: error.message || 'Registration failed. Please try again.',
-        duration: 3000,
-        type: 'error',
-        theme: 'dark'
-      });
-    }
+    dispatch('complete', {
+      phoneNumber,
+      password,
+      fullName,
+      address,
+      birthdate,
+      gender: +gender
+    });
   }
 </script>
 
-<!-- Headline outside the form container -->
 <div class="w-full max-w-md mx-auto text-center mb-4">
   <h2 class="text-2xl font-bold">Basic Info</h2>
 </div>
 
-<div class="w-full max-w-md mx-4 p-10 bg-white rounded-lg shadow-md">
-  <form on:submit|preventDefault={handleSignup} class="space-y-4">
+<div class="w-full max-w-md mx-4 p-8 bg-transparent">
+  <form on:submit|preventDefault={handleSubmit} class="space-y-4">
     <!-- Phone Number -->
     <div>
       <input
         type="text"
-        bind:value={$phoneNumber}
+        bind:value={phoneNumber}
         placeholder="Phone Number"
-        class="w-full p-2 border border-gray-600 rounded-md {errors.phoneNumber ? 'border-red-500' : ''}"
-        required
-        on:input={(e) => {
-          phoneNumber.set(e.target.value);
-          errors.phoneNumber = validatePhoneNumber(e.target.value);
-        }}
+        class="w-full p-2 border rounded-md {errors.phoneNumber ? 'border-red-500' : 'border-secondary'}"
+        on:input={() => errors.phoneNumber = validatePhoneNumber(phoneNumber)}
       />
       {#if errors.phoneNumber}
         <p class="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
@@ -140,14 +98,10 @@
     <div>
       <input
         type="password"
-        bind:value={$password}
+        bind:value={password}
         placeholder="Password"
-        class="w-full p-2 border border-gray-600 rounded-md {errors.password ? 'border-red-500' : ''}"
-        required
-        on:input={(e) => {
-          password.set(e.target.value);
-          errors.password = validatePassword(e.target.value);
-        }}
+        class="w-full p-2 border rounded-md {errors.password ? 'border-red-500' : 'border-secondary'}"
+        on:input={() => errors.password = validatePassword(password)}
       />
       {#if errors.password}
         <p class="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -158,14 +112,10 @@
     <div>
       <input
         type="text"
-        bind:value={$fullName}
+        bind:value={fullName}
         placeholder="Full Name"
-        class="w-full p-2 border border-gray-600 rounded-md {errors.fullName ? 'border-red-500' : ''}"
-        required
-        on:input={(e) => {
-          fullName.set(e.target.value);
-          errors.fullName = validateFullName(e.target.value);
-        }}
+        class="w-full p-2 border rounded-md {errors.fullName ? 'border-red-500' : 'border-secondary'}"
+        on:input={() => errors.fullName = validateFullName(fullName)}
       />
       {#if errors.fullName}
         <p class="text-red-500 text-sm mt-1">{errors.fullName}</p>
@@ -176,14 +126,10 @@
     <div>
       <input
         type="text"
-        bind:value={$address}
+        bind:value={address}
         placeholder="Address"
-        class="w-full p-2 border border-gray-600 rounded-md {errors.address ? 'border-red-500' : ''}"
-        required
-        on:input={(e) => {
-          address.set(e.target.value);
-          errors.address = validateAddress(e.target.value);
-        }}
+        class="w-full p-2 border rounded-md {errors.address ? 'border-red-500' : 'border-secondary'}"
+        on:input={() => errors.address = validateAddress(address)}
       />
       {#if errors.address}
         <p class="text-red-500 text-sm mt-1">{errors.address}</p>
@@ -194,14 +140,9 @@
     <div>
       <input
         type="date"
-        bind:value={$birthdate}
-        placeholder="Birthdate"
-        class="w-full p-2 border border-gray-600 rounded-md {errors.birthdate ? 'border-red-500' : ''}"
-        required
-        on:input={(e) => {
-          birthdate.set(e.target.value);
-          errors.birthdate = validateBirthdate(e.target.value);
-        }}
+        bind:value={birthdate}
+        class="w-full p-2 border rounded-md {errors.birthdate ? 'border-red-500' : 'border-secondary'}"
+        on:input={() => errors.birthdate = validateBirthdate(birthdate)}
       />
       {#if errors.birthdate}
         <p class="text-red-500 text-sm mt-1">{errors.birthdate}</p>
@@ -211,12 +152,9 @@
     <!-- Gender -->
     <div>
       <select
-        bind:value={$gender}
-        class="w-full p-2 border border-gray-600 rounded-md {errors.gender ? 'border-red-500' : ''}"
-        on:change={(e) => {
-          gender.set(e.target.value);
-          errors.gender = validateGender(e.target.value);
-        }}
+        bind:value={gender}
+        class="w-full p-2 border rounded-md {errors.gender ? 'border-red-500' : 'border-secondary'}"
+        on:change={() => errors.gender = validateGender(gender)}
       >
         <option value="">Select Gender</option>
         <option value="1">Male</option>
@@ -234,9 +172,8 @@
       Next
     </button>
   </form>
-
-  <p class="mt-4 text-sm">
+  <p class="mt-4 text-sm text-center">
     Already have an account?
-    <a href="/login" class="text-secondary">Login</a>
+    <a href="/login" class="text-secondary underline">Login</a>
   </p>
 </div>

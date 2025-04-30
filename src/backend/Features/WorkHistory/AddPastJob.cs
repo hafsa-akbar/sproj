@@ -26,7 +26,7 @@ public class AddPastJob : Endpoint<AddPastJob.Request, EmptyResponse> {
             ThrowError(r => r.JobGender, "user not a couple");
 
         var empPhoneNumber = Utils.NormalizePhoneNumber(req.EmployerPhoneNumber);
-        if (user.PhoneNumber == empPhoneNumber) {
+        if (user.PhoneNumber == empPhoneNumber || user.Couple?.PhoneNumber == empPhoneNumber) {
             await SendUnauthorizedAsync();
             return;
         }
@@ -87,7 +87,7 @@ public class AddPastJob : Endpoint<AddPastJob.Request, EmptyResponse> {
             RuleFor(r => r.JobType).NotEmpty().IsInEnum();
             RuleFor(r => r.Locale).NotEmpty();
             RuleFor(r => r.Description).NotEmpty().MaximumLength(1000);
-            RuleFor(r => r.EmployerPhoneNumber).NotEmpty().Matches(@"^\+?[1-9]\d{1,14}$");
+            RuleFor(r => r.EmployerPhoneNumber).NotEmpty().Must(Utils.ValidatePhoneNumber);
         }
     }
 }

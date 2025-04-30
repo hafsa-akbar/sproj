@@ -81,8 +81,8 @@ export async function verifyCnic(file) {
 
   const response = await fetch(`${BASE_URL}/verify/cnic`, {
     method: 'POST',
-    headers: { 'Content-Type': 'multipart/form-data; boundary=WebAppBoundary' },
-    body: formData
+    credentials: 'include',
+    body: formData 
   });
 
   if (!response.ok) {
@@ -100,18 +100,6 @@ export async function getJobs() {
     const text = await res.text();
     const err = text ? JSON.parse(text) : {};
     throw new Error(parseErrorMessage(err, 'Failed to load jobs'));
-  }
-  return await res.json();
-}
-
-export async function getWorkerDetails(jobId) {
-  const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
-    headers: { 'Content-Type': 'application/json' },
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    const err = text ? JSON.parse(text) : {};
-    throw new Error(parseErrorMessage(err, 'Failed to load worker details'));
   }
   return await res.json();
 }
@@ -138,5 +126,78 @@ export async function getJobDetails(jobId) {
   if (!response.ok) {
     throw new Error('Failed to fetch job details');
   }
+  return response.json();
+}
+
+export async function getWorkerDetails() {
+  const response = await fetch(`${BASE_URL}/worker-details`, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: "include"
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch worker details');
+  }
+  return response.json();
+}
+
+export async function closeJob(jobId) {
+  const response = await fetch(`${BASE_URL}/jobs/${jobId}`, {
+    method: 'DELETE',
+    credentials: "include"
+  });
+  if (!response.ok) {
+    throw new Error('Failed to close job');
+  }
+}
+
+export async function createPastJob(jobData) {
+  const response = await fetch(`${BASE_URL}/past-jobs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: "include",
+    body: JSON.stringify(jobData)
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create past job');
+  }
+  return response.json();
+}
+
+export async function getPendingReviews() {
+  const response = await fetch(`${BASE_URL}/pending-reviews`, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: "include"
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch pending reviews');
+  }
+  return response.json();
+}
+
+export async function verifyReview(pastJobId, rating, comments) {
+  const response = await fetch(`${BASE_URL}/verify-review`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: "include",
+    body: JSON.stringify({ pastJobId, rating, comments })
+  });
+  if (!response.ok) {
+    throw new Error('Failed to verify review');
+  }
+  return;
+}
+
+export async function addCouple(phoneNumber) {
+  const response = await fetch(`${BASE_URL}/profile/add-couple`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(phoneNumber)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to add couple');
+  }
+
   return response.json();
 }

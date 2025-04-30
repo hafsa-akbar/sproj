@@ -1,5 +1,6 @@
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using sproj.Data;
 
 namespace sproj.Features.Reviews;
@@ -25,6 +26,7 @@ public class VerifyJob : Endpoint<VerifyJob.Request, EmptyResponse> {
             .FirstOrDefaultAsync(ct);
 
         if (pendingJob is null) {
+            Logger.LogError("Pending job not found");
             await SendResultAsync(Results.BadRequest());
             return;
         }

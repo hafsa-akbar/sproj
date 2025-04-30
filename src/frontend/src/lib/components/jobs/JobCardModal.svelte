@@ -57,11 +57,17 @@
         <!-- Profile images -->
         <div class="flex items-center gap-2">
           {#each job.workers as worker}
-            <img
-              src={`https://avatar.iran.liara.run/public/${GenderAvatarMap[worker.gender]}?username=${worker.fullName}`}
-              class="w-28 h-28 rounded-full object-cover border-4 border-white shadow"
-              alt="Worker Profile"
-            />
+            {#if worker?.fullName}
+              <img
+                src={`https://avatar.iran.liara.run/public/${worker.gender === 1 ? 'boy' : 'girl'}?username=${worker.fullName.split(' ').join('')}`}
+                class="w-28 h-28 rounded-full object-cover border-4 border-white shadow"
+                alt="Worker Profile"
+              />
+            {:else}
+              <div class="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow">
+                <span class="text-gray-400">Loading...</span>
+              </div>
+            {/if}
           {/each}
         </div>
 
