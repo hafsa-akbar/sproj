@@ -4,6 +4,7 @@
   
   const dispatch = createEventDispatcher();
   export let job;
+  console.log(job);
 
   function getExperienceWidth(level) {
     return level === 1 ? '33%' : level === 2 ? '66%' : '100%';
@@ -20,7 +21,7 @@
   $: isCouple = Number(job.jobGender) === 3;
 
   function handleClick() {
-    dispatch('click', job.id);
+    dispatch('select', job.jobId);
   }
 
   $: img_src = `https://avatar.iran.liara.run/public/${job.workers[0].gender === 1 ? 'boy' : 'girl'}?username=${job.workers[0].fullName.split(' ').join('')}`

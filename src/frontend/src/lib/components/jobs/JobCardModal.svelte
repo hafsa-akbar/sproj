@@ -193,10 +193,11 @@
               {/if}
             </div>
           {/each}
-
-          <button class="self-center text-sky-400 text-sm" on:click={() => showAllPastJobs = !showAllPastJobs}>
-            {showAllPastJobs ? 'See Less' : 'See More'}
-          </button>
+          {#if job.pastJobs.length > 1}
+              <button class="self-center text-sky-400 text-sm" on:click={() => showAllPastJobs = !showAllPastJobs}>
+                {showAllPastJobs ? 'See Less' : 'See More'}
+              </button>
+            {/if}
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ using sproj.Authentication;
 using Microsoft.EntityFrameworkCore;
 using sproj.Data;
 using sproj.Services;
+using Microsoft.Extensions.Logging;
 
 namespace sproj.Features.Registration;
 
@@ -25,11 +26,13 @@ public class Login : Endpoint<Login.Request, Login.UserResponse> {
             .SingleOrDefaultAsync(u => u.PhoneNumber == normalizedPhoneNumber, ct);
 
         if (user is null) {
+            Logger.LogWarning("Login failed: User is null");
             await SendUnauthorizedAsync(ct);
             return;
         }
 
         if (!PasswordHasher.VerifyHashedPassword(user.Password, req.Password)) {
+            Logger.LogWarning("Password hasher failed");
             await SendUnauthorizedAsync(ct);
             return;
         }

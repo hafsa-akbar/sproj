@@ -94,7 +94,15 @@
 {#if showAddJob}
   <AddJobModal
     on:submit={e => {
-      jobsStore.update(js => [e.detail, ...js]);
+      const newJob = e.detail;
+      newJob.workers = newJob.jobGender === 3
+        ? [
+            { fullName: $authUser.fullName, gender: $authUser.gender },
+            { fullName: $authUser.coupleName, gender: $authUser.gender === 1 ? 2 : 1 }
+          ]
+        : [{ fullName: $authUser.fullName, gender: $authUser.gender }];
+      jobsStore.update(js => [...js, newJob]);
+      showAddJob = false;
     }}
     on:close={() => showAddJob = false}
   />
